@@ -1,0 +1,48 @@
+﻿@model IEnumerable<NewCity.Models.StoryCard>
+
+@{
+    ViewData["Title"] = "Index";
+}
+
+<h2>Index</h2>
+
+<p>
+    <a asp-controller="Home" asp-action="Main">Start this story</a>
+</p>
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.StoryName)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Text)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.IMG)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.BackgroundIMG)
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+@foreach (var item in Model) {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.StoryName)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Text)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.IMG)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.BackgroundIMG)
+            </td>
+        </tr>
+}
+    </tbody>
+</table>
