@@ -5,7 +5,6 @@ F:\VisualStudioProject\NewCity\NewCity\bin\Debug\netcoreapp2.1\NewCity.dll
 F:\VisualStudioProject\NewCity\NewCity\bin\Debug\netcoreapp2.1\NewCity.pdb
 F:\VisualStudioProject\NewCity\NewCity\bin\Debug\netcoreapp2.1\NewCity.Views.dll
 F:\VisualStudioProject\NewCity\NewCity\bin\Debug\netcoreapp2.1\NewCity.Views.pdb
-F:\VisualStudioProject\NewCity\NewCity\obj\Debug\netcoreapp2.1\NewCity.csprojAssemblyReference.cache
 F:\VisualStudioProject\NewCity\NewCity\obj\Debug\netcoreapp2.1\NewCity.csproj.CoreCompileInputs.cache
 F:\VisualStudioProject\NewCity\NewCity\obj\Debug\netcoreapp2.1\NewCity.RazorAssemblyInfo.cache
 F:\VisualStudioProject\NewCity\NewCity\obj\Debug\netcoreapp2.1\NewCity.RazorAssemblyInfo.cs
@@ -39,4 +38,5 @@ F:\VisualStudioProject\NewCity\NewCity\obj\Debug\netcoreapp2.1\Razor\Views\Story
 F:\VisualStudioProject\NewCity\NewCity\obj\Debug\netcoreapp2.1\Razor\Views\StorySeries\Edit.g.cshtml.cs
 F:\VisualStudioProject\NewCity\NewCity\obj\Debug\netcoreapp2.1\Razor\Views\StorySeries\Index.g.cshtml.cs
 F:\VisualStudioProject\NewCity\NewCity\obj\Debug\netcoreapp2.1\Razor\Views\StoryCards\Index.g.cshtml.cs
-F:\VisualStudioProject\NewCity\NewCity\obj\Debug\netcoreapp2.1\Razor\Views\Home\Main.g.cshtml.cs
+F:\VisualStudioProject\NewCity\NewCity\obj\Debug\netcoreapp2.1\Razor\Views\Main\Index.g.cshtml.cs
+F:\VisualStudioProject\NewCity\NewCity\obj\Debug\netcoreapp2.1\NewCity.csprojAssemblyReference.cache

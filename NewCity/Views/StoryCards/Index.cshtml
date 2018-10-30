@@ -1,13 +1,13 @@
 ﻿@model IEnumerable<NewCity.Models.StoryCard>
 
 @{
-    ViewData["Title"] = "Index";
+    ViewData["Title"] = "StoryCard";
 }
 
 <h2>Index</h2>
 
 <p>
-    <a asp-controller="Home" asp-action="Main">Start this story</a>
+    <a asp-controller="Main" asp-action="Index">Start this story</a>
 </p>
 <table class="table">
     <thead>
@@ -24,7 +24,9 @@
             <th>
                 @Html.DisplayNameFor(model => model.BackgroundIMG)
             </th>
-            <th></th>
+            <th>
+                option
+            </th>
         </tr>
     </thead>
     <tbody>
@@ -42,7 +44,21 @@
             <td>
                 @Html.DisplayFor(modelItem => item.BackgroundIMG)
             </td>
+            <td>
+                @foreach(StoryOption option in item.StoryOptions)
+                {
+                   <div>
+                       @option.Text
+                       ||
+                       @option.ID.ToString()
+                   </div>
+                }
+            </td>
         </tr>
 }
+
+      
     </tbody>
+
+
 </table>
