@@ -23,10 +23,12 @@ namespace NewCity.Controllers
         public async Task<IActionResult> Index()
         {
 
-            var card = await _context.StoryCard.Include(s => s.StoryOptions).
-                AsNoTracking().ToListAsync();
-                
+            var card = await _context.StoryCard
+                .Include(s => s.StoryOptions)
+                .AsNoTracking()
+                .ToListAsync();
 
+            ViewBag.ID = card[0].StorySeriesID;
             return View(card);
         }
 
