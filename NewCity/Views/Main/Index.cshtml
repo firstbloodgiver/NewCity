@@ -1,11 +1,32 @@
-﻿
+﻿@model NewCity.Models.StoryCard
+
 @{
     ViewData["Title"] = "Main";
 }
 
 <h2>Main</h2>
 <div class="container-fluid">
-    <div class="col-md-3" style="background-color:aquamarine">ppp</div>
-    <div class="col-md-6" style="background-color:aqua">ppp</div>
-    <div class="col-md-3"style="background-color:burlywood">ppp</div>
+    <div class="col-md-3" style="background-color:aquamarine">
+
+
+    </div>
+    <div class="col-md-6" style="background-color:aqua">
+        @Html.DisplayFor(model => model.StoryName)
+        ||
+        @Html.DisplayFor(model => model.Text)
+        <div>
+            <!--选项-->
+            @foreach (StoryOption storyOption in Model.StoryOptions)
+            {
+            <button type="button" class="btn btn-secondary">
+                @storyOption.Text;
+            </button>
+            }
+        </div>
+
+    </div>
+    <div class="col-md-3" style="background-color:burlywood">
+
+
+    </div>
 </div>

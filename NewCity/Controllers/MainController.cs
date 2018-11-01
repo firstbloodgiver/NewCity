@@ -17,16 +17,25 @@ namespace NewCity.Controllers
             _context = context;
         }
 
-        public async Task<IActionResult> Index(int? storyID)
+        public async Task<IActionResult> Index(Guid? storyID)
         {
-            //TODO 读取出该ID的故事卡片
-            var card = await _context.StoryCard
-                .Include(s => s.StoryOptions)
-                .AsNoTracking()
-                .ToListAsync();
+            // 读取出该ID的故事卡片
+            var card = await _context
+                .StoryCard
+                .FirstOrDefaultAsync(m => m.ID == storyID);
 
 
-            return View();
+
+            return View(card);
+        }
+
+        public async Task<IActionResult> NextCart(Guid storyID)
+        {
+            //TODO 添加反作弊
+            var card = await _context
+               .StoryCard
+               .FirstOrDefaultAsync(m => m.ID == storyID);
+            return View(card);
         }
     }
 }
