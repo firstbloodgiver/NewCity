@@ -68,7 +68,7 @@ using NewCity.Models;
             WriteLiteral("\r\n<h2>Index</h2>\r\n\r\n<p>\r\n    ");
             EndContext();
             BeginContext(120, 37, false);
-            __tagHelperExecutionContext = __tagHelperScopeManager.Begin("a", global::Microsoft.AspNetCore.Razor.TagHelpers.TagMode.StartTagAndEndTag, "429205e9c20e4f73beedd298275e1788", async() => {
+            __tagHelperExecutionContext = __tagHelperScopeManager.Begin("a", global::Microsoft.AspNetCore.Razor.TagHelpers.TagMode.StartTagAndEndTag, "5b3f2eeaf2e240ddbe9a6e05653e8418", async() => {
                 BeginContext(143, 10, true);
                 WriteLiteral("Create New");
                 EndContext();
@@ -128,7 +128,7 @@ using NewCity.Models;
             WriteLiteral("        <tr>\r\n            <td>\r\n                ");
             EndContext();
             BeginContext(664, 101, false);
-            __tagHelperExecutionContext = __tagHelperScopeManager.Begin("a", global::Microsoft.AspNetCore.Razor.TagHelpers.TagMode.StartTagAndEndTag, "dfe6a1e858e24fe1b798cba079a06d6b", async() => {
+            __tagHelperExecutionContext = __tagHelperScopeManager.Begin("a", global::Microsoft.AspNetCore.Razor.TagHelpers.TagMode.StartTagAndEndTag, "94c6644c16cb4d309952150c7f5af50c", async() => {
                 BeginContext(716, 45, false);
 #line 31 "F:\VisualStudioProject\NewCity\NewCity\Views\StorySeries\Index.cshtml"
                                                               Write(Html.DisplayFor(modelItem => item.SeriesName));
@@ -176,7 +176,7 @@ using NewCity.Models;
             WriteLiteral("\r\n            </td>\r\n            <td>\r\n                ");
             EndContext();
             BeginContext(1020, 53, false);
-            __tagHelperExecutionContext = __tagHelperScopeManager.Begin("a", global::Microsoft.AspNetCore.Razor.TagHelpers.TagMode.StartTagAndEndTag, "ffa2fc4c75e24b36bb876ba6ae2a306c", async() => {
+            __tagHelperExecutionContext = __tagHelperScopeManager.Begin("a", global::Microsoft.AspNetCore.Razor.TagHelpers.TagMode.StartTagAndEndTag, "de9c07647b214aa3b657a96251a94abc", async() => {
                 BeginContext(1065, 4, true);
                 WriteLiteral("Edit");
                 EndContext();
@@ -211,7 +211,7 @@ using NewCity.Models;
             WriteLiteral(" |\r\n                ");
             EndContext();
             BeginContext(1093, 59, false);
-            __tagHelperExecutionContext = __tagHelperScopeManager.Begin("a", global::Microsoft.AspNetCore.Razor.TagHelpers.TagMode.StartTagAndEndTag, "e107a0d415cc4dfc9dc7c7539bfcee4c", async() => {
+            __tagHelperExecutionContext = __tagHelperScopeManager.Begin("a", global::Microsoft.AspNetCore.Razor.TagHelpers.TagMode.StartTagAndEndTag, "c21d5f919f164732bcffb8cd43b555a8", async() => {
                 BeginContext(1141, 7, true);
                 WriteLiteral("Details");
                 EndContext();
@@ -246,7 +246,7 @@ using NewCity.Models;
             WriteLiteral(" |\r\n                ");
             EndContext();
             BeginContext(1172, 57, false);
-            __tagHelperExecutionContext = __tagHelperScopeManager.Begin("a", global::Microsoft.AspNetCore.Razor.TagHelpers.TagMode.StartTagAndEndTag, "efc6352c709a4b169c510ee70b72326d", async() => {
+            __tagHelperExecutionContext = __tagHelperScopeManager.Begin("a", global::Microsoft.AspNetCore.Razor.TagHelpers.TagMode.StartTagAndEndTag, "a77b3b83ddcb47cab9c873aedd686a06", async() => {
                 BeginContext(1219, 6, true);
                 WriteLiteral("Delete");
                 EndContext();

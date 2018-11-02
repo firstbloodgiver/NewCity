@@ -1,10 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net.Http;
+using System.Text;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using NewCity.Data;
+using System.Web;
+using Newtonsoft.Json;
+
 
 namespace NewCity.Controllers
 {
@@ -22,20 +27,30 @@ namespace NewCity.Controllers
             // 读取出该ID的故事卡片
             var card = await _context
                 .StoryCard
-                .FirstOrDefaultAsync(m => m.ID == storyID);
+                .Include(s => s.StoryOptions)
+                .FirstOrDefaultAsync(m => m.StorySeriesID == storyID);
 
 
 
             return View(card);
         }
 
-        public async Task<IActionResult> NextCart(Guid storyID)
+
+        [HttpPost]
+        public async Task<JsonResult> NextCart(Guid? storyID)
         {
             //TODO 添加反作弊
             var card = await _context
                .StoryCard
-               .FirstOrDefaultAsync(m => m.ID == storyID);
-            return View(card);
+                .Include(s => s.StoryOptions)
+                .FirstOrDefaultAsync(m => m.ID == storyID);
+
+            var result = Json(card);
+
+            Response.Write(result);
+            return result;
         }
+
+
     }
 }
