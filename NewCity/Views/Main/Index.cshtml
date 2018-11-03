@@ -7,26 +7,44 @@
 <h2>Main</h2>
 <div class="container-fluid">
     <div class="col-md-3" style="background-color:aquamarine">
-
+        1
 
     </div>
     <div class="col-md-6" style="background-color:aqua">
         @Html.DisplayFor(model => model.StoryName)
         ||
         @Html.DisplayFor(model => model.Text)
-        <div>
-            <!--选项-->
-            @foreach (StoryOption storyOption in Model.StoryOptions)
-            {
-            <button type="button" class="btn btn-secondary">
-                @storyOption.Text;
-            </button>
-            }
-        </div>
+        
+
+        @foreach(var option in Model.StoryOptions)
+        {
+            <button onclick="NextCard('@option.NextStoryCardID')">@option.Text</button>
+        }
+
+
 
     </div>
     <div class="col-md-3" style="background-color:burlywood">
-
+        1
 
     </div>
 </div>
+
+
+<script>
+    function NextCard(storyID) {
+        debugger;
+        fetch('/Main/NextCart?storyID=' + storyID, {
+            method: 'post', headers: {
+                "Content-type": "application/x-www-form-urlencoded; charset=UTF-8"
+            },
+            body: 'story='+storyID
+        })
+            .then(function (data) {
+                console.log('Request succeeded with JSON response', data);
+            })
+            .catch(function (error) {
+                console.log('Request failed', error);
+            });
+    }
+</script>
