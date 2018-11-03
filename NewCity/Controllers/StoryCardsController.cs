@@ -22,7 +22,6 @@ namespace NewCity.Controllers
         // GET: StoryCards
         public async Task<IActionResult> Index()
         {
-
             var card = await _context.StoryCard
                 .Include(s => s.StoryOptions)
                 .AsNoTracking()
