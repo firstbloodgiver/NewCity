@@ -34,17 +34,23 @@
 <script>
     function NextCard(storyID) {
         debugger;
+        //$.post(
+        //    '/Main/NextCart?storyID=' + storyID,
+        //    { storyID: storyID },
+        //    function (result) {
+        //        debugger;
+        //        alert(result);
+        //    }
+        //)
+
         fetch('/Main/NextCart?storyID=' + storyID, {
             method: 'post', headers: {
-                "Content-type": "application/x-www-form-urlencoded; charset=UTF-8"
-            },
-            body: 'story='+storyID
+                'Content-Type': 'application/json'
+            }
         })
-            .then(function (data) {
-                console.log('Request succeeded with JSON response', data);
+            .then(function (response) {
+                debugger;
+                alert(response);
             })
-            .catch(function (error) {
-                console.log('Request failed', error);
-            });
     }
 </script>

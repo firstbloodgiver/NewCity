@@ -22,13 +22,13 @@ namespace NewCity.Controllers
             _context = context;
         }
 
-        public async Task<IActionResult> Index(Guid? storyID)
+        public async Task<IActionResult> Index(Guid? StorySeriesID)
         {
             // 读取出该ID的故事卡片
             var card = await _context
                 .StoryCard
                 .Include(s => s.StoryOptions)
-                .FirstOrDefaultAsync(m => m.StorySeriesID == storyID);
+                .FirstOrDefaultAsync(m => m.StorySeriesID == StorySeriesID);
 
 
 
@@ -45,10 +45,8 @@ namespace NewCity.Controllers
                 .Include(s => s.StoryOptions)
                 .FirstOrDefaultAsync(m => m.ID == storyID);
 
-            var result = Json(card);
-
-            Response.Write(result);
-            return result;
+            
+            return Json(card);
         }
 
 
