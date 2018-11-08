@@ -3,15 +3,17 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using NewCity.Data;
 
 namespace NewCity.Data.Migrations
 {
     [DbContext(typeof(NewCItyDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20181108160933_Initial2018119")]
+    partial class Initial2018119
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -184,28 +186,6 @@ namespace NewCity.Data.Migrations
                     b.ToTable("AspNetUserTokens");
                 });
 
-            modelBuilder.Entity("NewCity.Models.CharacterSchedule", b =>
-                {
-                    b.Property<Guid>("ID")
-                        .ValueGeneratedOnAdd();
-
-                    b.Property<Guid>("CharacterID");
-
-                    b.Property<bool>("IsMain");
-
-                    b.Property<Guid>("StoryCardID");
-
-                    b.Property<Guid>("StorySeriesID");
-
-                    b.Property<Guid?>("UserCharacterID");
-
-                    b.HasKey("ID");
-
-                    b.HasIndex("UserCharacterID");
-
-                    b.ToTable("CharacterSchedule");
-                });
-
             modelBuilder.Entity("NewCity.Models.StoryCard", b =>
                 {
                     b.Property<Guid>("ID")
@@ -262,20 +242,6 @@ namespace NewCity.Data.Migrations
                     b.ToTable("StorySeries");
                 });
 
-            modelBuilder.Entity("NewCity.Models.UserCharacter", b =>
-                {
-                    b.Property<Guid>("ID")
-                        .ValueGeneratedOnAdd();
-
-                    b.Property<string>("CharacterName");
-
-                    b.Property<Guid>("UserId");
-
-                    b.HasKey("ID");
-
-                    b.ToTable("UserCharacter");
-                });
-
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
                 {
                     b.HasOne("Microsoft.AspNetCore.Identity.IdentityRole")
@@ -319,13 +285,6 @@ namespace NewCity.Data.Migrations
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade);
-                });
-
-            modelBuilder.Entity("NewCity.Models.CharacterSchedule", b =>
-                {
-                    b.HasOne("NewCity.Models.UserCharacter")
-                        .WithMany("CharacterSchedules")
-                        .HasForeignKey("UserCharacterID");
                 });
 
             modelBuilder.Entity("NewCity.Models.StoryCard", b =>

@@ -11,18 +11,26 @@
 
     </div>
     <div class="col-md-6" style="background-color:aqua">
-        @Html.DisplayFor(model => model.StoryName)
-        ||
-        @Html.DisplayFor(model => model.Text)
-        
 
-        @foreach(var option in Model.StoryOptions)
-        {
-            <button onclick="NextCard('@option.NextStoryCardID')">@option.Text</button>
-        }
-
-
-
+        <div class="row">
+            <div id="Img" class="col-md-4">
+                @*<img src="@Html.DisplayFor(model=>model.IMG)"/>*@
+                @Html.DisplayFor(model => model.IMG)
+            </div>
+            <div id="Content" class="col-md-8">
+                <div>
+                    @Html.DisplayFor(model => model.Text)
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div id="Option">
+                @foreach (var option in Model.StoryOptions)
+                {
+                    <button onclick="NextCard('@option.NextStoryCardID')">@option.Text</button>
+                }
+            </div>
+        </div>
     </div>
     <div class="col-md-3" style="background-color:burlywood">
         1
@@ -33,24 +41,40 @@
 
 <script>
     function NextCard(storyID) {
-        debugger;
-        //$.post(
-        //    '/Main/NextCart?storyID=' + storyID,
-        //    { storyID: storyID },
-        //    function (result) {
-        //        debugger;
-        //        alert(result);
-        //    }
-        //)
-
-        fetch('/Main/NextCart?storyID=' + storyID, {
-            method: 'post', headers: {
-                'Content-Type': 'application/json'
-            }
-        })
-            .then(function (response) {
+        $.post(
+            '/Main/NextCart?storyID=' + storyID,
+            { storyID: storyID },
+            function (result) {
                 debugger;
-                alert(response);
-            })
+                CleanContent();
+                AddContent(result.text);
+                AddOption(result)
+            }
+        )
+
     }
+
+    //添加选项
+    function AddOption(option) {
+        for (let i = 1; i < option.length; i++) {
+            if (option.NextCard) {
+                $('#Option').append("< button onclick = "+NextCard(option.NextStoryCardID)+" > option.Text</button >")
+            }
+
+        }
+    }
+    //添加内容框内容
+    function AddContent(text) {
+
+        $('#Content').append("<div>"+text+"</div>");
+       
+    }
+    //清除内容框
+    function CleanContent() {
+        $('#Content').children().remove();
+        $('#Img').children().remove();
+        $('#Option').children().remove();
+    }
+
+   
 </script>
