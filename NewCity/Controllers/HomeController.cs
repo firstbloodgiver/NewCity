@@ -5,13 +5,24 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using NewCity.Models;
+using Microsoft.AspNetCore.Identity;
 
 namespace NewCity.Controllers
 {
     public class HomeController : Controller
     {
-        public IActionResult Index()
+        private readonly UserManager<IdentityUser> _userManager;
+
+        public HomeController(UserManager<IdentityUser> userManager)
         {
+              _userManager = userManager;
+        }
+
+        public async Task<IActionResult> Index()
+        {
+            IdentityUser user = await _userManager.GetUserAsync(HttpContext.User);
+            
+
             return View();
         }
 
