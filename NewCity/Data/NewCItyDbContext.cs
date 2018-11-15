@@ -7,9 +7,9 @@ using NewCity.Models;
 
 namespace NewCity.Data
 {
-    public class NewCItyDbContext : IdentityDbContext
+    public class NewCityDbContext : IdentityDbContext
     {
-        public NewCItyDbContext(DbContextOptions<NewCItyDbContext> options)
+        public NewCityDbContext(DbContextOptions<NewCityDbContext> options)
             : base(options)
         {
         }

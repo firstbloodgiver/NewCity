@@ -15,9 +15,9 @@ namespace NewCity.Controllers
 {
     public class MainController : Controller
     {
-        private readonly NewCItyDbContext _context;
+        private readonly NewCityDbContext _context;
 
-        public MainController(NewCItyDbContext context)
+        public MainController(NewCityDbContext context)
         {
             _context = context;
         }

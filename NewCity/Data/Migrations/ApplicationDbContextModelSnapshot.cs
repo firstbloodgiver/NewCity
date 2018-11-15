@@ -8,7 +8,7 @@ using NewCity.Data;
 
 namespace NewCity.Data.Migrations
 {
-    [DbContext(typeof(NewCItyDbContext))]
+    [DbContext(typeof(NewCityDbContext))]
     partial class ApplicationDbContextModelSnapshot : ModelSnapshot
     {
         protected override void BuildModel(ModelBuilder modelBuilder)

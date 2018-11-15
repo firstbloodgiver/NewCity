@@ -64,7 +64,7 @@ using NewCity.Models;
             WriteLiteral("\r\n<h2>Index</h2>\r\n\r\n<p>\r\n    ");
             EndContext();
             BeginContext(122, 102, false);
-            __tagHelperExecutionContext = __tagHelperScopeManager.Begin("a", global::Microsoft.AspNetCore.Razor.TagHelpers.TagMode.StartTagAndEndTag, "dd67a85b2b654c6b94367c9e7096b36f", async() => {
+            __tagHelperExecutionContext = __tagHelperScopeManager.Begin("a", global::Microsoft.AspNetCore.Razor.TagHelpers.TagMode.StartTagAndEndTag, "3d9c17b1d3a14e28bcae8b8390509495", async() => {
                 BeginContext(204, 16, true);
                 WriteLiteral("Start this story");
                 EndContext();

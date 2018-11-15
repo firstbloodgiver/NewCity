@@ -15,16 +15,19 @@ namespace NewCity.Controllers
 
         public HomeController(UserManager<IdentityUser> userManager)
         {
-              _userManager = userManager;
+            _userManager = userManager;
         }
 
         public async Task<IActionResult> Index()
         {
             IdentityUser user = await _userManager.GetUserAsync(HttpContext.User);
-            
+
 
             return View();
         }
+
+
+
 
         public IActionResult About()
         {

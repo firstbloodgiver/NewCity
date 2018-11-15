@@ -82,3 +82,8 @@ C:\Users\ryr\Source\Repos\NewCity\NewCity\obj\Debug\netcoreapp2.1\NewCity.Views.
 C:\Users\ryr\Source\Repos\NewCity\NewCity\obj\Debug\netcoreapp2.1\NewCity.dll
 C:\Users\ryr\Source\Repos\NewCity\NewCity\obj\Debug\netcoreapp2.1\NewCity.pdb
 C:\Users\ryr\Source\Repos\NewCity\NewCity\obj\Debug\netcoreapp2.1\NewCity.csproj.CopyComplete
+F:\VisualStudioProject\NewCity\NewCity\obj\Debug\netcoreapp2.1\Razor\Areas\Identity\Pages\Account\Login.g.cshtml.cs
+F:\VisualStudioProject\NewCity\NewCity\obj\Debug\netcoreapp2.1\Razor\Areas\Identity\Pages\Account\Logout.g.cshtml.cs
+F:\VisualStudioProject\NewCity\NewCity\obj\Debug\netcoreapp2.1\Razor\Areas\Identity\Pages\Account\_ViewImports.g.cshtml.cs
+F:\VisualStudioProject\NewCity\NewCity\obj\Debug\netcoreapp2.1\Razor\Areas\Identity\Pages\_ValidationScriptsPartial.g.cshtml.cs
+F:\VisualStudioProject\NewCity\NewCity\obj\Debug\netcoreapp2.1\Razor\Areas\Identity\Pages\_ViewImports.g.cshtml.cs

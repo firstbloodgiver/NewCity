@@ -34,11 +34,11 @@ namespace NewCity
                 options.MinimumSameSitePolicy = SameSiteMode.None;
             });
 
-            services.AddDbContext<NewCItyDbContext>(options =>
+            services.AddDbContext<NewCityDbContext>(options =>
                 options.UseSqlServer(
                     Configuration.GetConnectionString("DefaultConnection")));
             services.AddDefaultIdentity<IdentityUser>()
-                .AddEntityFrameworkStores<NewCItyDbContext>();
+                .AddEntityFrameworkStores<NewCityDbContext>();
 
             services.Configure<IdentityOptions>(options =>
             {
@@ -91,6 +91,7 @@ namespace NewCity
 
             app.UseHttpsRedirection();
             app.UseStaticFiles();
+            
             app.UseCookiePolicy();
 
             app.UseAuthentication();

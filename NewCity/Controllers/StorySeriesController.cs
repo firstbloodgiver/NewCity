@@ -12,9 +12,9 @@ namespace NewCity.Controllers
 {
     public class StorySeriesController : Controller
     {
-        private readonly NewCItyDbContext _context;
+        private readonly NewCityDbContext _context;
 
-        public StorySeriesController(NewCItyDbContext context)
+        public StorySeriesController(NewCityDbContext context)
         {
             _context = context;
         }

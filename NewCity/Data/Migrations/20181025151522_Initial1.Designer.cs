@@ -9,7 +9,7 @@ using NewCity.Data;
 
 namespace NewCity.Data.Migrations
 {
-    [DbContext(typeof(NewCItyDbContext))]
+    [DbContext(typeof(NewCityDbContext))]
     [Migration("20181025151522_Initial1")]
     partial class Initial1
     {
