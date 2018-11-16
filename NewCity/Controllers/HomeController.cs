@@ -11,18 +11,20 @@ namespace NewCity.Controllers
 {
     public class HomeController : Controller
     {
-        private readonly UserManager<IdentityUser> _userManager;
+        private readonly SignInManager<IdentityUser> _SignInManager;
+        //private readonly UserManager<IdentityUser> _userManager;
 
-        public HomeController(UserManager<IdentityUser> userManager)
+        public HomeController(SignInManager<IdentityUser> SignInManager)
         {
-            _userManager = userManager;
+            _SignInManager = SignInManager;
         }
 
-        public async Task<IActionResult> Index()
+        public IActionResult Index()
         {
-            IdentityUser user = await _userManager.GetUserAsync(HttpContext.User);
-
-
+            if (_SignInManager.IsSignedIn(User))
+            {
+                return RedirectToAction("Index", "StorySeries");
+            }
             return View();
         }
 
