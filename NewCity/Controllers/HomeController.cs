@@ -23,7 +23,7 @@ namespace NewCity.Controllers
         {
             if (_SignInManager.IsSignedIn(User))
             {
-                return RedirectToAction("Index", "StorySeries");
+                return RedirectToAction("Index", "Main");
             }
             return View();
         }
