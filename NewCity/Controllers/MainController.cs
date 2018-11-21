@@ -26,34 +26,20 @@ namespace NewCity.Controllers
             _userManager = userManager;
         }
 
-        public async Task<IActionResult> Index()
+        public IActionResult Index()
         {
             var userid = Guid.Parse(_userManager.GetUserId(User));
-            var list = await _context.UserCharacter.Where(p => p.UserId == userid)
-                .Join(_context.CharacterSchedule, u => u.ID, c => c.CharacterID, (u, c) => new { CNStorySeriesID = c.StorySeriesID }).ToArrayAsync();
-
+            var list =  _context.UserCharacter.Where(p => p.UserId == userid)
+                .Join(_context.CharacterSchedule, u => u.ID, c => c.CharacterID, (u, c) => new { CNStorySeriesID = c.StorySeriesID }).ToList()
+                .Join(_context.StorySeries, a => a.CNStorySeriesID, b => b.ID, (a, b) => new { storyseries = b.SeriesName }).ToArray();
 
             return View(list);
         }
 
-        //public async Task<IActionResult> Index(Guid? StorySeriesID)
-        //{
-        //    // 读取出该ID的故事卡片
-        //    var card = await _context
-        //        .StoryCard
-        //        .Include(s => s.StoryOptions)
-        //        .FirstOrDefaultAsync(m => m.StorySeriesID == StorySeriesID);
-
-
-
-        //    return View(card);
-        //}
-
-
         [HttpPost]
         public async Task<JsonResult> NextCart(Guid? storyID)
         {
-            //TODO 添加反作弊
+
             var card = await _context
                .StoryCard
                 .Include(s => s.StoryOptions)
