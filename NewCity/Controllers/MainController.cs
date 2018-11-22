@@ -30,10 +30,23 @@ namespace NewCity.Controllers
         {
             var userid = Guid.Parse(_userManager.GetUserId(User));
             var list =  _context.UserCharacter.Where(p => p.UserId == userid)
-                .Join(_context.CharacterSchedule, u => u.ID, c => c.CharacterID, (u, c) => new { CNStorySeriesID = c.StorySeriesID }).ToList()
-                .Join(_context.StorySeries, a => a.CNStorySeriesID, b => b.ID, (a, b) => new { storyseries = b.SeriesName }).ToArray();
+                .Join(_context.CharacterSchedule, u => u.ID, c => c.CharacterID, (u, c) => new { SeriesID = c.StorySeriesID ,c.StoryCardID}).ToList()
+                .Join(_context.StorySeries, a => a.SeriesID, b => b.ID, (a, b) => new { StorySeriesName = b.SeriesName, StorySeriesID =b.ID , NextStoryCard = a.StoryCardID}).ToList();
 
-            return View(list);
+            List<Mainlist> mainlists = new List<Mainlist>();
+
+            foreach(var item in list)
+            {
+                Mainlist mainlist = new Mainlist();
+                mainlist.StorySeriesID = item.StorySeriesID;
+                mainlist.NextStoryCard = item.NextStoryCard;
+                mainlist.StorySeriesName = item.StorySeriesName;
+                mainlists.Add(mainlist);
+            }
+
+            ViewBag.list=mainlists;
+
+            return View();
         }
 
         [HttpPost]
@@ -49,6 +62,14 @@ namespace NewCity.Controllers
             return Json(card);
         }
 
+        public class Mainlist
+        {
+            public string StorySeriesName = string.Empty;
+            public Guid StorySeriesID;
+            public Guid NextStoryCard;
+        }
+
 
     }
+
 }
