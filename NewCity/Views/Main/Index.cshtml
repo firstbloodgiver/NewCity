@@ -12,18 +12,14 @@
     <div class="col-md-6" style="background-color:aqua">
 
         <div class="row">
-            <div id="Img" class="col-md-4">
-                Img
-            </div>
-            <div id="Content" class="col-md-8">
-                @foreach (var item in ViewBag.list)
-                {
-                    <div class="row">
-                        <p>@item.StorySeriesName</p>
-                        <button class="btn btn-default" type="submit" onclick="NextCard(@item.NextStoryCard)">继续</button>
-                    </div>
-                }
-            </div>
+            @if (ViewBag.InLocation)
+            {
+                
+            }
+            else
+            {
+
+            }
         </div>
         <div class="row">
             <div id="Option">

@@ -14,6 +14,9 @@ namespace NewCity.Models
         public Guid Author { get; set; }
         public DateTime Creationdate { get; set; }
 
+        public string IMG { get; set; }
+        public string Text { get; set; }
+
         /// <summary>
         /// 出现条件
         /// </summary>

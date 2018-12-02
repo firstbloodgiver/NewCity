@@ -11,7 +11,7 @@ namespace NewCity.Models
         public Guid ID { get; set; }
 
         /// <summary>
-        /// 地点介绍
+        /// 地点介绍 
         /// </summary>
         public string Introduction { get; set; }
 
@@ -19,8 +19,7 @@ namespace NewCity.Models
         /// 地点坐标
         /// </summary>
         public string Coordinate { get; set; }
-
-
+  
         
     }
 }

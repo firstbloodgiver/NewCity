@@ -24,27 +24,35 @@ namespace NewCity.Controllers
         {
             _context = context;
             _userManager = userManager;
+            
         }
 
         public IActionResult Index()
         {
             var userid = Guid.Parse(_userManager.GetUserId(User));
-            var list =  _context.UserCharacter.Where(p => p.UserId == userid)
-                .Join(_context.CharacterSchedule, u => u.ID, c => c.CharacterID, (u, c) => new { SeriesID = c.StorySeriesID ,c.StoryCardID}).ToList()
-                .Join(_context.StorySeries, a => a.SeriesID, b => b.ID, (a, b) => new { StorySeriesName = b.SeriesName, StorySeriesID =b.ID , NextStoryCard = a.StoryCardID}).ToList();
+            List<Mainlist> list = new List<Mainlist>();
+            Guid StorySeriesID = Guid.Empty;
+            
+            List<StoryCard> OperaList = new List<StoryCard>();
 
-            List<Mainlist> mainlists = new List<Mainlist>();
-
-            foreach(var item in list)
+            //是否在场景
+            if (InLocation(userid, out StorySeriesID))
             {
-                Mainlist mainlist = new Mainlist();
-                mainlist.StorySeriesID = item.StorySeriesID;
-                mainlist.NextStoryCard = item.NextStoryCard;
-                mainlist.StorySeriesName = item.StorySeriesName;
-                mainlists.Add(mainlist);
+                StorySeries ReadList = new StorySeries();
+                ReadList = _context.StorySeries.Where(s => s.ID == StorySeriesID).FirstOrDefault();
+                OperaList = _context.StoryCard.Where(s => s.StorySeriesID == StorySeriesID).Where(s =>check(s.flag)==true).ToList();
+                ViewBag.ReadList = ReadList;
+                ViewBag.OperaList = list;
             }
-
-            ViewBag.list=mainlists;
+            else
+            {
+                StoryCard ReadList = new StoryCard();
+                var storycardID = _context.UserCharacter.Where(a => a.UserId == userid)
+                    .Join(_context.CharacterSchedule, a => a.ID, b => b.CharacterID, (a, b) => new { storycardID = b.StoryCardID }).FirstOrDefault();
+                ReadList = _context.StoryCard.Where(a => a.ID == storycardID.storycardID).FirstOrDefault();
+                ViewBag.ReadList = ReadList;
+            }
+            
 
             return View();
         }
@@ -62,11 +70,44 @@ namespace NewCity.Controllers
             return Json(card);
         }
 
+        /// <summary>
+        /// 检查是否符合显示条件
+        /// </summary>
+        /// <param name="a"></param>
+        /// <returns></returns>
+        private bool check(string a)
+        {
+            return false;
+        }
+
+        private bool InLocation(Guid userid, out Guid StorySeriesID)
+        {
+            var location = _context.UserCharacter.Where(p => p.UserId == userid)
+                .Join(_context.CharacterSchedule,u => u.ID,c => c.CharacterID,(u,c)=>new { c.IsStory,c.StorySeriesID }).ToList();
+
+            StorySeriesID = Guid.Empty;
+
+            foreach (var state in location)
+            {
+                if(state.IsStory == true)
+                {
+                    StorySeriesID = state.StorySeriesID;
+                    ViewBag.InLocation = true;
+                    return true;
+                }
+            }
+
+            return false;
+        }
+        /// <summary>
+        /// 返回主界面的场景信息
+        /// </summary>
         public class Mainlist
         {
             public string StorySeriesName = string.Empty;
             public Guid StorySeriesID;
             public Guid NextStoryCard;
+
         }
 
 
