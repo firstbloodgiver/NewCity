@@ -1,6 +1,7 @@
 ﻿
 @{
     ViewData["Title"] = "Main";
+    
 }
 
 <h2>Main</h2>
@@ -14,11 +15,34 @@
         <div class="row">
             @if (ViewBag.InLocation)
             {
-                
+                <div class="col-md-4">
+                    <img src="@ViewBag.ReadList.IMG" />
+                </div>
+                <div class="col-md-8">
+                    <p>@ViewBag.ReadList.Text</p>
+                </div>
+                @foreach (var option in ViewBag.OperaList)
+                {
+                    <div class="row">
+                        <p>@option.StorySeriesName</p>
+                        <button class="btn-default" onclick="NextCard(@option.NextStoryCard)">继续</button>
+                    </div>
+                }
             }
             else
             {
-
+                <div class="col-md-4">
+                    <img src="@ViewBag.ReadList.IMG" />
+                </div>
+                <div class="col-md-8">
+                    <p>@ViewBag.ReadList.Text</p>
+                    @foreach (var option in ViewBag.ReadList.StoryOptions)
+                    {
+                        <div class="row">
+                            <button class="btn-default" onclick="NextCard(@option.NextStoryCardID)">@option.Text</button>
+                        </div>
+                    }
+                </div>
             }
         </div>
         <div class="row">

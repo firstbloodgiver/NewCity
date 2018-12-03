@@ -49,7 +49,7 @@ namespace NewCity.Controllers
                 StoryCard ReadList = new StoryCard();
                 var storycardID = _context.UserCharacter.Where(a => a.UserId == userid)
                     .Join(_context.CharacterSchedule, a => a.ID, b => b.CharacterID, (a, b) => new { storycardID = b.StoryCardID }).FirstOrDefault();
-                ReadList = _context.StoryCard.Where(a => a.ID == storycardID.storycardID).FirstOrDefault();
+                ReadList = _context.StoryCard.Include(a=>a.StoryOptions).AsNoTracking().SingleOrDefault(a => a.ID == storycardID.storycardID);
                 ViewBag.ReadList = ReadList;
             }
             
@@ -99,6 +99,7 @@ namespace NewCity.Controllers
 
             return false;
         }
+        
         /// <summary>
         /// 返回主界面的场景信息
         /// </summary>
