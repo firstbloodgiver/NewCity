@@ -19,6 +19,7 @@ namespace NewCity.Controllers
             _SignInManager = SignInManager;
         }
 
+        
         public IActionResult Index()
         {
             if (_SignInManager.IsSignedIn(User))

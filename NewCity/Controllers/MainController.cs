@@ -30,10 +30,11 @@ namespace NewCity.Controllers
         public IActionResult Index()
         {
             var userid = Guid.Parse(_userManager.GetUserId(User));
-            List<Mainlist> list = new List<Mainlist>();
+
             Guid StorySeriesID = Guid.Empty;
             
             List<StoryCard> OperaList = new List<StoryCard>();
+
 
             //是否在场景
             if (InLocation(userid, out StorySeriesID))
@@ -42,13 +43,13 @@ namespace NewCity.Controllers
                 ReadList = _context.StorySeries.Where(s => s.ID == StorySeriesID).FirstOrDefault();
                 OperaList = _context.StoryCard.Where(s => s.StorySeriesID == StorySeriesID).Where(s =>check(s.flag)==true).ToList();
                 ViewBag.ReadList = ReadList;
-                ViewBag.OperaList = list;
+                ViewBag.OperaList = OperaList;
             }
             else
             {
                 StoryCard ReadList = new StoryCard();
                 var storycardID = _context.UserCharacter.Where(a => a.UserId == userid)
-                    .Join(_context.CharacterSchedule, a => a.ID, b => b.CharacterID, (a, b) => new { storycardID = b.StoryCardID }).FirstOrDefault();
+                    .Join(_context.CharacterSchedule, a => a.ID, b => b.CharacterID, (a, b) => new { storycardID = b.StoryCardID,b.IsMain }).FirstOrDefault(b=>b.IsMain==true);
                 ReadList = _context.StoryCard.Include(a=>a.StoryOptions).AsNoTracking().SingleOrDefault(a => a.ID == storycardID.storycardID);
                 ViewBag.ReadList = ReadList;
             }
@@ -92,24 +93,15 @@ namespace NewCity.Controllers
                 if(state.IsStory == true)
                 {
                     StorySeriesID = state.StorySeriesID;
-                    ViewBag.InLocation = true;
-                    return true;
+                    ViewBag.InLocation = false;
+                    return false;
                 }
             }
-
-            return false;
+            ViewBag.InLocation = true;
+            return true;
         }
         
-        /// <summary>
-        /// 返回主界面的场景信息
-        /// </summary>
-        public class Mainlist
-        {
-            public string StorySeriesName = string.Empty;
-            public Guid StorySeriesID;
-            public Guid NextStoryCard;
 
-        }
 
 
     }

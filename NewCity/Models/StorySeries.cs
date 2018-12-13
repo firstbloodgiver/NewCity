@@ -27,6 +27,11 @@ namespace NewCity.Models
         /// </summary>
         public bool IsPlayed { get; set; }
 
+        /// <summary>
+        /// 是否测试
+        /// </summary>
+        public bool IsTest { get; set; }
+
         public ICollection<StoryCard> StoryCards { get; set; }
     }
 }
