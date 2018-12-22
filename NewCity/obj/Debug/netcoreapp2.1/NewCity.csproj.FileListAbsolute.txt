@@ -39,7 +39,6 @@ F:\VisualStudioProject\NewCity\NewCity\obj\Debug\netcoreapp2.1\Razor\Views\Story
 F:\VisualStudioProject\NewCity\NewCity\obj\Debug\netcoreapp2.1\Razor\Views\StorySeries\Index.g.cshtml.cs
 F:\VisualStudioProject\NewCity\NewCity\obj\Debug\netcoreapp2.1\Razor\Views\StoryCards\Index.g.cshtml.cs
 F:\VisualStudioProject\NewCity\NewCity\obj\Debug\netcoreapp2.1\Razor\Views\Main\Index.g.cshtml.cs
-F:\VisualStudioProject\NewCity\NewCity\obj\Debug\netcoreapp2.1\NewCity.csprojAssemblyReference.cache
 C:\Users\ryr\Source\Repos\NewCity\NewCity\bin\Debug\netcoreapp2.1\NewCity.deps.json
 C:\Users\ryr\Source\Repos\NewCity\NewCity\bin\Debug\netcoreapp2.1\NewCity.runtimeconfig.json
 C:\Users\ryr\Source\Repos\NewCity\NewCity\bin\Debug\netcoreapp2.1\NewCity.runtimeconfig.dev.json
@@ -87,3 +86,5 @@ F:\VisualStudioProject\NewCity\NewCity\obj\Debug\netcoreapp2.1\Razor\Areas\Ident
 F:\VisualStudioProject\NewCity\NewCity\obj\Debug\netcoreapp2.1\Razor\Areas\Identity\Pages\Account\_ViewImports.g.cshtml.cs
 F:\VisualStudioProject\NewCity\NewCity\obj\Debug\netcoreapp2.1\Razor\Areas\Identity\Pages\_ValidationScriptsPartial.g.cshtml.cs
 F:\VisualStudioProject\NewCity\NewCity\obj\Debug\netcoreapp2.1\Razor\Areas\Identity\Pages\_ViewImports.g.cshtml.cs
+F:\VisualStudioProject\NewCity\NewCity\obj\Debug\netcoreapp2.1\Razor\Views\Creator\Index.g.cshtml.cs
+F:\VisualStudioProject\NewCity\NewCity\obj\Debug\netcoreapp2.1\NewCity.csprojAssemblyReference.cache
