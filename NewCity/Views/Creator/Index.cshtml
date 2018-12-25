@@ -20,7 +20,7 @@
                 <div>
                     @item.Text
                 </div>
-                <a asp-action="Edit" asp-route-id="@item.ID">编辑</a>
+                <a asp-controller="CreateStory" asp-action="Index" asp-route-id="@item.ID">编辑</a>
                 <a>启用</a>
                 <a>删除</a>
             </div>

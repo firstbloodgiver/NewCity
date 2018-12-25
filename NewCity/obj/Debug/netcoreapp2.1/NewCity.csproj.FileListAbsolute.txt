@@ -88,3 +88,4 @@ F:\VisualStudioProject\NewCity\NewCity\obj\Debug\netcoreapp2.1\Razor\Areas\Ident
 F:\VisualStudioProject\NewCity\NewCity\obj\Debug\netcoreapp2.1\Razor\Areas\Identity\Pages\_ViewImports.g.cshtml.cs
 F:\VisualStudioProject\NewCity\NewCity\obj\Debug\netcoreapp2.1\Razor\Views\Creator\Index.g.cshtml.cs
 F:\VisualStudioProject\NewCity\NewCity\obj\Debug\netcoreapp2.1\NewCity.csprojAssemblyReference.cache
+F:\VisualStudioProject\NewCity\NewCity\obj\Debug\netcoreapp2.1\Razor\Views\CreateStory\Index.g.cshtml.cs
