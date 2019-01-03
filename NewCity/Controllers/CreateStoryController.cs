@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using NewCity.Data;
 using NewCity.Models;
+using Newtonsoft.Json;
 
 namespace NewCity.Controllers
 {
@@ -15,7 +16,7 @@ namespace NewCity.Controllers
         private readonly SignInManager<IdentityUser> _SignInManager;
         private readonly UserManager<IdentityUser> _userManager;
         private readonly NewCityDbContext _context;
-
+        
         public CreateStoryController(SignInManager<IdentityUser> SignInManager, UserManager<IdentityUser> UserManager, NewCityDbContext context) {
             _SignInManager = SignInManager;
             _userManager = UserManager;
@@ -25,8 +26,23 @@ namespace NewCity.Controllers
         public IActionResult Index(string storySeriID)
         {
             List<StoryCard> storyCards = _context.StoryCard.Where(a => a.StorySeriesID == Guid.Parse(storySeriID)).ToList();
-            //在列表中按照下一项排序
-            return View();
+            
+           
+            return View(storyCards);
         }
+
+        /// <summary>
+        /// 返回故事卡信息
+        /// </summary>
+        /// <param name="ID"></param>
+        /// <returns></returns>
+        public string GetCard(string ID)
+        {
+            StoryCard storyCard = _context.StoryCard.Where(a => a.ID == Guid.Parse(ID)).FirstOrDefault();
+            return JsonConvert.SerializeObject(storyCard);
+        }
+
+
+
     }
 }

@@ -12,7 +12,7 @@ namespace NewCity.Controllers
     public class HomeController : Controller
     {
         private readonly SignInManager<IdentityUser> _SignInManager;
-        //private readonly UserManager<IdentityUser> _userManager;
+
 
         public HomeController(SignInManager<IdentityUser> SignInManager)
         {
