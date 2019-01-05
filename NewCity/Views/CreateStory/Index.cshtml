@@ -1,16 +1,54 @@
-﻿@model NewCity.Models.StorySeries
+﻿@model IEnumerable<NewCity.Models.StoryCard>
 @{
     ViewData["Title"] = "Creator";
-    List<StorySeries> storySeries = ViewBag.storySeries as List<StorySeries>;
 }
 
-
+<!--故事卡包装为树。新建下一故事卡要在故事卡里面建-->
 <div class="container-fluid">
     <div class="row">
-        <button class="btn btn-default">增加</button>
-    </div>
-    <div class="row">
-        <div class="col-md-4">树</div>
-        <div class="col-md-8"></div>
+        <div class="col-md-4">tree</div>
+        <div class="col-md-8">
+            <div class="row">
+                <div id="StoryId">
+
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-4" id="Img">
+                    <!--img-->
+                </div>
+                <div class="col-md-8" id="Content">
+                    <!--text-->
+                </div>
+            </div>
+            <div class="row" id="Option">
+
+                <button type="button" onclick="AddOption()">增加</button>
+            </div>
+            <div class="row">
+                <button type="button" class="btn" onclick="Save()">保存</button>
+            </div>
+        </div>
     </div>
 </div>
+
+<script>
+    $(document).ready(function () {
+        //返回第一个故事卡到主页面
+    })
+
+
+    function GetStoryCard() {
+        //点击树加载该故事卡到主页面
+        
+    }
+
+    function Save() {
+        
+    }
+
+    function AddOption() {
+
+    }
+</script>
+

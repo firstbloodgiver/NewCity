@@ -12,7 +12,6 @@ namespace NewCity.Controllers
 {
     public class CreateStoryController : Controller
     {
-
         private readonly SignInManager<IdentityUser> _SignInManager;
         private readonly UserManager<IdentityUser> _userManager;
         private readonly NewCityDbContext _context;
@@ -27,7 +26,6 @@ namespace NewCity.Controllers
         {
             List<StoryCard> storyCards = _context.StoryCard.Where(a => a.StorySeriesID == Guid.Parse(storySeriID)).ToList();
             
-           
             return View(storyCards);
         }
 
