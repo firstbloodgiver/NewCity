@@ -10,20 +10,34 @@
         <div class="col-md-8">
             <div class="row">
                 <div id="StoryId">
-
+                    @Model.First().ID
+                </div>
+                <div id="StoryName">
+                    @Model.First().StoryName
                 </div>
             </div>
             <div class="row">
                 <div class="col-md-4" id="Img">
                     <!--img-->
+                    @Model.First().IMG
                 </div>
                 <div class="col-md-8" id="Content">
+                    @Model.First().Text
                     <!--text-->
                 </div>
             </div>
             <div class="row" id="Option">
-
-                <button type="button" onclick="AddOption()">增加</button>
+                @foreach (var item in Model.First().StoryOptions)
+                {
+                    <div class="row" id="@item.ID">
+                        <button type="button"onclick="Condition('@item.ID')" >条件</button>
+                        <button type="button">@item.Text</button>
+                        <button type="button" onclick="Effect('@item.ID')">效果</button>
+                        <button type="button" onclick="Cancel('@item.ID')">取消</button>
+                        <button type="button" onclick="NextCard('@item.ID')">→</button>
+                    </div>
+                }
+                <button type="button" onclick="AddOption()">增加</button>foreach
             </div>
             <div class="row">
                 <button type="button" class="btn" onclick="Save()">保存</button>
@@ -35,6 +49,7 @@
 <script>
     $(document).ready(function () {
         //返回第一个故事卡到主页面
+        //加载树
     })
 
 
@@ -50,5 +65,30 @@
     function AddOption() {
 
     }
+
+    //设置条件
+    function Condition(optionid) {
+        //出现模态框
+        //选择条件类型 人物参数/故事状态 参数 < > = trul false 123456789 10 json[{name=speed,条件=大于,value=6}] 
+        //保存 添加到list 
+        //保存数据库
+    }
+
+    //设置效果
+    function Effect(optionid) {
+
+    }
+
+    //取消选项
+    function Cancel(optionid) {
+
+    }
+
+    //下一张卡
+    function NextCard(optionid) {
+
+    }
+
+
 </script>
 

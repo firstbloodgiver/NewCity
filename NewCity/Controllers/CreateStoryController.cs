@@ -36,10 +36,12 @@ namespace NewCity.Controllers
         /// <returns></returns>
         public string GetCard(string ID)
         {
+            
             StoryCard storyCard = _context.StoryCard.Where(a => a.ID == Guid.Parse(ID)).FirstOrDefault();
             return JsonConvert.SerializeObject(storyCard);
         }
 
+        
 
 
     }
