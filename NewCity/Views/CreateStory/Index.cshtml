@@ -46,6 +46,11 @@
     </div>
 </div>
 
+<!--条件模态框-->
+<div id="Condition" class="modal fade">
+    
+</div>
+
 <script>
     $(document).ready(function () {
         //返回第一个故事卡到主页面
@@ -68,10 +73,13 @@
 
     //设置条件
     function Condition(optionid) {
+        //加载模态款数据
         //出现模态框
         //选择条件类型 人物参数/故事状态 参数 < > = trul false 123456789 10 json[{name=speed,条件=大于,value=6}] 
         //保存 添加到list 
         //保存数据库
+
+        $('#Condition').modal('show');
     }
 
     //设置效果
