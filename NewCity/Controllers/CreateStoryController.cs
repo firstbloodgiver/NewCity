@@ -41,7 +41,20 @@ namespace NewCity.Controllers
             return JsonConvert.SerializeObject(storyCard);
         }
 
-        
+        /// <summary>
+        /// 获取模态框默认条件
+        /// </summary>
+        /// 
+        public string GetCondition(string storycardid) {
+            List<StoryOption> storyOptions = _context.StoryOption.Where(a => a.StoryCardID == Guid.Parse(storycardid)).ToList();
+            string result = JsonConvert.SerializeObject(storyOptions);
+            if (string.IsNullOrEmpty(result)) {
+                return string.Empty;
+            }
+            return result;
+
+
+        }
 
 
     }

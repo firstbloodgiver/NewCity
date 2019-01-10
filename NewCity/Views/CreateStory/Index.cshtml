@@ -72,14 +72,29 @@
     }
 
     //设置条件
-    function Condition(optionid) {
+    function Condition(storycardid) {
         //加载模态款数据
         //出现模态框
         //选择条件类型 人物参数/故事状态 参数 < > = trul false 123456789 10 json[{name=speed,条件=大于,value=6}] 
         //保存 添加到list 
         //保存数据库
-
+        $.post("/CreateStoryController/GetCondition", { storycardid: storycardid }, function (data) {
+            let json = JSON.parse(data);
+            if (json) {
+                for (let i in json) {
+                    let 条件 = "<div></div>"
+                    let 文本 = "<div></div>"
+                    let 效果 = "<div></div>"
+                    let 下一 = "<div></div>"
+                    let context = 条件 + 文本 + 效果 + 下一
+                    let toappend = "<div>" + context + "</div>"
+                    $("#Condition").append(toappend)
+                }
+                
+            }
+        })
         $('#Condition').modal('show');
+
     }
 
     //设置效果

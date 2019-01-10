@@ -18,5 +18,10 @@ namespace NewCity.Models
         public string Name { get; set; }
 
         public string Value { get; set; }
+
+        /// <summary>
+        /// 大于 小于 等于  不等于
+        /// </summary>
+        public string type { get; set; }
     }
 }
