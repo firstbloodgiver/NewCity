@@ -1,6 +1,8 @@
 ﻿@model IEnumerable<NewCity.Models.StoryCard>
+@using NewCity.Enum;
 @{
     ViewData["Title"] = "Creator";
+    EnumConditionType enumConditionType = new EnumConditionType();
 }
 
 <!--故事卡包装为树。新建下一故事卡要在故事卡里面建-->
@@ -30,10 +32,10 @@
                 @foreach (var item in Model.First().StoryOptions)
                 {
                     <div class="row" id="@item.ID">
-                        <button type="button"onclick="Condition('@item.ID')" >条件</button>
+                        <button type="button" onclick="Condition('@item.ID')">条件</button>
                         <button type="button">@item.Text</button>
                         <button type="button" onclick="Effect('@item.ID')">效果</button>
-                        <button type="button" onclick="Cancel('@item.ID')">取消</button>
+                        <button type="button" onclick="Cancel()">取消</button>
                         <button type="button" onclick="NextCard('@item.ID')">→</button>
                     </div>
                 }
@@ -46,9 +48,15 @@
     </div>
 </div>
 
+
+
 <!--条件模态框-->
 <div id="Condition" class="modal fade">
-    
+    <form id="Condition-form">
+
+        <button type="submit"></button>
+    </form>
+    <button onclick="AddCondition()">+</button>
 </div>
 
 <script>
@@ -60,11 +68,11 @@
 
     function GetStoryCard() {
         //点击树加载该故事卡到主页面
-        
+
     }
 
     function Save() {
-        
+
     }
 
     function AddOption() {
@@ -72,25 +80,36 @@
     }
 
     //设置条件
-    function Condition(storycardid) {
+    function Condition(optionid) {
         //加载模态款数据
         //出现模态框
-        //选择条件类型 人物参数/故事状态 参数 < > = trul false 123456789 10 json[{name=speed,条件=大于,value=6}] 
-        //保存 添加到list 
+        //选择条件类型 人物参数/故事状态 参数 < > = trul false 123456789 10 json[{name=speed,条件=大于,value=6}]
+        //保存 添加到list
         //保存数据库
-        $.post("/CreateStoryController/GetCondition", { storycardid: storycardid }, function (data) {
+        $.post("/CreateStoryController/GetCondition", { optionid: optionid }, function (data) {
             let json = JSON.parse(data);
             if (json) {
                 for (let i in json) {
-                    let 条件 = "<div></div>"
-                    let 文本 = "<div></div>"
-                    let 效果 = "<div></div>"
-                    let 下一 = "<div></div>"
-                    let context = 条件 + 文本 + 效果 + 下一
-                    let toappend = "<div>" + context + "</div>"
-                    $("#Condition").append(toappend)
+                    let Name = "<input id='input-name-" + i + "'/>";
+                    let Type = "<select id='select-type-" + i + "'>" +
+                        + "<option value='1'>></option>"
+                        + "<option value='2'><</option>"
+                        + "<option value='3'>=</option>"
+                        + "<option value='4'>≠</option>"
+                        + "</select>";
+                    let Value = "<input id='input-value-" + i + "'/>";
+                    let Delete = "<div onclick='ConditionCancel()'>取消</div>"
+                    toappend = Name + Type + Value + Delete;
+                    let toappend = "<div class='row'>" + context + "</div>"
+                    $("#Condition-form").append(toappend)
+
+                    //赋值
+                    $("#input-name-" + i + "").val(json[i].Name);
+                    $("#select-type-" + i + "").text(enumConditionType[json[i].Type]);
+                    $("#select-type-" + i + "").val(json[i].Type);
+                    $("#input-value-" + i + "").val(json[i].Value);
                 }
-                
+
             }
         })
         $('#Condition').modal('show');
@@ -107,10 +126,23 @@
 
     }
 
+    //取消条件
+    function ConditionCancel() {
+
+    }
+
+    //增加条件
+    function AddCondition() {
+
+    }
+
     //下一张卡
     function NextCard(optionid) {
 
     }
+
+    //
+    var enumConditionType = [ ">", "<", "=", "≠" ];
 
 
 </script>

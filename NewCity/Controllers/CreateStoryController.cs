@@ -45,13 +45,13 @@ namespace NewCity.Controllers
         /// 获取模态框默认条件
         /// </summary>
         /// 
-        public string GetCondition(string storycardid) {
-            List<StoryOption> storyOptions = _context.StoryOption.Where(a => a.StoryCardID == Guid.Parse(storycardid)).ToList();
-            string result = JsonConvert.SerializeObject(storyOptions);
-            if (string.IsNullOrEmpty(result)) {
+        public string GetCondition(string optionid) {
+            StoryOption storyOptions = _context.StoryOption.Where(a => a.ID == Guid.Parse(optionid)).FirstOrDefault();
+            if (string.IsNullOrEmpty(storyOptions.Condition))
+            {
                 return string.Empty;
             }
-            return result;
+            return storyOptions.Condition;
 
 
         }

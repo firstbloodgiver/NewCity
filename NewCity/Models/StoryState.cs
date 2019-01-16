@@ -22,6 +22,6 @@ namespace NewCity.Models
         /// <summary>
         /// 大于 小于 等于  不等于
         /// </summary>
-        public string type { get; set; }
+        public string Type { get; set; }
     }
 }
