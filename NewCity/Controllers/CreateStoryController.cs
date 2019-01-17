@@ -56,6 +56,12 @@ namespace NewCity.Controllers
 
         }
 
+        public JsonResult SaveCondition(List<StoryState> storyStates) {
+            
+        }
+
+
+        
 
     }
 }

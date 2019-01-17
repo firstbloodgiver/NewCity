@@ -52,7 +52,7 @@
 
 <!--条件模态框-->
 <div id="Condition" class="modal fade">
-    <form id="Condition-form">
+    <form id="Condition-form" asp-action="">
 
         <button type="submit"></button>
     </form>
@@ -89,18 +89,37 @@
         $.post("/CreateStoryController/GetCondition", { optionid: optionid }, function (data) {
             let json = JSON.parse(data);
             if (json) {
+                let a = "<div>学生1：</div>
+                    < span > 姓名：</span> <input name="students[0].Name" />
+                        <span>年龄：</span> <input name="students[0].Age" />
+                        <span>性别：</span> <input name="students[0].Sex" />
+
+
+                        <div>学生2：</div>
+                        <span>姓名：</span> <input name="students[1].Name" />
+                        <span>年龄：</span> <input name="students[1].Age" />
+                        <span>性别：</span> <input name="students[1].Sex" />
+
+
+                        <div>学生3：</div>
+                        <span>姓名：</span> <input name="students[2].Name" />
+                        <span>年龄：</span> <input name="students[2].Age" />
+                        <span>性别：</span> <input name="students[2].Sex" />
+"
+
+
                 for (let i in json) {
-                    let Name = "<input id='input-name-" + i + "'/>";
-                    let Type = "<select id='select-type-" + i + "'>" +
+                    let Name = "<input type='text' name='name' id='input-name-" + i + "'/>";
+                    let Type = "<select name='type' id='select-type-" + i + "'>" +
                         + "<option value='1'>></option>"
                         + "<option value='2'><</option>"
                         + "<option value='3'>=</option>"
                         + "<option value='4'>≠</option>"
                         + "</select>";
-                    let Value = "<input id='input-value-" + i + "'/>";
-                    let Delete = "<div onclick='ConditionCancel()'>取消</div>"
+                    let Value = "<input type='text' name='value' id='input-value-" + i + "'/>";
+                    let Delete = "<div onclick='ConditionCancel("+i+")'>取消</div>"
                     toappend = Name + Type + Value + Delete;
-                    let toappend = "<div class='row'>" + context + "</div>"
+                    let toappend = "<div class='row' id='condition"+i+"'>" + context + "</div>"
                     $("#Condition-form").append(toappend)
 
                     //赋值
@@ -127,8 +146,8 @@
     }
 
     //取消条件
-    function ConditionCancel() {
-
+    function ConditionCancel(condition) {
+        $("#condition" + condition + "").remove();
     }
 
     //增加条件
