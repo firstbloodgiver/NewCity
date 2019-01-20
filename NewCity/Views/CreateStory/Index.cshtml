@@ -33,7 +33,7 @@
                 {
                     <div class="row" id="@item.ID">
                         <button type="button" onclick="Condition('@item.ID')">条件</button>
-                        <button type="button">@item.Text</button>
+                        <input type="text" value="@item.Text">
                         <button type="button" onclick="Effect('@item.ID')">效果</button>
                         <button type="button" onclick="Cancel()">取消</button>
                         <button type="button" onclick="NextCard('@item.ID')">→</button>
@@ -54,7 +54,7 @@
 <div id="Condition" class="modal fade">
     <form id="Condition-form" asp-action="">
 
-        <button type="submit"></button>
+        <button type="submit">保存</button>
     </form>
     <button onclick="AddCondition()">+</button>
 </div>
@@ -75,8 +75,10 @@
 
     }
 
+    //增加按钮
     function AddOption() {
-
+    //返回后台传回一个guid
+    //建立页面
     }
 
     //设置条件
@@ -89,44 +91,27 @@
         $.post("/CreateStoryController/GetCondition", { optionid: optionid }, function (data) {
             let json = JSON.parse(data);
             if (json) {
-                let a = "<div>学生1：</div>
-                    < span > 姓名：</span> <input name="students[0].Name" />
-                        <span>年龄：</span> <input name="students[0].Age" />
-                        <span>性别：</span> <input name="students[0].Sex" />
-
-
-                        <div>学生2：</div>
-                        <span>姓名：</span> <input name="students[1].Name" />
-                        <span>年龄：</span> <input name="students[1].Age" />
-                        <span>性别：</span> <input name="students[1].Sex" />
-
-
-                        <div>学生3：</div>
-                        <span>姓名：</span> <input name="students[2].Name" />
-                        <span>年龄：</span> <input name="students[2].Age" />
-                        <span>性别：</span> <input name="students[2].Sex" />
-"
-
-
                 for (let i in json) {
-                    let Name = "<input type='text' name='name' id='input-name-" + i + "'/>";
-                    let Type = "<select name='type' id='select-type-" + i + "'>" +
+                    let StorySeries = "<input hidden type='text' name='storyStates[" + i + "].StorySeries' id='storyStates[" + i + "].StorySeries'/>";
+                    let Name = "<input type='text' name='storyStates[" + i + "].Name' id='storyStates[" + i +"].Name'/>";
+                    let Type = "<select name='storyStates[" + i + "].Type' id='storyStates[" + i +"].Type'>" +
                         + "<option value='1'>></option>"
                         + "<option value='2'><</option>"
                         + "<option value='3'>=</option>"
                         + "<option value='4'>≠</option>"
                         + "</select>";
-                    let Value = "<input type='text' name='value' id='input-value-" + i + "'/>";
+                    let Value = "<input type='text' name='storyStates[" + i + "].Value' id='storyStates[" + i + "].Value'/>";
                     let Delete = "<div onclick='ConditionCancel("+i+")'>取消</div>"
-                    toappend = Name + Type + Value + Delete;
+                    toappend = Name + Type + Value + Delete + StorySeries;
                     let toappend = "<div class='row' id='condition"+i+"'>" + context + "</div>"
                     $("#Condition-form").append(toappend)
 
                     //赋值
-                    $("#input-name-" + i + "").val(json[i].Name);
-                    $("#select-type-" + i + "").text(enumConditionType[json[i].Type]);
-                    $("#select-type-" + i + "").val(json[i].Type);
-                    $("#input-value-" + i + "").val(json[i].Value);
+                    $("#storyStates[" + i +"].Name").val(json[i].Name);
+                    $("#storyStates[" + i +"].Type").text(enumConditionType[json[i].Type]);
+                    $("storyStates[" + i + "].Type").val(json[i].Type);
+                    $("storyStates[" + i + "].Value").val(json[i].Value);
+                    $("storyStates[" + i + "].Value").val(json[i].StorySeries);
                 }
 
             }

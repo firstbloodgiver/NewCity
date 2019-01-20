@@ -8,7 +8,7 @@ namespace NewCity.Models
     /// <summary>
     /// 记录故事系列的状态
     /// </summary>
-    public class StoryState
+    public class StoryStatus
     {
 
         public Guid ID { get; set; }
