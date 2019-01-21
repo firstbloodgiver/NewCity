@@ -93,16 +93,19 @@
             if (json) {
                 for (let i in json) {
                     let StorySeries = "<input hidden type='text' name='storyStates[" + i + "].StorySeries' id='storyStates[" + i + "].StorySeries'/>";
-                    let Name = "<input type='text' name='storyStates[" + i + "].Name' id='storyStates[" + i +"].Name'/>";
-                    let Type = "<select name='storyStates[" + i + "].Type' id='storyStates[" + i +"].Type'>" +
+                    let Name = "<input readonly type='text' name='storyStates[" + i + "].Name' id='storyStates[" + i +"].Name'/>";
+                    let Type = "<select disabled name='storyStates[" + i + "].Type' id='storyStates[" + i +"].Type'>" +
                         + "<option value='1'>></option>"
                         + "<option value='2'><</option>"
                         + "<option value='3'>=</option>"
                         + "<option value='4'>≠</option>"
                         + "</select>";
-                    let Value = "<input type='text' name='storyStates[" + i + "].Value' id='storyStates[" + i + "].Value'/>";
-                    let Delete = "<div onclick='ConditionCancel("+i+")'>取消</div>"
-                    toappend = Name + Type + Value + Delete + StorySeries;
+                    let Value = "<input readonly type='text' name='storyStates[" + i + "].Value' id='storyStates[" + i + "].Value'/>";
+                    let Edit = "<div  id='EditCondition" + i +"' onclick='EditCondition(" + i + ")'>编辑</div>";
+                    let Save = "<div hidden id='SaveCondition"+i+"' style='display:none' onclick='SaveCondition(" + i + ")'>保存</div>";
+                    let Delete = "<div onclick='ConditionCancel(" + i + ")'>取消</div>";
+
+                    toappend = Name + Type + Value + Save + Edit+Delete + StorySeries;
                     let toappend = "<div class='row' id='condition"+i+"'>" + context + "</div>"
                     $("#Condition-form").append(toappend)
 
@@ -121,18 +124,28 @@
     }
 
     //设置效果
-    function Effect(optionid) {
+    function Effect(optionID) {
 
     }
 
     //取消选项
-    function Cancel(optionid) {
+    function Cancel(optionID) {
 
     }
 
+    //编辑条件
+    function EditCondition(conditionID) {
+        $("#storyStates[" + conditionID + "].Type").removeAttr("disabled");
+        $("#storyStates[" + conditionID + "].Type").removeAttr("readonly");
+        $("#storyStates[" + conditionID + "].Type").removeAttr("readonly");
+        $('#SaveCondition' + i).show()
+        $('#EditCondition' + i).hidden();
+    }
+
+
     //取消条件
-    function ConditionCancel(condition) {
-        $("#condition" + condition + "").remove();
+    function ConditionCancel(conditionID) {
+        $("#condition" + conditionID + "").remove();
     }
 
     //增加条件
