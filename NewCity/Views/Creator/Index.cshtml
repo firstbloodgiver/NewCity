@@ -11,19 +11,23 @@
     </div>
     <hr />
     <div class="row">
-        @foreach (var item in storySeries)
+        @if (storySeries.Count != 0)
         {
-            <div>
+            @foreach (var item in storySeries)
+            {
+
                 <div>
-                    @item.SeriesName
+                    <div>
+                        @item.SeriesName
+                    </div>
+                    <div>
+                        @item.Text
+                    </div>
+                    <a asp-controller="CreateStory" asp-action="Index" asp-route-id="@item.ID">编辑</a>
+                    <a>启用</a>
+                    <a>删除</a>
                 </div>
-                <div>
-                    @item.Text
-                </div>
-                <a asp-controller="CreateStory" asp-action="Index" asp-route-id="@item.ID">编辑</a>
-                <a>启用</a>
-                <a>删除</a>
-            </div>
+            }
         }
     </div>
 </div>

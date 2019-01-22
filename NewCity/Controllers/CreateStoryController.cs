@@ -22,9 +22,9 @@ namespace NewCity.Controllers
             _context = context;
         }
 
-        public IActionResult Index(string storySeriID)
+        public IActionResult Index(string id)
         {
-            List<StoryCard> storyCards = _context.StoryCard.Where(a => a.StorySeriesID == Guid.Parse(storySeriID)).ToList();
+            List<StoryCard> storyCards = _context.StoryCard.Where(a => a.StorySeriesID == Guid.Parse(id)).ToList();
             
             return View(storyCards);
         }
@@ -64,7 +64,7 @@ namespace NewCity.Controllers
             if (_userManager.GetUserId(User) != Author.ToString()) {
                 return new JsonResult(0);
             }
-            
+            return new JsonResult(0);
 
         }
 
