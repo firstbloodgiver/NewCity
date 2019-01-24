@@ -32,18 +32,19 @@
                 <div class="row" id="Option">
                     @if (Model.Count() != 0)
                     {
+                        <input hidden id="optionCount" type="text" value="@Model.Count()" />
                         @foreach (var item in Model.First().StoryOptions)
                         {
                             <div class="row" id="@item.ID">
                                 <input hidden type="text" value="@item.ID" />
 
                                 <button type="button" onclick="Condition('@item.ID')">条件</button>
-                                <input hidden type="text" value="@item.ID" />
+                                <input hidden type="text" value="@item.Condition" />
 
                                 <input type="text" value="@item.Text">
 
                                 <button type="button" onclick="Effect('@item.ID')">效果</button>
-                                <input hidden type="text" value="@item.ID" />
+                                <input hidden type="text" value="@item.Effect" />
 
                                 <button type="button" onclick="Cancel()">取消</button>
                                 <button type="button" onclick="NextCard('@item.ID')">→</button>
@@ -85,7 +86,11 @@
     }
 
     function Save() {
+        let storyCard = $('#StoryCard').serialize();
+        //等待动画
+        $.post("/CreateStoryController/Save", { storyCard: storyCard}, function (data) {
 
+        })
     }
 
     //取消选项
@@ -99,15 +104,20 @@
     }
 
     //增加选项
+    var 
     function AddOption() {
-        let optionID = "<input hidden type='text' value='' />";
-        let condition = "<button type='button' onclick='Condition()'>条件</button><input hidden type='text' value='' />";
-        let text = "<button type='button' onclick='Condition()'>条件</button><input hidden type='text' value='' />";
-        let Effect = "<button type='button' onclick='Condition()'>条件</button><input hidden type='text' value='' />";
+        let optioncount = $("#optionCount").val()++;  //选项计数
+        let guid = guid();
+
+        let optionID = "<input hidden type='text' name='StoryOptions[" + optioncount +"].ID' value="+guid+" />";
+        let condition = "<button type='button' onclick='Condition(" + guid +")'>条件</button><input hidden type='text' value='' />";
+        let text = "<input type='text' value=''>";
+        let Effect = "<button type='button' onclick='Effect(" + guid +")'>效果</button><input hidden type='text' value='' />";
         let button = " <button type='button' onclick='Cancel()'>取消</button><button type='button' onclick='NextCard('')'>→</button>";
 
-        let toappend = "<div class='row' id=''>" + optionID + condition + text + Effect + button + "</div>"
+        let toappend = "<div class='row' id=" + guid +">" + optionID + condition + text + Effect + button + "</div>"
         $("#Option").append(toappend)
+        $("#optionCount").val(optioncount);
     }
 
     //设置条件
