@@ -13,6 +13,7 @@
             <form id="StoryCard">
                 <div class="row">
                     <div id="StoryId">
+                        <input name="storyCard.ID" hidden value="@(Model.Count() > 0 ? Model.First().ID : Guid.Empty)"/>
                         @(Model.Count() > 0 ? Model.First().ID : Guid.Empty)
                     </div>
                     <div id="StoryName">
@@ -26,29 +27,31 @@
                     </div>
                     <div class="col-md-8" id="Content">
                         <!--text-->
-                        <textarea class="form-control" rows="10">@(Model.Count() > 0 ? Model.First().Text : "")</textarea>
+                        <textarea name="storyCard.Text" class="form-control" rows="10">@(Model.Count() > 0 ? Model.First().Text : "")</textarea>
                     </div>
                 </div>
                 <div class="row" id="Option">
                     @if (Model.Count() != 0)
                     {
-                        <input hidden id="optionCount" type="text" value="@Model.Count()" />
+                        <input hidden id="optionCount" type="text" value="@Model.First().StoryOptions.Count()" />
+                        int i = 0;
                         @foreach (var item in Model.First().StoryOptions)
                         {
                             <div class="row" id="@item.ID">
-                                <input hidden type="text" value="@item.ID" />
+                                <input name="storyCard.StoryOptions[@i].ID" hidden type="text" value="@item.ID" />
 
                                 <button type="button" onclick="Condition('@item.ID')">条件</button>
-                                <input hidden type="text" value="@item.Condition" />
+                                <input name="storyCard.StoryOptions[@i].Condition" hidden type="text" value="@item.Condition" />
 
-                                <input type="text" value="@item.Text">
+                                <input name="storyCard.StoryOptions[@i].Text" type="text" value="@item.Text">
 
                                 <button type="button" onclick="Effect('@item.ID')">效果</button>
-                                <input hidden type="text" value="@item.Effect" />
+                                <input name="storyCard.StoryOptions[@i].Effect" hidden type="text" value="@item.Effect" />
 
                                 <button type="button" onclick="Cancel()">取消</button>
                                 <button type="button" onclick="NextCard('@item.ID')">→</button>
                             </div>
+                            i++;
                         }
                     }
 

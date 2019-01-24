@@ -62,8 +62,12 @@ namespace NewCity.Controllers
         /// 保存故事卡
         /// </summary>
         /// <returns></returns>
-        public JsonResult Save(StoryCard storyCard) {
-
+        public async Task<JsonResult> Save(StoryCard storyCard) {
+            //如果你是该故事系列的作者才可以保存
+            if (ModelState.IsValid) {
+                _context.Add(storyCard);
+                await _context.SaveChangesAsync();
+            }
 
             return new JsonResult(true);
         }
