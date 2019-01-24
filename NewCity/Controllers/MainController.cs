@@ -41,7 +41,7 @@ namespace NewCity.Controllers
             {
                 StorySeries ReadList = new StorySeries();
                 ReadList = _context.StorySeries.Where(s => s.ID == StorySeriesID).FirstOrDefault();
-                OperaList = _context.StoryCard.Where(s => s.StorySeriesID == StorySeriesID).Where(s =>check(s.flag)==true).ToList();
+                OperaList = _context.StoryCard.Where(s => s.StorySeriesID == StorySeriesID).ToList();
                 ViewBag.ReadList = ReadList;
                 ViewBag.OperaList = OperaList;
             }

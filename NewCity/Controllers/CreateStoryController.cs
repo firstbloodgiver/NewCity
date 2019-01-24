@@ -41,6 +41,7 @@ namespace NewCity.Controllers
             return JsonConvert.SerializeObject(storyCard);
         }
 
+       
         /// <summary>
         /// 获取模态框默认条件
         /// </summary>
@@ -56,20 +57,16 @@ namespace NewCity.Controllers
 
         }
 
-        public JsonResult SaveCondition(List<StoryStatus> storyStates,string optionID) {
-            if(!storyStates.Any(a=>a.StorySeries == storyStates.FirstOrDefault().StorySeries)){
-                return new JsonResult(0);
-            }
-            var Author = _context.StorySeries.Where(a => a.ID == Guid.Parse(storyStates.FirstOrDefault().StorySeries)).First().Author;
-            if (_userManager.GetUserId(User) != Author.ToString()) {
-                return new JsonResult(0);
-            }
-            return new JsonResult(0);
 
+        /// <summary>
+        /// 保存故事卡
+        /// </summary>
+        /// <returns></returns>
+        public JsonResult Save(StoryCard storyCard) {
+
+
+            return new JsonResult(true);
         }
-
-
-        
 
     }
 }

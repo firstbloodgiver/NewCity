@@ -15,11 +15,6 @@ namespace NewCity.Models
         public string IMG { get; set; }
         public string BackgroundIMG { get; set; }
 
-        /// <summary>
-        /// 出现条件
-        /// </summary>
-        public string flag { get; set; }
-
         public ICollection<StoryOption> StoryOptions { get; set; }
-}
+    }
 }

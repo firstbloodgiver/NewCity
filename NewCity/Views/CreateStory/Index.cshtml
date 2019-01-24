@@ -10,41 +10,50 @@
     <div class="row">
         <div class="col-md-4">tree</div>
         <div class="col-md-8">
-            <div class="row">
-                <div id="StoryId">
-                    @(Model.Count() > 0 ? Model.First().ID:Guid.Empty)
+            <form id="StoryCard">
+                <div class="row">
+                    <div id="StoryId">
+                        @(Model.Count() > 0 ? Model.First().ID : Guid.Empty)
+                    </div>
+                    <div id="StoryName">
+                        @(Model.Count() > 0 ? Model.First().StoryName : "")
+                    </div>
                 </div>
-                <div id="StoryName">
-                    @(Model.Count() > 0 ? Model.First().StoryName:"")
+                <div class="row">
+                    <div class="col-md-4" id="Img">
+                        <!--img-->
+                        @(Model.Count() > 0 ? Model.First().IMG : "")
+                    </div>
+                    <div class="col-md-8" id="Content">
+                        <!--text-->
+                        <textarea class="form-control" rows="10">@(Model.Count() > 0 ? Model.First().Text : "")</textarea>
+                    </div>
                 </div>
-            </div>
-            <div class="row">
-                <div class="col-md-4" id="Img">
-                    <!--img-->
-                    @(Model.Count() > 0 ? Model.First().IMG:"")
-                </div>
-                <div class="col-md-8" id="Content">
-                    @(Model.Count() > 0 ? Model.First().Text:"")
-                    <!--text-->
-                </div>
-            </div>
-            <div class="row" id="Option">
-                @if (Model.Count() != 0)
-                {
-                    @foreach (var item in Model.First().StoryOptions)
+                <div class="row" id="Option">
+                    @if (Model.Count() != 0)
                     {
-                        <div class="row" id="@item.ID">
-                            <button type="button" onclick="Condition('@item.ID')">条件</button>
-                            <input type="text" value="@item.Text">
-                            <button type="button" onclick="Effect('@item.ID')">效果</button>
-                            <button type="button" onclick="Cancel()">取消</button>
-                            <button type="button" onclick="NextCard('@item.ID')">→</button>
-                        </div>
-                    }
-                }
+                        @foreach (var item in Model.First().StoryOptions)
+                        {
+                            <div class="row" id="@item.ID">
+                                <input hidden type="text" value="@item.ID" />
 
-                <button type="button" onclick="AddOption()">增加</button>foreach
-            </div>
+                                <button type="button" onclick="Condition('@item.ID')">条件</button>
+                                <input hidden type="text" value="@item.ID" />
+
+                                <input type="text" value="@item.Text">
+
+                                <button type="button" onclick="Effect('@item.ID')">效果</button>
+                                <input hidden type="text" value="@item.ID" />
+
+                                <button type="button" onclick="Cancel()">取消</button>
+                                <button type="button" onclick="NextCard('@item.ID')">→</button>
+                            </div>
+                        }
+                    }
+
+                    <button type="button" onclick="AddOption()">增加选项</button>foreach
+                </div>
+            </form>
             <div class="row">
                 <button type="button" class="btn" onclick="Save()">保存</button>
             </div>
@@ -72,7 +81,7 @@
 
     function GetStoryCard() {
         //点击树加载该故事卡到主页面
-
+        
     }
 
     function Save() {
@@ -89,10 +98,16 @@
 
     }
 
-    //增加按钮
+    //增加选项
     function AddOption() {
-    //返回后台传回一个guid
-    //建立页面
+        let optionID = "<input hidden type='text' value='' />";
+        let condition = "<button type='button' onclick='Condition()'>条件</button><input hidden type='text' value='' />";
+        let text = "<button type='button' onclick='Condition()'>条件</button><input hidden type='text' value='' />";
+        let Effect = "<button type='button' onclick='Condition()'>条件</button><input hidden type='text' value='' />";
+        let button = " <button type='button' onclick='Cancel()'>取消</button><button type='button' onclick='NextCard('')'>→</button>";
+
+        let toappend = "<div class='row' id=''>" + optionID + condition + text + Effect + button + "</div>"
+        $("#Option").append(toappend)
     }
 
     //设置条件
@@ -126,9 +141,9 @@
                     //赋值
                     $("#storyStates[" + i +"].Name").val(json[i].Name);
                     $("#storyStates[" + i +"].Type").text(enumConditionType[json[i].Type]);
-                    $("storyStates[" + i + "].Type").val(json[i].Type);
-                    $("storyStates[" + i + "].Value").val(json[i].Value);
-                    $("storyStates[" + i + "].Value").val(json[i].StorySeries);
+                    $("#storyStates[" + i + "].Type").val(json[i].Type);
+                    $("#storyStates[" + i + "].Value").val(json[i].Value);
+                    $("#storyStates[" + i + "].Value").val(json[i].StorySeries);
                 }
 
             }
@@ -168,7 +183,13 @@
     }
 
     
-
+    //生成uuid
+    function S4() {
+        return (((1 + Math.random()) * 0x10000) | 0).toString(16).substring(1);
+    }
+    function guid() {
+        return (S4() + S4() + "-" + S4() + "-" + S4() + "-" + S4() + "-" + S4() + S4() + S4());
+    }
 
 </script>
 
