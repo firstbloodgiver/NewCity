@@ -19,8 +19,7 @@ namespace NewCity.Controllers
 
         public IActionResult Index(string id)
         {
-            List<StoryCard> storyCards = _context.StoryCard.Where(a => a.StorySeriesID == Guid.Parse(id)).ToList();
-            
+            List<StoryCard> storyCards = _context.StoryCard.Where(a => a.StorySeriesID == Guid.Parse(id)).Include(a => a.StoryOptions).ToList() ;
             return View(storyCards);
         }
 
