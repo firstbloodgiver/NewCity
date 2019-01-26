@@ -33,5 +33,14 @@ namespace NewCity.Controllers
             return Guid.Parse(_userManager.GetUserId(User));
         }
 
+        /// <summary>
+        /// 是否该故事系列的作者
+        /// </summary>
+        /// <param name="AuthorID"></param>
+        /// <returns></returns>
+        public bool IsAuthor(Guid AuthorID) {
+            return true;
+        }
+
     }
 }

@@ -11,6 +11,9 @@ namespace NewCity.Models
         public Guid LocationID { get; set; }
         public string SeriesName { get; set; }
 
+        /// <summary>
+        /// 作者ID
+        /// </summary>
         public Guid Author { get; set; }
         public DateTime Creationdate { get; set; }
 
