@@ -39,7 +39,8 @@ namespace NewCity.Controllers
         /// 保存故事卡
         /// </summary>
         /// <returns></returns>
-        public async Task<JsonResult> Save([Bind("ID,Text,IMG,BackgroundIMG,StoryOptions")]StoryCard storyCard) {
+        [HttpPost]
+        public async Task<IActionResult> Save([Bind("ID,Text,IMG,BackgroundIMG,StoryOptions")]StoryCard storyCard) {
             //如果你是该故事系列的作者才可以保存
             StoryCard card = _context.StoryCard.Where(a => a.ID == storyCard.ID).FirstOrDefault();
             StorySeries series = _context.StorySeries.Where(a => a.ID == card.StorySeriesID).FirstOrDefault();
@@ -67,5 +68,12 @@ namespace NewCity.Controllers
 
         }
 
+
+
+        [HttpGet]
+        public IActionResult Save()
+        {
+            return new JsonResult(false);
+        }
     }
 }

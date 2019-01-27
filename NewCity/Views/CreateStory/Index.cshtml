@@ -13,7 +13,7 @@
             <form id="StoryCard">
                 <div class="row">
                     <div id="StoryId">
-                        <input name="storyCard.ID" hidden value="@(Model.Count() > 0 ? Model.First().ID : Guid.Empty)"/>
+                        <input name="storyCard.ID" hidden value="@(Model.Count() > 0 ? Model.First().ID : Guid.Empty)" />
                         @(Model.Count() > 0 ? Model.First().ID : Guid.Empty)
                     </div>
                     <div id="StoryName">
@@ -55,9 +55,10 @@
                         }
                     }
 
-                    <button type="button" onclick="AddOption()">增加选项</button>foreach
+
                 </div>
             </form>
+            <button type="button" onclick="AddOption()">增加选项</button>
             <div class="row">
                 <button type="button" class="btn" onclick="Save()">保存</button>
             </div>
@@ -69,9 +70,21 @@
 
 <!--条件模态框-->
 <div id="ConditionModel" class="modal fade">
-    <form id="ConditionForm"></form>
-    <button onclick="AddCondition()">+</button>
-    <button onclick="SaveCondition()">确定</button>
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                <h4 class="modal-title" id="myModalLabel">模态框（Modal）标题</h4>
+            </div>
+            <div class="modal-body">
+                <form id="ConditionForm"></form>
+                <button onclick="AddCondition()">+</button>
+                <button onclick="SaveCondition()">确定</button>
+            </div>
+        </div>
+    </div>
+
+  
 </div>
 
 <!--效果模态框-->
@@ -82,10 +95,6 @@
 </div>
 
 <script>
-    $(document).ready(function () {
-        //返回第一个故事卡到主页面
-        //加载树
-    })
 
 
     function GetStoryCard() {
@@ -95,9 +104,13 @@
 
     function Save() {
         //等待动画
+        debugger;
         let storyCard = $('#StoryCard').serialize();
-        $.post("/CreateStoryController/Save", { storyCard: storyCard }, function (data) {
-            alert(data);
+        //$.post("/CreateStoryController/Save", { storyCard: storyCard }, function (data) {
+        //    alert(data);
+        //})
+        $.get("/CreateStory/Save", function (data) {
+
         })
     }
 
@@ -113,16 +126,18 @@
 
     //增加选项
     function AddOption() {
-        let optioncount = $("#optionCount").val()++;  //选项计数
-        let guid = guid();
+        let optioncount = $("#optionCount").val();  //选项计数
+        optioncount++;
+       
+        let id = guid();
 
-        let optionID = "<input hidden type='text' name='StoryOptions[" + optioncount +"].ID' value="+guid+" />";
-        let condition = "<button type='button' onclick='Condition(" + optioncount +")'>条件</button><input hidden type='text' value='' />";
+        let optionID = "<input hidden type='text' name='StoryOptions[" + optioncount + "].ID' value='" + id+"' />";
+        let condition = "<button type='button' onclick='Condition(" + optioncount + ")'>条件</button> <input hidden type='text' value='' />";
         let text = "<input type='text' value=''>";
-        let Effect = "<button type='button' onclick='Effect(" + optioncount +")'>效果</button><input hidden type='text' value='' />";
-        let button = " <button type='button' onclick='Cancel()'>取消</button><button type='button' onclick='NextCard('')'>→</button>";
+        let Effect = " <button type='button' onclick='Effect(" + optioncount + ")'>效果</button> <input hidden type='text' value='' />";
+        let button = " <button type='button' onclick=Cancel('option-"+id+"')>取消</button> <button type='button' onclick='NextCard('')'>→</button>";
 
-        let toappend = "<div class='row' id=" + guid +">" + optionID + condition + text + Effect + button + "</div>"
+        let toappend = "<div class='row' id=option-" + id +">" + optionID + condition + text + Effect + button + "</div>"
         $("#Option").append(toappend)
         $("#optionCount").val(optioncount);
     }
@@ -134,24 +149,24 @@
         var ConditionForm = document.getElementById("ConditionForm");
         ConditionForm.innerHTML = "";
         conditioncount = 0;
-
-        let condition = JSON.parse($("#storyCard.StoryOptions[" + number+"].Condition").val());
-        if (condition) {
-            let q = "<input hidden type='text' id='ConditionId' value=" + number+"/>";
+        let Cd = $("#storyCard.StoryOptions[" + number + "].Condition").val();
+        if (Cd) {
+            let condition = JSON.parse(Cd);
+            let q = "<input hidden type='text' id='ConditionId' value=" + number + "/>";
             $("#ConditionForm").append(q);
-            
+
             for (let i in condition) {
                 //let StorySeries = "<input hidden type='text' name='storyStates[" + i + "].StorySeries' id='storyStates[" + i + "].StorySeries'/>";
                 let Name = "<input  type='text' name='storyStates[" + i + "].Name' id='storyStates[" + i + "].Name'/>";
-                let Type = "<select  name='storyStates[" + i + "].Type' id='storyStates[" + i + "].Type'>" +
+                let Type = "<select  name='storyStates[" + i + "].Type' id='storyStates[" + i + "].Type'>" 
                     + "<option value='1'>></option>"
                     + "<option value='2'><</option>"
                     + "<option value='3'>=</option>"
                     + "<option value='4'>≠</option>"
                     + "</select>";
                 let Value = "<input  type='text' name='storyStates[" + i + "].Value' id='storyStates[" + i + "].Value'/>";
-                let Delete = "<div onclick='ConditionCancel(" + i + ")'>取消</div>";
-                toappend = StorySeries + Name + Type + Value + Delete;
+                let Delete = "<button onclick='ConditionCancel(" + i + ")'>取消</button>";
+                let context = StorySeries + Name + Type + Value + Delete;
                 let toappend = "<div class='row' id='condition" + i + "'>" + context + "</div>"
                 $("#ConditionForm").append(toappend)
                 conditioncount++;
@@ -186,15 +201,15 @@
     function AddCondition() {
         let i = conditioncount;
         let Name = "<input  type='text' name='storyStates[" + i + "].Name' id='storyStates[" + i + "].Name'/>";
-        let Type = "<select  name='storyStates[" + i + "].Type' id='storyStates[" + i + "].Type'>" +
+        let Type = "<select  name='storyStates[" + i + "].Type' id='storyStates[" + i + "].Type'>" 
             + "<option value='1'>></option>"
             + "<option value='2'><</option>"
             + "<option value='3'>=</option>"
             + "<option value='4'>≠</option>"
             + "</select>";
         let Value = "<input  type='text' name='storyStates[" + i + "].Value' id='storyStates[" + i + "].Value'/>";
-        let Delete = "<div onclick='ConditionCancel(" + i + ")'>取消</div>";
-        toappend = StorySeries + Name + Type + Value + Delete;
+        let Delete = "<button onclick='ConditionCancel(" + i + ")'>取消</button>";
+        let context =  Name + Type + Value + Delete;
         let toappend = "<div class='row' id='condition" + i + "'>" + context + "</div>"
         $("#ConditionForm").append(toappend)
     }
@@ -212,7 +227,6 @@
         }
     }
 
-    
     //生成uuid
     function S4() {
         return (((1 + Math.random()) * 0x10000) | 0).toString(16).substring(1);
@@ -220,6 +234,7 @@
     function guid() {
         return (S4() + S4() + "-" + S4() + "-" + S4() + "-" + S4() + "-" + S4() + S4() + S4());
     }
+
 
 </script>
 
