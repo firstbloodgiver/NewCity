@@ -10,7 +10,7 @@
     <div class="row">
         <div class="col-md-4">tree</div>
         <div class="col-md-8">
-            <form id="StoryCard">
+            <form target="fack" id="StoryCard" asp-action="Save" method="post" >
                 <div class="row">
                     <div id="StoryId">
                         <input name="storyCard.ID" hidden value="@(Model.Count() > 0 ? Model.First().ID : Guid.Empty)" />
@@ -57,11 +57,14 @@
 
 
                 </div>
+                <div class="form-group">
+                    <button type="button" onclick="AddOption()">增加选项</button>
+                </div>
+                <div class="form-group">
+                    <button type="submit" id="submit" onclick="Save()" class="btn">保存</button>
+                </div>
             </form>
-            <button type="button" onclick="AddOption()">增加选项</button>
-            <div class="row">
-                <button type="button" class="btn" onclick="Save()">保存</button>
-            </div>
+            <iframe name="fack" id="fack" style="display:none"></iframe>
         </div>
     </div>
 </div>
@@ -96,6 +99,7 @@
 
 <script>
 
+   
 
     function GetStoryCard() {
         //点击树加载该故事卡到主页面
@@ -103,15 +107,9 @@
     }
 
     function Save() {
-        //等待动画
-        debugger;
-        let storyCard = $('#StoryCard').serialize();
-        //$.post("/CreateStoryController/Save", { storyCard: storyCard }, function (data) {
-        //    alert(data);
-        //})
-        $.get("/CreateStory/Save", function (data) {
-
-        })
+        setTimeout(function () {
+            var a = window.frames["fack"].document.body.innerText;
+            alert(a); }, 1000);   
     }
 
     //取消选项
@@ -127,19 +125,20 @@
     //增加选项
     function AddOption() {
         let optioncount = $("#optionCount").val();  //选项计数
-        optioncount++;
+        
        
         let id = guid();
 
-        let optionID = "<input hidden type='text' name='StoryOptions[" + optioncount + "].ID' value='" + id+"' />";
-        let condition = "<button type='button' onclick='Condition(" + optioncount + ")'>条件</button> <input hidden type='text' value='' />";
-        let text = "<input type='text' value=''>";
-        let Effect = " <button type='button' onclick='Effect(" + optioncount + ")'>效果</button> <input hidden type='text' value='' />";
+        let optionID = "<input hidden type='text' name='storyCard.StoryOptions[" + optioncount + "].ID' value='" + id+"' />";
+        let condition = "<button type='button' onclick='Condition(" + optioncount + ")'>条件</button> <input hidden name='storyCard.StoryOptions[" + optioncount + "].Condition' type='text' value='' />";
+        let text = "<input type='text' name='storyCard.StoryOptions[" + optioncount + "].Text' value=''>";
+        let effect = " <button type='button' onclick='Effect(" + optioncount + ")'>效果</button> <input name='storyCard.StoryOptions[" + optioncount + "].Effect' hidden type='text' value='' />";
         let button = " <button type='button' onclick=Cancel('option-"+id+"')>取消</button> <button type='button' onclick='NextCard('')'>→</button>";
 
-        let toappend = "<div class='row' id=option-" + id +">" + optionID + condition + text + Effect + button + "</div>"
+        let toappend = "<div class='row' id=option-" + id +">" + optionID + condition + text + effect + button + "</div>"
         $("#Option").append(toappend)
         $("#optionCount").val(optioncount);
+        optioncount++;
     }
 
     //设置条件

@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 
 namespace NewCity.Models
 {
+    
     public class StoryCard
     {
         public Guid ID { get; set; }

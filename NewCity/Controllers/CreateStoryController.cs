@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.Serialization.Formatters.Binary;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -40,18 +41,22 @@ namespace NewCity.Controllers
         /// </summary>
         /// <returns></returns>
         [HttpPost]
-        public async Task<IActionResult> Save([Bind("ID,Text,IMG,BackgroundIMG,StoryOptions")]StoryCard storyCard) {
+        public async Task<IActionResult> Save([Bind("ID,Text,IMG,BackgroundIMG,StoryOptions")]StoryCard storyCard)
+        {
             //如果你是该故事系列的作者才可以保存
+
             StoryCard card = _context.StoryCard.Where(a => a.ID == storyCard.ID).FirstOrDefault();
             StorySeries series = _context.StorySeries.Where(a => a.ID == card.StorySeriesID).FirstOrDefault();
             var userid = GetUserId();
-            if (series.Author == userid) {
+            if (series.Author == userid)
+            {
+
                 if (ModelState.IsValid)
                 {
                     try
                     {
-                        _context.Update(storyCard);
-                        await _context.SaveChangesAsync();
+                        //_context.Update(storyCard);
+                        //await _context.SaveChangesAsync();
                         return new JsonResult(true);
                     }
                     catch (DbUpdateConcurrencyException)
@@ -59,21 +64,15 @@ namespace NewCity.Controllers
                         throw;
                     }
                 }
-                return new JsonResult(false);
+
             }
             else
             {
-                return new JsonResult(false);
+                return new JsonResult(true);
             }
-
+            return new JsonResult(true);
         }
 
-
-
-        [HttpGet]
-        public IActionResult Save()
-        {
-            return new JsonResult(false);
-        }
     }
+
 }
