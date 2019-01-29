@@ -5,6 +5,7 @@
     EnumConditionType enumConditionType = new EnumConditionType();
 }
 <script src="~/js/enum.js"></script>
+<script src="~/lib/jquery/dist/jquery.min.js"></script>
 <!--故事卡包装为树。新建下一故事卡要在故事卡里面建-->
 <div class="container-fluid">
     <div class="row">
@@ -64,10 +65,10 @@
                     <button type="button" onclick="AddOption()">增加选项</button>
                 </div>
                 <div class="form-group">
-                    <button type="submit" id="submit" onclick="Save()" class="btn">保存</button>
+                    <button type="submit" id="submit"  class="btn">保存</button>
                 </div>
             </form>
-            <iframe name="fack" id="fack" style="height:0px"></iframe>
+            <iframe name="fack" id="fack" hidden></iframe>
         </div>
     </div>
 </div>
@@ -109,23 +110,13 @@
         
     }
 
-    $("#fack").ready(function () {
+    $("#fack").on('load',function () {
         let a = window.frames["fack"].document.body.innerText;
-        alert(a);
-        window.location.reload(); 
+        if (a != '') {
+            alert(a);
+            window.location.reload(); 
+        }
     });
-
-    $("#fack").onload(function () {
-        let a = window.frames["fack"].document.body.innerText;
-        alert(a);
-        window.location.reload(); 
-    });
-
-    function Save() {
-        setTimeout(function () {
-            let a = window.frames["fack"].document.body.innerText;
-            alert(a); }, 1000);   
-    }
 
     //取消选项
     function Cancel(optionid) {

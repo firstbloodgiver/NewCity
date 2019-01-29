@@ -15,12 +15,13 @@ namespace NewCity.Controllers
     public class CreateStoryController : BaseController
     {
         public CreateStoryController(SignInManager<IdentityUser> SignInManager, UserManager<IdentityUser> UserManager, NewCityDbContext context)
-            :base(SignInManager, UserManager, context) {
+            : base(SignInManager, UserManager, context)
+        {
         }
 
         public IActionResult Index(string id)
         {
-            List<StoryCard> storyCards = _context.StoryCard.Where(a => a.StorySeriesID == Guid.Parse(id)).Include(a => a.StoryOptions).ToList() ;
+            List<StoryCard> storyCards = _context.StoryCard.Where(a => a.StorySeriesID == Guid.Parse(id)).Include(a => a.StoryOptions).ToList();
             return View(storyCards);
         }
 
@@ -31,7 +32,7 @@ namespace NewCity.Controllers
         /// <returns></returns>
         public string GetCard(string ID)
         {
-            
+
             StoryCard storyCard = _context.StoryCard.Where(a => a.ID == Guid.Parse(ID)).FirstOrDefault();
             return JsonConvert.SerializeObject(storyCard);
         }
@@ -45,8 +46,8 @@ namespace NewCity.Controllers
         {
             //如果你是该故事系列的作者才可以保存
 
-            StoryCard card = _context.StoryCard.Where(a => a.ID == storyCard.ID).FirstOrDefault();
-            StorySeries series = _context.StorySeries.Where(a => a.ID == card.StorySeriesID).FirstOrDefault();
+            StoryCard card = _context.StoryCard.Where(a => a.ID == storyCard.ID).AsNoTracking().FirstOrDefault();
+            StorySeries series = _context.StorySeries.Where(a => a.ID == card.StorySeriesID).AsNoTracking().FirstOrDefault();
             var userid = GetUserId();
             if (series.Author == userid)
             {
@@ -59,7 +60,7 @@ namespace NewCity.Controllers
                         await _context.SaveChangesAsync();
                         return new JsonResult(true);
                     }
-                    catch (DbUpdateConcurrencyException)
+                    catch (Exception ex)
                     {
                         throw;
                     }
@@ -76,3 +77,5 @@ namespace NewCity.Controllers
     }
 
 }
+
+        
