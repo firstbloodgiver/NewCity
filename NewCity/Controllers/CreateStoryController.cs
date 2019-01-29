@@ -55,8 +55,8 @@ namespace NewCity.Controllers
                 {
                     try
                     {
-                        //_context.Update(storyCard);
-                        //await _context.SaveChangesAsync();
+                        _context.Update(storyCard);
+                        await _context.SaveChangesAsync();
                         return new JsonResult(true);
                     }
                     catch (DbUpdateConcurrencyException)

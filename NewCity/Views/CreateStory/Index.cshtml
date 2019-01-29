@@ -8,8 +8,11 @@
 <!--故事卡包装为树。新建下一故事卡要在故事卡里面建-->
 <div class="container-fluid">
     <div class="row">
-        <div class="col-md-4">tree</div>
-        <div class="col-md-8">
+        <div class="col-md-3">
+
+
+        </div>
+        <div class="col-md-9">
             <form target="fack" id="StoryCard" asp-action="Save" method="post" >
                 <div class="row">
                     <div id="StoryId">
@@ -64,7 +67,7 @@
                     <button type="submit" id="submit" onclick="Save()" class="btn">保存</button>
                 </div>
             </form>
-            <iframe name="fack" id="fack" style="display:none"></iframe>
+            <iframe name="fack" id="fack" style="height:0px"></iframe>
         </div>
     </div>
 </div>
@@ -106,9 +109,21 @@
         
     }
 
+    $("#fack").ready(function () {
+        let a = window.frames["fack"].document.body.innerText;
+        alert(a);
+        window.location.reload(); 
+    });
+
+    $("#fack").onload(function () {
+        let a = window.frames["fack"].document.body.innerText;
+        alert(a);
+        window.location.reload(); 
+    });
+
     function Save() {
         setTimeout(function () {
-            var a = window.frames["fack"].document.body.innerText;
+            let a = window.frames["fack"].document.body.innerText;
             alert(a); }, 1000);   
     }
 
