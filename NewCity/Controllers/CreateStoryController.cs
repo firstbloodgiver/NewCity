@@ -56,6 +56,8 @@ namespace NewCity.Controllers
                 {
                     try
                     {
+                        storyCard.StorySeriesID = card.StorySeriesID;
+
                         _context.Update(storyCard);
                         await _context.SaveChangesAsync();
                         return new JsonResult(true);
