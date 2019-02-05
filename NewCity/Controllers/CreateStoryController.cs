@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Migrations;
 using NewCity.Data;
 using NewCity.Models;
 using Newtonsoft.Json;
@@ -46,7 +47,7 @@ namespace NewCity.Controllers
         {
             //如果你是该故事系列的作者才可以保存
 
-            StoryCard card = _context.StoryCard.Where(a => a.ID == storyCard.ID).AsNoTracking().FirstOrDefault();
+            StoryCard card = _context.StoryCard.Where(a => a.ID == storyCard.ID).Include(i=>i.StoryOptions).FirstOrDefault();
             StorySeries series = _context.StorySeries.Where(a => a.ID == card.StorySeriesID).AsNoTracking().FirstOrDefault();
             var userid = GetUserId();
             if (series.Author == userid)
@@ -56,9 +57,39 @@ namespace NewCity.Controllers
                 {
                     try
                     {
-                        storyCard.StorySeriesID = card.StorySeriesID;
+                        card.Text = storyCard.Text;
+                        card.IMG = storyCard.IMG;
+                        if (storyCard.StoryOptions != null) {
+                            if (storyCard.StoryOptions.Count() != card.StoryOptions.Count())
+                            {
+                                //存在选项更改
+                                card.StoryOptions = null;
+                                var deletelist = _context.StoryOption.Where(a => a.StoryCardID == card.ID).ToList();
+                                _context.StoryOption.RemoveRange(deletelist);
+                                foreach (var option in storyCard.StoryOptions)
+                                {
+                                    option.StoryCardID = card.ID;
+                                    option.Condition = storyCard.StoryOptions.Where(a => a.ID == option.ID).First().Condition;
+                                }
+                                _context.StoryOption.AddRange(storyCard.StoryOptions);
+                                _context.SaveChanges();
+                            }
+                            else
+                            {
+                                foreach (var option in card.StoryOptions)
+                                {
+                                    option.Condition = storyCard.StoryOptions.Where(a => a.ID == option.ID).First().Condition;
 
-                        _context.Update(storyCard);
+                                }
+                            }
+                        }
+                        else
+                        {
+                            card.StoryOptions = null;
+                            _context.SaveChanges();
+                        }
+                        
+                        _context.StoryCard.Update(card);
                         await _context.SaveChangesAsync();
                         return new JsonResult(true);
                     }
@@ -67,7 +98,6 @@ namespace NewCity.Controllers
                         throw;
                     }
                 }
-
             }
             else
             {

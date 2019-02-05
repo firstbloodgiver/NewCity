@@ -8,6 +8,7 @@ namespace NewCity.Models
     
     public class StoryCard
     {
+        
         public Guid ID { get; set; }
         public Guid StorySeriesID { get; set; }
         public string StoryName { get; set; }
