@@ -51,12 +51,17 @@
                         <input asp-for="Text" class="form-control" />
                         <span asp-validation-for="SeriesName" class="text-danger"></span>
                     </div>
-                    <button type="submit">确定</button>
+                    <button type="submit" onclick="reload()">确定</button>
                     <button type="reset">取消</button>
                 </form>
-
             </div>
         </div>
     </div>
 </div>
 
+<script>
+    function reload() {
+        debugger;
+        window.location.reload();
+    }
+</script>

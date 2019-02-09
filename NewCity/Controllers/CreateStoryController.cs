@@ -23,6 +23,16 @@ namespace NewCity.Controllers
         public IActionResult Index(string id)
         {
             List<StoryCard> storyCards = _context.StoryCard.Where(a => a.StorySeriesID == Guid.Parse(id)).Include(a => a.StoryOptions).ToList();
+            if (storyCards.Count == 0) {
+                StoryCard card = new StoryCard() {
+                    ID = Guid.NewGuid(),
+                    StorySeriesID = Guid.Parse(id),
+                    StoryName = string.Empty,
+                };
+                storyCards.Add(card);
+                _context.StoryCard.Add(card);
+                _context.SaveChanges();
+            }
             return View(storyCards);
         }
 
@@ -47,7 +57,8 @@ namespace NewCity.Controllers
         {
             //如果你是该故事系列的作者才可以保存
 
-            StoryCard card = _context.StoryCard.Where(a => a.ID == storyCard.ID).Include(i=>i.StoryOptions).FirstOrDefault();
+            StoryCard card = _context.StoryCard.Where(a => a.ID == storyCard.ID).Include(i => i.StoryOptions).FirstOrDefault();
+
             StorySeries series = _context.StorySeries.Where(a => a.ID == card.StorySeriesID).AsNoTracking().FirstOrDefault();
             var userid = GetUserId();
             if (series.Author == userid)
@@ -59,7 +70,8 @@ namespace NewCity.Controllers
                     {
                         card.Text = storyCard.Text;
                         card.IMG = storyCard.IMG;
-                        if (storyCard.StoryOptions != null) {
+                        if (storyCard.StoryOptions != null)
+                        {
                             if (storyCard.StoryOptions.Count() != card.StoryOptions.Count())
                             {
                                 //存在选项更改
@@ -88,7 +100,7 @@ namespace NewCity.Controllers
                             card.StoryOptions = null;
                             _context.SaveChanges();
                         }
-                        
+
                         _context.StoryCard.Update(card);
                         await _context.SaveChangesAsync();
                         return new JsonResult(true);
@@ -103,6 +115,8 @@ namespace NewCity.Controllers
             {
                 return new JsonResult(true);
             }
+
+
             return new JsonResult(true);
         }
 

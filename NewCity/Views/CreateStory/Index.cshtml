@@ -37,26 +37,30 @@
                 <div class="row" id="Option">
                     @if (Model.Count() != 0)
                     {
-                        <input hidden id="optionCount" type="text" value="@Model.First().StoryOptions.Count()" />
+                        <input hidden id="optionCount" type="text" value="@(Model.First().StoryOptions!=null?Model.First().StoryOptions.Count():0)" />
                         int i = 0; //计算当前是第几个选项
-                        @foreach (var item in Model.First().StoryOptions)
+                        @if (Model.First().StoryOptions != null)
                         {
-                            <div class="row" id="option-@item.ID">
-                                <input name="storyCard.StoryOptions[@i].ID" hidden type="text" value="@item.ID" />
+                            @foreach (var item in Model.First().StoryOptions)
+                            {
+                                <div class="row" id="option-@item.ID">
+                                    <input name="storyCard.StoryOptions[@i].ID" hidden type="text" value="@item.ID" />
 
-                                <button type="button" onclick="Condition('@i')">条件</button>
-                                <input id="storyCard.StoryOptions[@i].Condition" name="storyCard.StoryOptions[@i].Condition" hidden type="text" value="@(item.Condition)" />
+                                    <button type="button" onclick="Condition('@i')">条件</button>
+                                    <input id="storyCard.StoryOptions[@i].Condition" name="storyCard.StoryOptions[@i].Condition" hidden type="text" value="@(item.Condition)" />
 
-                                <input name="storyCard.StoryOptions[@i].Text" type="text" value="@item.Text">
+                                    <input name="storyCard.StoryOptions[@i].Text" type="text" value="@item.Text">
 
-                                <button type="button" onclick="Effect('@i')">效果</button>
-                                <input name="storyCard.StoryOptions[@i].Effect" hidden type="text" value="@item.Effect" />
+                                    <button type="button" onclick="Effect('@i')">效果</button>
+                                    <input name="storyCard.StoryOptions[@i].Effect" hidden type="text" value="@item.Effect" />
 
-                                <button type="button" onclick="Cancel('option-@item.ID')">取消</button>
-                                <button type="button" onclick="NextCard('@item.ID')">→</button>
-                            </div>
-                            i++;
+                                    <button type="button" onclick="Cancel('option-@item.ID')">取消</button>
+                                    <button type="button" onclick="NextCard('@item.ID')">→</button>
+                                </div>
+                                i++;
+                            }
                         }
+
                     }
 
 
@@ -128,8 +132,11 @@
 
     //增加选项
     function AddOption() {
+        debugger;
         let optioncount = $("#optionCount").val();  //选项计数
-        
+        if (!optioncount) {
+            optioncount = 0;
+        }
         let id = guid();
         let optionID = "<input hidden type='text' name='storyCard.StoryOptions[" + optioncount + "].ID' value='" + id+"' />";
         let condition = "<button type='button' onclick='Condition(" + optioncount + ")'>条件</button> <input hidden id='storyCard.StoryOptions[" + optioncount + "].Condition' name='storyCard.StoryOptions[" + optioncount + "].Condition' type='text' value='' />";
@@ -176,10 +183,15 @@
                 $("#ConditionForm").append(toappend)
                 conditioncount++;
                 //赋值
-                $("#storyStates[" + i + "].Name").val(condition["storyStates[" + i + "].Name"]);
-                $("#storyStates[" + i + "].Type").text(enumConditionType[condition["storyStates[" + i + "].Type"]]);
-                $("#storyStates[" + i + "].Type").val(condition["storyStates[" + i + "].Type"]);
-                $("#storyStates[" + i + "].Value").val(condition["storyStates[" + i + "].Value"]);
+                //$("#storyStates[" + i + "].Name").val(condition["storyStates[" + i + "].Name"]);
+                //$("#storyStates[" + i + "].Type").text(enumConditionType[condition["storyStates[" + i + "].Type"]]);
+                //$("#storyStates[" + i + "].Type").val(condition["storyStates[" + i + "].Type"]);
+                //$("#storyStates[" + i + "].Value").val(condition["storyStates[" + i + "].Value"]);
+
+                document.getElementById("storyStates[" + i + "].Name").value = condition["storyStates[" + i + "].Name"];
+                document.getElementById("storyStates[" + i + "].Type").text = enumConditionType[condition["storyStates[" + i + "].Type"]];
+                document.getElementById("storyStates[" + i + "].Type").value = condition["storyStates[" + i + "].Type"];
+                document.getElementById("storyStates[" + i + "].Value").value = condition["storyStates[" + i + "].Value"];
                 
             }
         }
@@ -254,7 +266,7 @@
                 o[a[obj].name].push(a[obj].value) || ""; 
             }
             else {
-                o[a[obj].name] = a[obj].value || '';x  
+                o[a[obj].name] = a[obj].value || '';
             }
         }
         

@@ -13,7 +13,7 @@
     <div class="col-md-6" style="background-color:aqua">
 
         <div class="row">
-            @if (ViewBag.InLocation)
+            @if (ViewBag.InLocation&&ViewBag.ReadList!=null)
             {
                 <div class="col-md-4">
                     <img src="@ViewBag.ReadList.IMG" />
@@ -29,10 +29,10 @@
                     </div>
                 }
             }
-            else
+            else if (!ViewBag.InLocation && ViewBag.ReadList != null)
             {
                 <div class="col-md-4">
-                    <img src="@ViewBag.ReadList.IMG" />
+                    <img src="@(ViewBag.ReadList.IMG)" />
                 </div>
                 <div class="col-md-8">
                     <p>@ViewBag.ReadList.Text</p>
