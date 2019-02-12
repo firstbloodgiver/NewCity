@@ -4,24 +4,17 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using NewCity.Data;
 using NewCity.Models;
 
 namespace NewCity.Controllers
 {
-    public class CreatorController : Controller
-    {
-        private readonly SignInManager<IdentityUser> _SignInManager;
-        private readonly UserManager<IdentityUser> _userManager;
-        private readonly NewCityDbContext _context;
+    public class CreatorController : BaseController
+    { 
 
-
-        public CreatorController(SignInManager<IdentityUser> SignInManager, UserManager<IdentityUser> UserManager, NewCityDbContext context ) {
-            _SignInManager = SignInManager;
-            _userManager = UserManager;
-            _context = context;
-            
-        }
+        public CreatorController(SignInManager<IdentityUser> SignInManager, UserManager<IdentityUser> UserManager, NewCityDbContext context)
+            : base(SignInManager, UserManager, context){}
 
         public IActionResult Index()
         {
@@ -43,7 +36,7 @@ namespace NewCity.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Index([Bind("SeriesName,Text")] StorySeries storySeries)
         {
-            string AccoundID = _userManager.GetUserId(User);
+            string AccoundID = GetUserId().ToString();
             if (ModelState.IsValid)
             {
                 storySeries.ID = Guid.NewGuid();
@@ -55,7 +48,16 @@ namespace NewCity.Controllers
             return Index();
         }
 
-        [HttpDelete]
+        [HttpPost]
+        public async Task<IActionResult> Delete(string id) {
+            var storySeries = await _context.StorySeries.FirstOrDefaultAsync(m => m.ID == Guid.Parse(id));
+            if (storySeries.Author == GetUserId()) {
+                _context.StorySeries.Remove(storySeries);
+                await _context.SaveChangesAsync();
+                return new JsonResult(true);
+            }
+            return new JsonResult(false);
+        }
 
     }
 }
