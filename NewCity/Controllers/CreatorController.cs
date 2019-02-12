@@ -54,5 +54,8 @@ namespace NewCity.Controllers
             
             return Index();
         }
+
+        [HttpDelete]
+
     }
 }

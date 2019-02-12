@@ -25,7 +25,7 @@
                     </div>
                     <a asp-controller="CreateStory" asp-action="Index" asp-route-id="@item.ID">编辑</a>
                     <a>启用</a>
-                    <a>删除</a>
+                    <a asp-controller="CreateStory" asp-action="Delete" asp-route-id="@item.ID" onclick="return DeleteConfirm()">删除</a>
                 </div>
             }
         }
@@ -63,5 +63,10 @@
     function reload() {
         debugger;
         window.location.reload();
+    }
+
+    function DeleteConfirm() {
+        let msg = "您真的确定要删除吗？\n\n请确认！"; 
+        return confirm(msg);
     }
 </script>
