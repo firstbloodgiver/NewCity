@@ -69,7 +69,7 @@
         let msg = "您真的确定要删除吗？\n\n请确认！"; 
         if (confirm(msg)) {
             $.post("/Creator/Delete", { id: id }, function (data) {
-
+                window.location.reload();
             })
         }
     }

@@ -15,7 +15,7 @@
 
         </div>
         <div class="col-md-9">
-            <form target="fack" id="StoryCard" asp-action="Save" method="post" >
+            <form target="fack" id="StoryCard" asp-action="Save" method="post">
                 <div class="row">
                     <div id="StoryId">
                         <input name="storyCard.ID" hidden value="@(Model.Count() > 0 ? Model.First().ID : Guid.Empty)" />
@@ -70,7 +70,7 @@
                     <button type="button" onclick="AddOption()">增加选项</button>
                 </div>
                 <div class="form-group">
-                    <button type="submit" id="submit"  class="btn">保存</button>
+                    <button type="submit" id="submit" class="btn">保存</button>
                 </div>
             </form>
             <iframe name="fack" id="fack" hidden></iframe>
@@ -114,18 +114,33 @@
     </div>
 </div>
 
+<!--下一张卡片模态框-->
+<div id="NextCardModel" class="modal fade">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                <h4 class="modal-title" id="myModalLabel">模态框（Modal）标题</h4>
+            </div>
+            <div class="modal-body">
+                
+            </div>
+        </div>
+    </div>
+</div>
+
 <script>
-    
+
     function GetStoryCard() {
         //点击树加载该故事卡到主页面
-        
+
     }
 
-    $("#fack").on('load',function () {
+    $("#fack").on('load', function () {
         let a = window.frames["fack"].document.body.innerText;
         if (a != '') {
             alert(a);
-            window.location.reload(); 
+            window.location.reload();
         }
     });
 
@@ -136,7 +151,24 @@
 
     //下一张卡
     function NextCard(optionid) {
-
+        $.post("/CreateStory/", { id: optionid }, function (data) {
+            debugger;
+            var json = JSON.parse(data);
+            switch (json.value) {
+                case (1):
+                    alert("无效ID")
+                    //ID无效
+                    break;
+                case (2):
+                    //创建新卡片
+                    $('#NextCardModel').modal('show');
+                    break;
+                case (3):
+                    alert("权限不足")
+                    //权限不足
+                    break;
+            }
+        })
     }
 
     //增加选项
@@ -146,13 +178,13 @@
             optioncount = 0;
         }
         let id = guid();
-        let optionID = "<input hidden type='text' name='storyCard.StoryOptions[" + optioncount + "].ID' value='" + id+"' />";
+        let optionID = "<input hidden type='text' name='storyCard.StoryOptions[" + optioncount + "].ID' value='" + id + "' />";
         let condition = "<button type='button' onclick='Condition(" + optioncount + ")'>条件</button> <input hidden id='storyCard.StoryOptions[" + optioncount + "].Condition' name='storyCard.StoryOptions[" + optioncount + "].Condition' type='text' value='' />";
         let text = "<input type='text' name='storyCard.StoryOptions[" + optioncount + "].Text' value=''>";
         let effect = " <button type='button' onclick='Effect(" + optioncount + ")'>效果</button> <input id='storyCard.StoryOptions[" + optioncount + "].Effect' name='storyCard.StoryOptions[" + optioncount + "].Effect' hidden type='text' value='' />";
-        let button = " <button type='button' onclick=Cancel('option-"+id+"')>取消</button> <button type='button' onclick='NextCard('')'>→</button>";
+        let button = " <button type='button' onclick=Cancel('option-" + id + "')>取消</button> <button type='button' onclick='NextCard('')'>→</button>";
 
-        let toappend = "<div class='row' id=option-" + id +">" + optionID + condition + text + effect + button + "</div>"
+        let toappend = "<div class='row' id=option-" + id + ">" + optionID + condition + text + effect + button + "</div>"
         $("#Option").append(toappend)
         $("#optionCount").val(optioncount);
         optioncount++;
@@ -175,9 +207,9 @@
                 conditionLength++;
             }
 
-            for (let i = 0; i < conditionLength/3;i++) {
+            for (let i = 0; i < conditionLength / 3; i++) {
                 let Name = "<input  type='text' name='storyStates[" + i + "].Name' id='cd-storyStates[" + i + "].Name'/>";
-                let Type = "<select  name='storyStates[" + i + "].Type' id='cd-storyStates[" + i + "].Type'>" 
+                let Type = "<select  name='storyStates[" + i + "].Type' id='cd-storyStates[" + i + "].Type'>"
                     + "<option value='1'>></option>"
                     + "<option value='2'><</option>"
                     + "<option value='3'>=</option>"
@@ -185,7 +217,7 @@
                     + "</select>";
                 let Value = "<input  type='text' name='storyStates[" + i + "].Value' id='cd-storyStates[" + i + "].Value'/>";
                 let Delete = "<button onclick='ConditionCancel(" + i + ")'>取消</button>";
-                let context =  Name + Type + Value + Delete;
+                let context = Name + Type + Value + Delete;
                 let toappend = "<div class='row' id='condition" + i + "'>" + context + "</div>"
                 $("#ConditionForm").append(toappend)
                 conditioncount++;
@@ -195,7 +227,7 @@
                 document.getElementById("cd-storyStates[" + i + "].Type").text = enumConditionType[condition["storyStates[" + i + "].Type"]];
                 document.getElementById("cd-storyStates[" + i + "].Type").value = condition["storyStates[" + i + "].Type"];
                 document.getElementById("cd-storyStates[" + i + "].Value").value = condition["storyStates[" + i + "].Value"];
-                
+
             }
         }
 
@@ -213,8 +245,8 @@
         let i = $("#ConditionId").val();
         //let value = $("#ConditionForm").serialize();
         let value = FormtoJson($("#ConditionForm"));
-        
-        document.getElementById("storyCard.StoryOptions["+i+"].Condition").value = value;
+
+        document.getElementById("storyCard.StoryOptions[" + i + "].Condition").value = value;
         $("#ConditionModel").modal('hide')
     }
 
@@ -222,7 +254,7 @@
     function AddCondition() {
         let i = conditioncount;
         let Name = "<input  type='text'  name='storyStates[" + i + "].Name' id='cd-storyStates[" + i + "].Name'/>";
-        let Type = "<select  name='storyStates[" + i + "].Type' id='cd-storyStates[" + i + "].Type'>" 
+        let Type = "<select  name='storyStates[" + i + "].Type' id='cd-storyStates[" + i + "].Type'>"
             + "<option value='1'>></option>"
             + "<option value='2'><</option>"
             + "<option value='3'>=</option>"
@@ -230,7 +262,7 @@
             + "</select>";
         let Value = "<input  type='text' name='storyStates[" + i + "].Value' id='cd-storyStates[" + i + "].Value'/>";
         let Delete = "<button onclick='ConditionCancel(" + i + ")'>取消</button>";
-        let context =  Name + Type + Value + Delete;
+        let context = Name + Type + Value + Delete;
         let toappend = "<div class='row' id='condition" + i + "'>" + context + "</div>"
         $("#ConditionForm").append(toappend)
         conditioncount++;
@@ -315,7 +347,7 @@
         return (S4() + S4() + "-" + S4() + "-" + S4() + "-" + S4() + "-" + S4() + S4() + S4());
     }
 
-    function FormtoJson (form) {
+    function FormtoJson(form) {
         var o = {};
         var a = form.serializeArray();
         for (let obj in a) {
@@ -323,13 +355,13 @@
                 if (!o[a[obj].name].push) {
                     o[a[obj].name] = [o[a[obj].name]]
                 }
-                o[a[obj].name].push(a[obj].value) || ""; 
+                o[a[obj].name].push(a[obj].value) || "";
             }
             else {
                 o[a[obj].name] = a[obj].value || '';
             }
         }
-        
+
         return JSON.stringify(o);
     }
 

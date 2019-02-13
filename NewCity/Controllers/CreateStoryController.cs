@@ -107,19 +107,47 @@ namespace NewCity.Controllers
                     }
                     catch (Exception ex)
                     {
-                        throw;
+                        return new JsonResult(true);
                     }
+                }
+            }
+            return new JsonResult(false);
+        }
+
+        [HttpPost]
+        public IActionResult NextCard(Guid id) {
+            int statuscode = 0;
+            string ContentType = string.Empty;
+            if (id != null ) {
+                var card = _context.StoryCard.Where(a => a.ID == id).AsNoTracking().FirstOrDefault();
+                if (card != null ) {
+                    if (_context.StorySeries.Where(a => a.ID == card.StorySeriesID).AsNoTracking().FirstOrDefault().Author == GetUserId()) {
+                        return RedirectToAction("Index", id);
+                    }
+                    else
+                    {
+                        statuscode = 3;
+                        ContentType = "权限不足！";
+                    }
+                }
+                else
+                {
+                    statuscode = 2;
+                    ContentType = "不存在该卡片！";
                 }
             }
             else
             {
-                return new JsonResult(true);
+                statuscode = 1;
+                ContentType = "无效ID！";
             }
-
-
-            return new JsonResult(true);
+            JsonResult result = new JsonResult(false) {
+                StatusCode = statuscode,
+                ContentType = ContentType,
+            };
+            
+            return result;
         }
-
     }
 
 }
