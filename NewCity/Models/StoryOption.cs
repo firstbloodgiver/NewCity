@@ -12,7 +12,7 @@ namespace NewCity.Models
 
 
         public string Text { get; set; }
-        public Guid NextStoryCardID { get; set; }
+        public Guid NextStoryCardID { get; set; } 
 
         /// <summary>
         /// 选项出现条件

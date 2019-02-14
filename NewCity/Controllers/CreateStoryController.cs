@@ -64,53 +64,54 @@ namespace NewCity.Controllers
             if (series.Author == userid)
             {
 
-                if (ModelState.IsValid)
-                {
-                    try
-                    {
-                        card.Text = storyCard.Text;
-                        card.IMG = storyCard.IMG;
-                        if (storyCard.StoryOptions != null)
-                        {
-                            if (storyCard.StoryOptions.Count() != card.StoryOptions.Count())
-                            {
-                                //存在选项更改
-                                card.StoryOptions = null;
-                                var deletelist = _context.StoryOption.Where(a => a.StoryCardID == card.ID).ToList();
-                                _context.StoryOption.RemoveRange(deletelist);
-                                foreach (var option in storyCard.StoryOptions)
-                                {
-                                    option.StoryCardID = card.ID;
-                                    option.Condition = storyCard.StoryOptions.Where(a => a.ID == option.ID).First().Condition;
-                                }
-                                _context.StoryOption.AddRange(storyCard.StoryOptions);
-                                _context.SaveChanges();
-                            }
-                            else
-                            {
-                                foreach (var option in card.StoryOptions)
-                                {
-                                    option.Condition = storyCard.StoryOptions.Where(a => a.ID == option.ID).First().Condition;
 
-                                }
+                try
+                {
+                    card.Text = storyCard.Text;
+                    card.IMG = storyCard.IMG;
+                    if (storyCard.StoryOptions != null)
+                    {
+                        if (storyCard.StoryOptions.Count() != card.StoryOptions.Count())
+                        {
+                            //存在选项更改
+                            card.StoryOptions = null;
+                            var deletelist = _context.StoryOption.Where(a => a.StoryCardID == card.ID).ToList();
+                            _context.StoryOption.RemoveRange(deletelist);
+                            foreach (var option in storyCard.StoryOptions)
+                            {
+                                option.StoryCardID = card.ID;
+                                option.Condition = storyCard.StoryOptions.Where(a => a.ID == option.ID).First().Condition;
                             }
+                            _context.StoryOption.AddRange(storyCard.StoryOptions);
+                            _context.SaveChanges();
                         }
                         else
                         {
-                            card.StoryOptions = null;
-                            _context.SaveChanges();
-                        }
+                            foreach (var option in card.StoryOptions)
+                            {
+                                option.Condition = storyCard.StoryOptions.Where(a => a.ID == option.ID).First().Condition;
 
-                        _context.StoryCard.Update(card);
-                        await _context.SaveChangesAsync();
-                        return new JsonResult(true);
+                            }
+                        }
                     }
-                    catch (Exception ex)
+                    else
                     {
-                        return new JsonResult(ex);
+                        card.StoryOptions = null;
+                        _context.SaveChanges();
                     }
+
+                    _context.StoryCard.Update(card);
+                    await _context.SaveChangesAsync();
+                    return new JsonResult(true);
                 }
+                catch (Exception ex)
+                {
+                    return new JsonResult(ex);
+                }
+
+
             }
+
             return new JsonResult(false);
         }
 
@@ -125,7 +126,7 @@ namespace NewCity.Controllers
         public IActionResult NextCard(Guid id,Guid seriesid,Guid optionid) {
             int statuscode = 0;
             string ContentType = string.Empty;
-            if (id != null ) {
+            if (id != null||id !=Guid.Empty ) {
                 var card = _context.StoryCard.Where(a => a.ID == id).AsNoTracking().FirstOrDefault();
                 if (card != null ) {
                     if (_context.StorySeries.Where(a => a.ID == card.StorySeriesID).AsNoTracking().FirstOrDefault().Author == GetUserId()) {

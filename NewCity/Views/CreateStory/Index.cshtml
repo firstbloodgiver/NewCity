@@ -56,7 +56,7 @@
                                     <button type="button" onclick="Cancel('option-@item.ID')">取消</button>
 
                                     <button type="button" onclick="NextCard('@item.ID','@Model.First().StorySeriesID','@item.ID')">→</button>
-                                    <input name="storyCard.StoryOptions[@i].NextStoryCardID" type="text" placeholder="为空则新建故事卡" value="@item.NextStoryCardID">
+                                    <input name="storyCard.StoryOptions[@i].NextStoryCardID" type="text" placeholder="为空则新建故事卡" value="@(item.NextStoryCardID==null?Guid.Empty:item.NextStoryCardID)">
                                 </div>
                                 i++;
                             }
@@ -150,9 +150,9 @@
     }
 
     //下一张卡
-    function NextCard(optionid, seriesid) {
+    function NextCard(optionid, seriesid, optionid) {
         if (confirm("即将移动到新的页面，请确认已保存")) {
-            $.post("/CreateStory/", { id: optionid, seriesid: seriesid }, function (data) {
+            $.post("/CreateStory/NextCard", { id: optionid, seriesid: seriesid, optionid: optionid}, function (data) {
 
             });
         }
