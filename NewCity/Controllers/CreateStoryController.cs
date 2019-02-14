@@ -107,21 +107,38 @@ namespace NewCity.Controllers
                     }
                     catch (Exception ex)
                     {
-                        return new JsonResult(true);
+                        return new JsonResult(ex);
                     }
                 }
             }
             return new JsonResult(false);
         }
 
+        /// <summary>
+        /// 移动到下一卡片，若id无则新建
+        /// </summary>
+        /// <param name="id">指定的下一卡片id</param>
+        /// <param name="seriesid">故事系列id</param>
+        /// <param name="optionid">选项id</param>
+        /// <returns></returns>
         [HttpPost]
-        public IActionResult NextCard(Guid id) {
+        public IActionResult NextCard(Guid id,Guid seriesid,Guid optionid) {
             int statuscode = 0;
             string ContentType = string.Empty;
             if (id != null ) {
                 var card = _context.StoryCard.Where(a => a.ID == id).AsNoTracking().FirstOrDefault();
                 if (card != null ) {
                     if (_context.StorySeries.Where(a => a.ID == card.StorySeriesID).AsNoTracking().FirstOrDefault().Author == GetUserId()) {
+                        var option = _context.StoryOption.Where(a => a.ID == optionid).FirstOrDefault();
+                        if (option.NextStoryCardID != id) {
+                            //if (_context.StoryOption.Where(a => a.NextStoryCardID == nextid).AsNoTracking().ToArray().Length == 0) {
+                            //删除
+                            //}
+                            option.NextStoryCardID = id;
+                            _context.StoryOption.Update(option);
+                            _context.SaveChanges();
+
+                        }
                         return RedirectToAction("Index", id);
                     }
                     else
@@ -135,11 +152,18 @@ namespace NewCity.Controllers
                     statuscode = 2;
                     ContentType = "不存在该卡片！";
                 }
+
             }
             else
             {
-                statuscode = 1;
-                ContentType = "无效ID！";
+                //新建卡片
+                StoryCard storyCard = new StoryCard()
+                {
+                    ID = Guid.NewGuid(),
+                    StorySeriesID  = seriesid,                    
+                };
+                _context.StoryCard.Add(storyCard);
+                _context.SaveChanges();
             }
             JsonResult result = new JsonResult(false) {
                 StatusCode = statuscode,

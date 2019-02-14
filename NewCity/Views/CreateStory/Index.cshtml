@@ -2,8 +2,6 @@
 @using NewCity.Enum;
 @{
     ViewData["Title"] = "Creator";
-    //EnumConditionType enumConditionType = new EnumConditionType();
-    //EnumEffectType enumEffectType = new EnumEffectType();
 }
 <script src="~/js/enum.js"></script>
 <script src="~/lib/jquery/dist/jquery.min.js"></script>
@@ -56,7 +54,9 @@
                                     <input id="storyCard.StoryOptions[@i].Effect" name="storyCard.StoryOptions[@i].Effect" hidden type="text" value="@(item.Effect)" />
 
                                     <button type="button" onclick="Cancel('option-@item.ID')">取消</button>
-                                    <button type="button" onclick="NextCard('@item.ID')">→</button>
+
+                                    <button type="button" onclick="NextCard('@item.ID','@Model.First().StorySeriesID','@item.ID')">→</button>
+                                    <input name="storyCard.StoryOptions[@i].NextStoryCardID" type="text" placeholder="为空则新建故事卡" value="@item.NextStoryCardID">
                                 </div>
                                 i++;
                             }
@@ -150,25 +150,12 @@
     }
 
     //下一张卡
-    function NextCard(optionid) {
-        $.post("/CreateStory/", { id: optionid }, function (data) {
-            debugger;
-            var json = JSON.parse(data);
-            switch (json.value) {
-                case (1):
-                    alert("无效ID")
-                    //ID无效
-                    break;
-                case (2):
-                    //创建新卡片
-                    $('#NextCardModel').modal('show');
-                    break;
-                case (3):
-                    alert("权限不足")
-                    //权限不足
-                    break;
-            }
-        })
+    function NextCard(optionid, seriesid) {
+        if (confirm("即将移动到新的页面，请确认已保存")) {
+            $.post("/CreateStory/", { id: optionid, seriesid: seriesid }, function (data) {
+
+            });
+        }
     }
 
     //增加选项
@@ -182,9 +169,9 @@
         let condition = "<button type='button' onclick='Condition(" + optioncount + ")'>条件</button> <input hidden id='storyCard.StoryOptions[" + optioncount + "].Condition' name='storyCard.StoryOptions[" + optioncount + "].Condition' type='text' value='' />";
         let text = "<input type='text' name='storyCard.StoryOptions[" + optioncount + "].Text' value=''>";
         let effect = " <button type='button' onclick='Effect(" + optioncount + ")'>效果</button> <input id='storyCard.StoryOptions[" + optioncount + "].Effect' name='storyCard.StoryOptions[" + optioncount + "].Effect' hidden type='text' value='' />";
-        let button = " <button type='button' onclick=Cancel('option-" + id + "')>取消</button> <button type='button' onclick='NextCard('')'>→</button>";
-
-        let toappend = "<div class='row' id=option-" + id + ">" + optionID + condition + text + effect + button + "</div>"
+        let cancel = " <button type='button' onclick=Cancel('option-" + id + "')>取消</button> <button type='button' onclick='NextCard('','@Model.First().StorySeriesID','" + id+"')'>→</button>";
+        let nextcard = "<input name='storyCard.StoryOptions[" + optioncount + "].NextStoryCardID' type='text' >";
+        let toappend = "<div class='row' id=option-" + id + ">" + optionID + condition + text + effect + cancel + nextcard + "</div>"
         $("#Option").append(toappend)
         $("#optionCount").val(optioncount);
         optioncount++;
