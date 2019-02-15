@@ -11,7 +11,7 @@ using NewCity.Data;
 using NewCity.Models;
 using System.Web;
 using Newtonsoft.Json;
-
+using NewCity.Enum;
 
 namespace NewCity.Controllers
 {
@@ -98,11 +98,28 @@ namespace NewCity.Controllers
         /// 检查是否符合显示条件
         /// </summary>
         /// <param name="Condition"></param>
+        /// <param name="Condition"></param>
         /// <returns></returns>
-        private bool check(string Condition)
+        private bool check(string Condition,string StorySeriesID)
         {
-            
-            return true;
+            List<StoryStatus> storyStatuses = JsonConvert.DeserializeObject<List<StoryStatus>>(Condition);
+            foreach (var statu in storyStatuses) {
+                var status = _context.StoryStatus.Where(a => a.StorySeries == StorySeriesID && a.Name == statu.Name).FirstOrDefault();
+                if (status != null) {
+
+                    switch (Convert.ToInt32(status.Type)) {
+                        case (int)enumConditionType.大于:
+                            break;
+                        case (int)enumConditionType.小于:
+                            break;
+                        case (int)enumConditionType.等于:
+                            break;
+                        case (int)enumConditionType.不等于:
+                            break;
+                    }
+                }
+            }
+            return false;
         }
 
         private bool InLocation(Guid userid, out Guid StorySeriesID)
