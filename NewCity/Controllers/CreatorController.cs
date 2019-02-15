@@ -54,9 +54,9 @@ namespace NewCity.Controllers
             if (storySeries.Author == GetUserId()) {
                 _context.StorySeries.Remove(storySeries);
                 await _context.SaveChangesAsync();
-                return new JsonResult(true);
+                return Json(true);
             }
-            return new JsonResult(false);
+            return Json(false);
         }
 
     }

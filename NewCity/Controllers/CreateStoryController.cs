@@ -43,7 +43,6 @@ namespace NewCity.Controllers
         /// <returns></returns>
         public string GetCard(string ID)
         {
-
             StoryCard storyCard = _context.StoryCard.Where(a => a.ID == Guid.Parse(ID)).FirstOrDefault();
             return JsonConvert.SerializeObject(storyCard);
         }
@@ -102,17 +101,17 @@ namespace NewCity.Controllers
 
                     _context.StoryCard.Update(card);
                     await _context.SaveChangesAsync();
-                    return new JsonResult(true);
+                    return Json(true);
                 }
                 catch (Exception ex)
                 {
-                    return new JsonResult(ex);
+                    return Json(ex);
                 }
 
 
             }
 
-            return new JsonResult(false);
+            return Json(false);
         }
 
         /// <summary>

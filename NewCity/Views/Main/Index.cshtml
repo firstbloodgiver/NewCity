@@ -62,7 +62,7 @@
 
     function NextCard(storyID) {
         $.post(
-            '/Main/NextCart?storyID=' + storyID,
+            '/Main/NextCart',
             { storyID: storyID },
             function (result) {
                 debugger;
