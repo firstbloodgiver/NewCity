@@ -50,7 +50,7 @@ namespace NewCity.Controllers
                 //去除不符合显示条件的选项
                 List<StoryOption> storyOptions = new List<StoryOption>();
                 foreach (var option in ReadList.StoryOptions) {
-                    if (check(option.Condition)) {
+                    if (Check(option.Condition, ReadList.StorySeriesID.ToString())) {
                         storyOptions.Add(option);
                     }
                 }
@@ -63,35 +63,57 @@ namespace NewCity.Controllers
         }
 
         [HttpPost]
-        public async Task<JsonResult> NextCart(Guid? storyID)
+        public async Task<JsonResult> NextCard(Guid? optionID)
         {
             var userid = GetUserId();
             var Schedule = _context.UserCharacter.AsNoTracking().Where(a => a.UserId == userid)
                 .Join(_context.CharacterSchedule, a => a.ID,b=>b.CharacterID,(a,b)=>new { IsStory = b.IsStory, StorySeriesID=b.StorySeriesID, StoryCardID =b.StoryCardID })
                 .FirstOrDefault();
-            if (Schedule.IsStory) {
+            if (Schedule.IsStory)
+            {
                 List<StoryOption> Options = new List<StoryOption>();
-                var storycards = _context.StoryCard.AsNoTracking().Where(a => a.ID == Schedule.StoryCardID).Include(a=>a.StoryOptions).FirstOrDefault();
-                foreach (var option in storycards.StoryOptions) {
-                    if (check(option.Condition)) {
+                var storycards = _context.StoryCard.AsNoTracking().Where(a => a.ID == Schedule.StoryCardID).Include(a => a.StoryOptions).FirstOrDefault();
+                foreach (var option in storycards.StoryOptions)
+                {
+                    if (Check(option.Condition, storycards.StorySeriesID.ToString()))
+                    {
                         Options.Add(option);
                     }
                 }
-                if (Options.Where(a => a.NextStoryCardID == storyID).FirstOrDefault() == null) {
-                    return Json("不存在的后续故事卡片！");
+                var opt = Options.Where(a => a.ID == optionID).FirstOrDefault();
+                if (opt != null)
+                {
+                    var card = await _context
+                       .StoryCard
+                       .AsNoTracking()
+                       .Include(s => s.StoryOptions)
+                       .FirstOrDefaultAsync(m => m.ID == opt.NextStoryCardID);
+
+                    Execute(opt.Effect);
+
+                    UpdateCharacterSchedule(userid, opt);
+
+                    return Json(card);
                 }
             }
             else
             {
                 //地图场景处理
             }
-            var card = await _context
-               .StoryCard
-               .AsNoTracking()
-               .Include(s => s.StoryOptions)
-               .FirstOrDefaultAsync(m => m.ID == storyID);
-
-            return Json(card);
+            return Json("不存在的后续故事卡片！");
+        }
+        /// <summary>
+        /// 更新角色当前故事卡进度
+        /// </summary>
+        /// <param name="userid"></param>
+        /// <param name="opt"></param>
+        private void UpdateCharacterSchedule(Guid userid, StoryOption opt)
+        {
+            Guid CharacterID = _context.UserCharacter.AsNoTracking().Where(a => a.UserId == userid).FirstOrDefault().ID;
+            var characterSchedule = _context.CharacterSchedule.Where(a => a.CharacterID == CharacterID).FirstOrDefault();
+            characterSchedule.StoryCardID = opt.NextStoryCardID;
+            _context.Update(characterSchedule);
+            _context.SaveChanges();
         }
 
         /// <summary>
@@ -100,28 +122,41 @@ namespace NewCity.Controllers
         /// <param name="Condition"></param>
         /// <param name="Condition"></param>
         /// <returns></returns>
-        private bool check(string Condition,string StorySeriesID)
+        private bool Check(string Condition,string StorySeriesID)
         {
             List<StoryStatus> storyStatuses = JsonConvert.DeserializeObject<List<StoryStatus>>(Condition);
-            foreach (var statu in storyStatuses) {
-                var status = _context.StoryStatus.Where(a => a.StorySeries == StorySeriesID && a.Name == statu.Name).FirstOrDefault();
-                if (status != null) {
-
+            foreach (var status in storyStatuses) {
+                var DBstatus = _context.StoryStatus.AsNoTracking().Where(a => a.StorySeries == StorySeriesID && a.Name == status.Name).FirstOrDefault();
+                if (DBstatus != null) {
+                    int dbstatus = Convert.ToInt32(DBstatus.Value);
+                    int statues = Convert.ToInt32(status.Value);
+                    bool result = false;
                     switch (Convert.ToInt32(status.Type)) {
                         case (int)enumConditionType.大于:
+                            result = dbstatus > statues ? true : false;
                             break;
                         case (int)enumConditionType.小于:
+                            result = dbstatus < statues ? true : false;
                             break;
                         case (int)enumConditionType.等于:
+                            result = dbstatus == statues ? true : false;
                             break;
                         case (int)enumConditionType.不等于:
+                            result = dbstatus != statues ? true : false;
                             break;
                     }
+                    if (result == false) return false;
                 }
             }
-            return false;
+            return true;
         }
 
+        /// <summary>
+        /// 检测在故事卡中还是在场景中
+        /// </summary>
+        /// <param name="userid"></param>
+        /// <param name="StorySeriesID"></param>
+        /// <returns></returns>
         private bool InLocation(Guid userid, out Guid StorySeriesID)
         {
             var location = _context.UserCharacter.AsNoTracking().Where(p => p.UserId == userid)
@@ -141,10 +176,18 @@ namespace NewCity.Controllers
             ViewBag.InLocation = true;
             return true;
         }
-        
 
+        /// <summary>
+        /// 执行进行选项时下一部操作
+        /// </summary>
+        /// <param name="Effect"></param>
+        private void Execute(string Effect) {
+            List<StoryStatus> storyStatuses = JsonConvert.DeserializeObject<List<StoryStatus>>(Effect);
+            //暂时只能修改状态
+            foreach (var obj in storyStatuses) {
 
-
+            }
+        }
     }
 
 }
