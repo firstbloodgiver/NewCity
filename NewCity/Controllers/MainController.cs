@@ -185,9 +185,50 @@ namespace NewCity.Controllers
             List<StoryStatus> storyStatuses = JsonConvert.DeserializeObject<List<StoryStatus>>(Effect);
             //暂时只能修改状态
             foreach (var obj in storyStatuses) {
-
+                switch (Convert.ToInt32(obj.Type)) {
+                    case (int)enumEffectType.增加:
+                        Increase(obj);
+                        break;
+                    case (int)enumEffectType.减少:
+                        Reduce(obj);
+                        break;
+                    case (int)enumEffectType.赋值:
+                        Assign(obj);
+                        break;
+                }
             }
         }
+
+        private void Increase(StoryStatus storyStatus)
+        {
+            StoryStatus status = _context.StoryStatus.Where(a => a.StorySeries == storyStatus.StorySeries && a.Name == storyStatus.Name).FirstOrDefault();
+            if (status != null) {
+                status.Value = (Convert.ToInt32(status.Value)+Convert.ToInt32(storyStatus.Value)).ToString();
+                _context.Update(status);
+                _context.SaveChanges();
+            }
+        }
+        private void Reduce(StoryStatus storyStatus)
+        {
+            StoryStatus status = _context.StoryStatus.Where(a => a.StorySeries == storyStatus.StorySeries && a.Name == storyStatus.Name).FirstOrDefault();
+            if (status != null)
+            {
+                status.Value = (Convert.ToInt32(status.Value) - Convert.ToInt32(storyStatus.Value)).ToString();
+                _context.Update(status);
+                _context.SaveChanges();
+            }
+        }
+        private void Assign(StoryStatus storyStatus)
+        {
+            StoryStatus status = _context.StoryStatus.Where(a => a.StorySeries == storyStatus.StorySeries && a.Name == storyStatus.Name).FirstOrDefault();
+            if (status != null)
+            {
+                status.Value = storyStatus.Value;
+                _context.Update(status);
+                _context.SaveChanges();
+            }
+        }
+
     }
 
 }
