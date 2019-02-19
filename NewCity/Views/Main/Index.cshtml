@@ -1,10 +1,14 @@
 ﻿
 @{
     ViewData["Title"] = "Main";
-    
+
 }
 
 <h2>Main</h2>
+@if (ViewData["Creator"].ToString() == "true")
+{
+    <li><a asp-area="" asp-controller="Creator" asp-action="Index">Creator</a></li>
+}
 <div class="container-fluid">
     <div class="col-md-3" style="background-color:aquamarine">
         物品
@@ -13,7 +17,7 @@
     <div class="col-md-6" style="background-color:aqua">
 
         <div class="row">
-            @if (ViewBag.InLocation&&ViewBag.ReadList!=null)
+            @if (ViewBag.InLocation && ViewBag.ReadList != null)
             {
                 <div class="col-md-4">
                     <img src="@ViewBag.ReadList.IMG" />
@@ -47,7 +51,7 @@
         </div>
         <div class="row">
             <div id="Option">
-                
+
             </div>
         </div>
     </div>
@@ -63,7 +67,7 @@
     function NextCard(optionID) {
         $.post(
             '/Main/NextCard',
-            {optionID: optionID},
+            { optionID: optionID },
             function (result) {
                 debugger;
                 CleanContent();
@@ -77,7 +81,7 @@
     function AddOption(option) {
         for (let i = 1; i < option.length; i++) {
             if (option.NextCard) {
-                $('#Option').append("<button onclick = "+NextCard(option.ID)+" > option.Text</button>")
+                $('#Option').append("<button onclick = " + NextCard(option.ID) + " > option.Text</button>")
             }
 
         }
@@ -85,8 +89,8 @@
     //添加内容框内容
     function AddContent(text) {
 
-        $('#Content').append("<div>"+text+"</div>");
-       
+        $('#Content').append("<div>" + text + "</div>");
+
     }
     //清除内容框
     function CleanContent() {
@@ -95,5 +99,5 @@
         $('#Option').children().remove();
     }
 
-   
+
 </script>

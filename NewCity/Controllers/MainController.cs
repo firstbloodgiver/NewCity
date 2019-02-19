@@ -31,6 +31,15 @@ namespace NewCity.Controllers
             List<StoryCard> OperaList = new List<StoryCard>();
 
 
+            if (isCreator())
+            {
+                ViewData["Creator"] = true;
+            }
+            else
+            {
+                ViewData["Creator"] = false;
+            }
+
             //是否在场景
             if (InLocation(userid, out StorySeriesID))
             {

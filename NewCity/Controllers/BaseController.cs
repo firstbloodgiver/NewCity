@@ -21,16 +21,27 @@ namespace NewCity.Controllers
         {
             _SignInManager = SignInManager;
             _userManager = UserManager;
-            _context = context;
-            
+            _context = context;            
         }
 
+
+        public bool isCreator() {
+            return _context.Creator.Where(a => a.UserID == GetUserId()).FirstOrDefault() != null ? true : false;
+        }
         /// <summary>
         /// 获取当前用户Guid
         /// </summary>
         /// <returns></returns>
         public Guid GetUserId() {
-            return Guid.Parse(_userManager.GetUserId(User));
+            try
+            {
+                return User != null ? Guid.Parse(_userManager.GetUserId(User)) : Guid.Empty;
+            }
+            catch
+            {
+                return Guid.Empty;
+            }
+                
         }
 
         /// <summary>
