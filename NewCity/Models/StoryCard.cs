@@ -5,8 +5,10 @@ using System.Threading.Tasks;
 
 namespace NewCity.Models
 {
+    
     public class StoryCard
     {
+        
         public Guid ID { get; set; }
         public Guid StorySeriesID { get; set; }
         public string StoryName { get; set; }
@@ -15,11 +17,6 @@ namespace NewCity.Models
         public string IMG { get; set; }
         public string BackgroundIMG { get; set; }
 
-        /// <summary>
-        /// 出现条件
-        /// </summary>
-        public string flag { get; set; }
-
         public ICollection<StoryOption> StoryOptions { get; set; }
-}
+    }
 }

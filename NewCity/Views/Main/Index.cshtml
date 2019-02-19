@@ -1,10 +1,14 @@
 ﻿
 @{
     ViewData["Title"] = "Main";
-    
+
 }
 
 <h2>Main</h2>
+@if (ViewData["Creator"].ToString() == "true")
+{
+    <li><a asp-area="" asp-controller="Creator" asp-action="Index">Creator</a></li>
+}
 <div class="container-fluid">
     <div class="col-md-3" style="background-color:aquamarine">
         物品
@@ -13,7 +17,7 @@
     <div class="col-md-6" style="background-color:aqua">
 
         <div class="row">
-            @if (ViewBag.InLocation)
+            @if (ViewBag.InLocation && ViewBag.ReadList != null)
             {
                 <div class="col-md-4">
                     <img src="@ViewBag.ReadList.IMG" />
@@ -25,21 +29,21 @@
                 {
                     <div class="row">
                         <p>@option.StorySeriesName</p>
-                        <button class="btn-default" onclick="NextCard(@option.NextStoryCard)">继续</button>
+                        <button class="btn-default" onclick="NextCard(@option.ID)">继续</button>
                     </div>
                 }
             }
-            else
+            else if (!ViewBag.InLocation && ViewBag.ReadList != null)
             {
                 <div class="col-md-4">
-                    <img src="@ViewBag.ReadList.IMG" />
+                    <img src="@(ViewBag.ReadList.IMG)" />
                 </div>
                 <div class="col-md-8">
                     <p>@ViewBag.ReadList.Text</p>
                     @foreach (var option in ViewBag.ReadList.StoryOptions)
                     {
                         <div class="row">
-                            <button class="btn-default" onclick="NextCard(@option.NextStoryCardID)">@option.Text</button>
+                            <button class="btn-default" onclick="NextCard(@option.ID)">@option.Text</button>
                         </div>
                     }
                 </div>
@@ -47,7 +51,7 @@
         </div>
         <div class="row">
             <div id="Option">
-                
+
             </div>
         </div>
     </div>
@@ -60,10 +64,10 @@
 
 <script>
 
-    function NextCard(storyID) {
+    function NextCard(optionID) {
         $.post(
-            '/Main/NextCart?storyID=' + storyID,
-            { storyID: storyID },
+            '/Main/NextCard',
+            { optionID: optionID },
             function (result) {
                 debugger;
                 CleanContent();
@@ -71,14 +75,13 @@
                 AddOption(result)
             }
         )
-
     }
 
     //添加选项
     function AddOption(option) {
         for (let i = 1; i < option.length; i++) {
             if (option.NextCard) {
-                $('#Option').append("< button onclick = "+NextCard(option.NextStoryCardID)+" > option.Text</button >")
+                $('#Option').append("<button onclick = " + NextCard(option.ID) + " > option.Text</button>")
             }
 
         }
@@ -86,8 +89,8 @@
     //添加内容框内容
     function AddContent(text) {
 
-        $('#Content').append("<div>"+text+"</div>");
-       
+        $('#Content').append("<div>" + text + "</div>");
+
     }
     //清除内容框
     function CleanContent() {
@@ -96,5 +99,5 @@
         $('#Option').children().remove();
     }
 
-   
+
 </script>

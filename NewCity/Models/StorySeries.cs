@@ -11,6 +11,9 @@ namespace NewCity.Models
         public Guid LocationID { get; set; }
         public string SeriesName { get; set; }
 
+        /// <summary>
+        /// 作者ID
+        /// </summary>
         public Guid Author { get; set; }
         public DateTime Creationdate { get; set; }
 
@@ -26,6 +29,11 @@ namespace NewCity.Models
         /// 是否已经游玩
         /// </summary>
         public bool IsPlayed { get; set; }
+
+        /// <summary>
+        /// 是否测试
+        /// </summary>
+        public bool IsTest { get; set; }
 
         public ICollection<StoryCard> StoryCards { get; set; }
     }

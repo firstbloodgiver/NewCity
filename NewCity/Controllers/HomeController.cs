@@ -6,21 +6,21 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using NewCity.Models;
 using Microsoft.AspNetCore.Identity;
+using NewCity.Data;
 
 namespace NewCity.Controllers
 {
-    public class HomeController : Controller
+    public class HomeController : BaseController
     {
-        private readonly SignInManager<IdentityUser> _SignInManager;
-        //private readonly UserManager<IdentityUser> _userManager;
-
-        public HomeController(SignInManager<IdentityUser> SignInManager)
+        public HomeController(SignInManager<IdentityUser> SignInManager, UserManager<IdentityUser> UserManager, NewCityDbContext context)
+           : base(SignInManager, UserManager, context)
         {
-            _SignInManager = SignInManager;
         }
+
 
         public IActionResult Index()
         {
+            
             if (_SignInManager.IsSignedIn(User))
             {
                 return RedirectToAction("Index", "Main");

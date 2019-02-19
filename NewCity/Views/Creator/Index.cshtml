@@ -1,0 +1,77 @@
+﻿@model NewCity.Models.StorySeries
+@{
+    ViewData["Title"] = "Creator";
+    List<StorySeries> storySeries = ViewBag.storySeries as List<StorySeries>;
+}
+
+<div class="container-fluid">
+    <div class="row">
+        <button class="btn-default">返回</button>
+        <button class="btn-default" data-toggle="modal" data-target="#Addseries">新增</button>
+    </div>
+    <hr />
+    <div class="row">
+        @if (storySeries.Count != 0)
+        {
+            @foreach (var item in storySeries)
+            {
+
+                <div>
+                    <div>
+                        @item.SeriesName
+                    </div>
+                    <div>
+                        @item.Text
+                    </div>
+                    <a asp-controller="CreateStory" asp-action="Index" asp-route-id="@item.ID">编辑</a>
+                    <a>启用</a>
+                    <a onclick="DeleteConfirm('@item.ID')">删除</a>
+                </div>
+            }
+        }
+    </div>
+</div>
+
+<div class="modal fade" id="Addseries" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog">   
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+                <h4 class="modal-title" id="myModalLabel"></h4>
+            </div>
+            <div class="modal-body">
+                <form asp-action="Index">
+                    <div class="form-group">
+                        <label asp-for="SeriesName" class="control-label"></label>
+                        <input asp-for="SeriesName" class="form-control" />
+                        <span asp-validation-for="SeriesName" class="text-danger"></span>
+                    </div>
+                    <div class="form-group">
+                        <label asp-for="Text" class="control-label"></label>
+                        <input asp-for="Text" class="form-control" />
+                        <span asp-validation-for="SeriesName" class="text-danger"></span>
+                    </div>
+                    <button type="submit" onclick="reload()">确定</button>
+                    <button type="reset">取消</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    function reload() {
+        debugger;
+        window.location.reload();
+    }
+
+    function DeleteConfirm(id) {
+        let msg = "您真的确定要删除吗？\n\n请确认！"; 
+        if (confirm(msg)) {
+            $.post("/Creator/Delete", { id: id }, function (data) {
+                window.location.reload();
+            })
+        }
+    }
+
+</script>

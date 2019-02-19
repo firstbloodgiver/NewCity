@@ -227,6 +227,8 @@ namespace NewCity.Data.Migrations
 
                     b.Property<bool>("IsMain");
 
+                    b.Property<bool>("IsStory");
+
                     b.Property<Guid>("StoryCardID");
 
                     b.Property<Guid>("StorySeriesID");
@@ -238,6 +240,20 @@ namespace NewCity.Data.Migrations
                     b.HasIndex("UserCharacterID");
 
                     b.ToTable("CharacterSchedule");
+                });
+
+            modelBuilder.Entity("NewCity.Models.Creator", b =>
+                {
+                    b.Property<Guid>("ID")
+                        .ValueGeneratedOnAdd();
+
+                    b.Property<DateTime>("CreationTime");
+
+                    b.Property<Guid>("UserID");
+
+                    b.HasKey("ID");
+
+                    b.ToTable("Creator");
                 });
 
             modelBuilder.Entity("NewCity.Models.Item", b =>
@@ -285,8 +301,6 @@ namespace NewCity.Data.Migrations
 
                     b.Property<string>("Introduction");
 
-                    b.Property<bool>("IsMain");
-
                     b.HasKey("ID");
 
                     b.ToTable("Location");
@@ -319,6 +333,10 @@ namespace NewCity.Data.Migrations
                     b.Property<Guid>("ID")
                         .ValueGeneratedOnAdd();
 
+                    b.Property<string>("Condition");
+
+                    b.Property<string>("Effect");
+
                     b.Property<Guid>("NextStoryCardID");
 
                     b.Property<Guid>("StoryCardID");
@@ -341,17 +359,41 @@ namespace NewCity.Data.Migrations
 
                     b.Property<DateTime>("Creationdate");
 
+                    b.Property<string>("IMG");
+
                     b.Property<bool>("IsPlayed");
+
+                    b.Property<bool>("IsTest");
 
                     b.Property<Guid>("LocationID");
 
                     b.Property<string>("SeriesName");
+
+                    b.Property<string>("Text");
 
                     b.Property<string>("flag");
 
                     b.HasKey("ID");
 
                     b.ToTable("StorySeries");
+                });
+
+            modelBuilder.Entity("NewCity.Models.StoryStatus", b =>
+                {
+                    b.Property<Guid>("ID")
+                        .ValueGeneratedOnAdd();
+
+                    b.Property<string>("Name");
+
+                    b.Property<string>("StorySeries");
+
+                    b.Property<string>("Type");
+
+                    b.Property<string>("Value");
+
+                    b.HasKey("ID");
+
+                    b.ToTable("StoryStatus");
                 });
 
             modelBuilder.Entity("NewCity.Models.UserCharacter", b =>
