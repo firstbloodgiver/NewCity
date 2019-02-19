@@ -3,15 +3,17 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using NewCity.Data;
 
 namespace NewCity.Data.Migrations
 {
     [DbContext(typeof(NewCityDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20190218152137_20190218")]
+    partial class _20190218
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -240,20 +242,6 @@ namespace NewCity.Data.Migrations
                     b.HasIndex("UserCharacterID");
 
                     b.ToTable("CharacterSchedule");
-                });
-
-            modelBuilder.Entity("NewCity.Models.Creator", b =>
-                {
-                    b.Property<Guid>("ID")
-                        .ValueGeneratedOnAdd();
-
-                    b.Property<DateTime>("CreationTime");
-
-                    b.Property<Guid>("UserID");
-
-                    b.HasKey("ID");
-
-                    b.ToTable("Creator");
                 });
 
             modelBuilder.Entity("NewCity.Models.Item", b =>

@@ -6,6 +6,35 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="Data\Migrations\20181019151126_Initial.cs" />
+    <Compile Remove="Data\Migrations\20181019151126_Initial.Designer.cs" />
+    <Compile Remove="Data\Migrations\20181025151522_Initial1.cs" />
+    <Compile Remove="Data\Migrations\20181025151522_Initial1.Designer.cs" />
+    <Compile Remove="Data\Migrations\20181108160933_Initial2018119.cs" />
+    <Compile Remove="Data\Migrations\20181108160933_Initial2018119.Designer.cs" />
+    <Compile Remove="Data\Migrations\20181108161212_Initial2018119#2.cs" />
+    <Compile Remove="Data\Migrations\20181108161212_Initial2018119#2.Designer.cs" />
+    <Compile Remove="Data\Migrations\20181125163632_Initial20181123.cs" />
+    <Compile Remove="Data\Migrations\20181125163632_Initial20181123.Designer.cs" />
+    <Compile Remove="Data\Migrations\20181125163723_Initial20181123-2.cs" />
+    <Compile Remove="Data\Migrations\20181125163723_Initial20181123-2.Designer.cs" />
+    <Compile Remove="Data\Migrations\20181127152538_Initial20181127.cs" />
+    <Compile Remove="Data\Migrations\20181127152538_Initial20181127.Designer.cs" />
+    <Compile Remove="Data\Migrations\20181204154254_2018-12-4.cs" />
+    <Compile Remove="Data\Migrations\20181204154254_2018-12-4.Designer.cs" />
+    <Compile Remove="Data\Migrations\20181214155330_Initial20181214.cs" />
+    <Compile Remove="Data\Migrations\20181214155330_Initial20181214.Designer.cs" />
+    <Compile Remove="Data\Migrations\20190103152433_20190103.cs" />
+    <Compile Remove="Data\Migrations\20190103152433_20190103.Designer.cs" />
+    <Compile Remove="Data\Migrations\20190207155851_20190207.cs" />
+    <Compile Remove="Data\Migrations\20190207155851_20190207.Designer.cs" />
+    <Compile Remove="Data\Migrations\20190215151403_20190215.cs" />
+    <Compile Remove="Data\Migrations\20190215151403_20190215.Designer.cs" />
+    <Compile Remove="Data\Migrations\20190218152137_20190218.cs" />
+    <Compile Remove="Data\Migrations\20190218152137_20190218.Designer.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore.App" />
     <PackageReference Include="Microsoft.AspNetCore.Razor.Design" Version="2.1.2" PrivateAssets="All" />
     <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="2.1.5" PrivateAssets="All" />
