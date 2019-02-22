@@ -125,7 +125,7 @@ namespace NewCity.Controllers
         public IActionResult NextCard(Guid id,Guid seriesid,Guid optionid) {
             int statuscode = 0;
             string ContentType = string.Empty;
-            if (id != null||id !=Guid.Empty ) {
+            if (id !=Guid.Empty ) {
                 var card = _context.StoryCard.Where(a => a.ID == id).AsNoTracking().FirstOrDefault();
                 if (card != null ) {
                     if (_context.StorySeries.Where(a => a.ID == card.StorySeriesID).AsNoTracking().FirstOrDefault().Author == GetUserId()) {
@@ -137,9 +137,10 @@ namespace NewCity.Controllers
                             option.NextStoryCardID = id;
                             _context.StoryOption.Update(option);
                             _context.SaveChanges();
+                            return Json(_context.StoryCard.AsNoTracking().Where(a => a.ID == id).FirstOrDefault());
 
                         }
-                        return RedirectToAction("Index", id);
+                        return Index(id.ToString());
                     }
                     else
                     {
@@ -164,13 +165,15 @@ namespace NewCity.Controllers
                 };
                 _context.StoryCard.Add(storyCard);
                 _context.SaveChanges();
+
+                return Json(storyCard);
             }
             JsonResult result = new JsonResult(false) {
                 StatusCode = statuscode,
                 ContentType = ContentType,
             };
             
-            return result;
+            return Json(result);
         }
     }
 
