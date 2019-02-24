@@ -36,6 +36,7 @@ namespace NewCity.Controllers
             return View(storyCards);
         }
 
+
         /// <summary>
         /// 返回故事卡信息
         /// </summary>
@@ -140,7 +141,7 @@ namespace NewCity.Controllers
                             return Json(_context.StoryCard.AsNoTracking().Where(a => a.ID == id).FirstOrDefault());
 
                         }
-                        return Index(id.ToString());
+                        return Json(_context.StoryCard.AsNoTracking().Where(a => a.ID == id).FirstOrDefault());
                     }
                     else
                     {

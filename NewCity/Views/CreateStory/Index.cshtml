@@ -136,6 +136,7 @@
 
     }
 
+    //form 返回的消息容器
     $("#fack").on('load', function () {
         let a = window.frames["fack"].document.body.innerText;
         if (a != '') {
@@ -149,17 +150,61 @@
         $("#" + optionid).remove();
     }
 
+
     //下一张卡
     function NextCard(id, seriesid, optionid) {
-        debugger;
         let nextid = document.getElementById("storyCard.StoryOptions["+id+"].NextStoryCardID").value;
 
         if (confirm("即将移动到新的页面，请确认已保存")) {
-            $.post("/CreateStory/NextCard", { nextid: nextid, seriesid: seriesid, optionid: optionid}, function (data) {
+            $.post("/CreateStory/NextCard", { nextid: nextid, seriesid: seriesid, optionid: optionid }, function (data) {
                 debugger;
-                alert(data);
+                LoadNextCard(data);
             });
         }
+    }
+
+    //加载下一张卡
+    function LoadNextCard(data) {
+        //清空显示
+        $("#StoryId").empty();
+        $("#StoryName").empty();
+        $("#Img").empty();
+        $("#Content").empty();
+        $("#Option").empty();
+
+        //加载基本数据
+        let StoryId = "<input name='storyCard.ID' hidden value='' />";
+        StoryId += "<p>" + data.id + "</p>";
+        let StoryName = "<p>"+ data.name +"</p>";
+        let Img = "<p>" + data.Img+"</p>";
+        let Content = "<textarea name='storyCard.Text' class='form-control' rows='10' >" + data.Content +"</textarea>";
+        let Option;
+        //计算当前是第几个选项
+        let count = data.option.length != 0 ? data.option.length : 0;
+        Option += "<input hidden id='optionCount' type='text' value='" + count +"' />";
+        for (let i in data.option) {
+            let option;
+            option += "<input name='storyCard.StoryOptions[i].ID' hidden type='text value="+data.option[i].id+" />";
+            option += "<button type='button' onclick='Condition(i)'>条件</button>";
+            option += "<input id='storyCard.StoryOptions[i].Condition' name='storyCard.StoryOptions[i].Condition' hidden type='text' value=" + data.option[i].Condition+" />";
+            option += "<input name='storyCard.StoryOptions[i].Text' type='text' value="+data.option[i].text+">"
+            option += "<button type='button' onclick='Effect(i)'>效果</button>"
+            option += "<input id='storyCard.StoryOptions[i].Effect' name='storyCard.StoryOptions[i].Effect' hidden type='text' value=" + data.option[i].Effect +" />"
+            option += " <button type='button' onclick='Cancel('option-"+data.option[i].id+"')'>取消</button>"
+            option += "<button type='button' onclick='NextCard(i,'@Model.First().StorySeriesID','" + data.option[i].id + "')'>→</button>"
+
+            let NextStoryCardID = data.option[i].NextStoryCardID == "" ? GuidEmpty : data.option[i].NextStoryCardID
+            option += "<input id='storyCard.StoryOptions[i].NextStoryCardID' name='storyCard.StoryOptions[i].NextStoryCardID' type='text' placeholder='为空则新建故事卡' value='"+NextStoryCardID+"'>"
+
+            Option += "<div class='row' id='option-" + data.option[i].id+"'>" + option+"</div>";
+        }
+        //赋值
+        $("#StoryId").append(StoryId);
+        $("#StoryName").append(StoryName);
+        $("#Img").append(Img);
+        $("#Content").append(Content);
+        $("#Option").append(Option);
+
     }
 
     //增加选项
