@@ -180,23 +180,23 @@
         let Content = "<textarea name='storyCard.Text' class='form-control' rows='10' >" + data.Content +"</textarea>";
         let Option;
         //计算当前是第几个选项
-        let count = data.option.length != 0 ? data.option.length : 0;
+        let count = data.StoryOptions != null ? data.StoryOptions.length : 0;
         Option += "<input hidden id='optionCount' type='text' value='" + count +"' />";
-        for (let i in data.option) {
+        for (let i in data.StoryOptions) {
             let option;
-            option += "<input name='storyCard.StoryOptions[i].ID' hidden type='text value="+data.option[i].id+" />";
+            option += "<input name='storyCard.StoryOptions[i].ID' hidden type='text value=" + data.StoryOptions[i].ID+" />";
             option += "<button type='button' onclick='Condition(i)'>条件</button>";
-            option += "<input id='storyCard.StoryOptions[i].Condition' name='storyCard.StoryOptions[i].Condition' hidden type='text' value=" + data.option[i].Condition+" />";
-            option += "<input name='storyCard.StoryOptions[i].Text' type='text' value="+data.option[i].text+">"
+            option += "<input id='storyCard.StoryOptions[i].Condition' name='storyCard.StoryOptions[i].Condition' hidden type='text' value=" + data.StoryOptions[i].Condition+" />";
+            option += "<input name='storyCard.StoryOptions[i].Text' type='text' value=" + data.StoryOptions[i].Text+">"
             option += "<button type='button' onclick='Effect(i)'>效果</button>"
-            option += "<input id='storyCard.StoryOptions[i].Effect' name='storyCard.StoryOptions[i].Effect' hidden type='text' value=" + data.option[i].Effect +" />"
-            option += " <button type='button' onclick='Cancel('option-"+data.option[i].id+"')'>取消</button>"
-            option += "<button type='button' onclick='NextCard(i,'@Model.First().StorySeriesID','" + data.option[i].id + "')'>→</button>"
+            option += "<input id='storyCard.StoryOptions[i].Effect' name='storyCard.StoryOptions[i].Effect' hidden type='text' value=" + data.StoryOptions[i].Effect +" />"
+            option += " <button type='button' onclick='Cancel('option-" + data.option[i].ID+"')'>取消</button>"
+            option += "<button type='button' onclick='NextCard(i,'@Model.First().StorySeriesID','" + data.StoryOptions[i].ID + "')'>→</button>"
 
-            let NextStoryCardID = data.option[i].NextStoryCardID == "" ? GuidEmpty : data.option[i].NextStoryCardID
+            let NextStoryCardID = data.StoryOptions[i].NextStoryCardID == "" ? GuidEmpty : data.StoryOptions[i].NextStoryCardID
             option += "<input id='storyCard.StoryOptions[i].NextStoryCardID' name='storyCard.StoryOptions[i].NextStoryCardID' type='text' placeholder='为空则新建故事卡' value='"+NextStoryCardID+"'>"
 
-            Option += "<div class='row' id='option-" + data.option[i].id+"'>" + option+"</div>";
+            Option += "<div class='row' id='option-" + data.StoryOptions[i].id+"'>" + option+"</div>";
         }
         //赋值
         $("#StoryId").append(StoryId);

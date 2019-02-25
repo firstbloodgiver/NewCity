@@ -158,12 +158,15 @@ namespace NewCity.Controllers
             }
             else
             {
+                var option = _context.StoryOption.Where(a => a.ID == optionid).FirstOrDefault();
                 //新建卡片
                 StoryCard storyCard = new StoryCard()
                 {
                     ID = Guid.NewGuid(),
                     StorySeriesID  = seriesid,                    
                 };
+                option.NextStoryCardID = storyCard.ID;
+                _context.StoryOption.Update(option);
                 _context.StoryCard.Add(storyCard);
                 _context.SaveChanges();
 
