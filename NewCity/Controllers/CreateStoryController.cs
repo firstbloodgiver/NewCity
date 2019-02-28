@@ -89,8 +89,10 @@ namespace NewCity.Controllers
                         {
                             foreach (var option in card.StoryOptions)
                             {
-                                option.Condition = storyCard.StoryOptions.Where(a => a.ID == option.ID).First().Condition;
-
+                                var o = storyCard.StoryOptions.Where(a => a.ID == option.ID).First();
+                                option.Condition = o.Condition;
+                                option.NextStoryCardID = o.NextStoryCardID;
+                                option.Effect = o.Effect;
                             }
                         }
                     }
@@ -123,25 +125,27 @@ namespace NewCity.Controllers
         /// <param name="optionid">选项id</param>
         /// <returns></returns>
         [HttpPost]
-        public IActionResult NextCard(Guid id,Guid seriesid,Guid optionid) {
+        public IActionResult NextCard(Guid nextid, Guid seriesid,Guid optionid) {
             int statuscode = 0;
             string ContentType = string.Empty;
-            if (id !=Guid.Empty ) {
-                var card = _context.StoryCard.Where(a => a.ID == id).AsNoTracking().FirstOrDefault();
+            if (nextid != Guid.Empty ) {
+                var card = _context.StoryCard.Where(a => a.ID == nextid).AsNoTracking().FirstOrDefault();
                 if (card != null ) {
                     if (_context.StorySeries.Where(a => a.ID == card.StorySeriesID).AsNoTracking().FirstOrDefault().Author == GetUserId()) {
                         var option = _context.StoryOption.Where(a => a.ID == optionid).FirstOrDefault();
-                        if (option.NextStoryCardID != id) {
+                        if (option.NextStoryCardID != nextid) {
                             //if (_context.StoryOption.Where(a => a.NextStoryCardID == nextid).AsNoTracking().ToArray().Length == 0) {
                             //删除
                             //}
-                            option.NextStoryCardID = id;
+                            option.NextStoryCardID = nextid;
                             _context.StoryOption.Update(option);
                             _context.SaveChanges();
-                            return Json(_context.StoryCard.AsNoTracking().Where(a => a.ID == id).FirstOrDefault());
+                            return Json(_context.StoryCard.AsNoTracking().Where(a => a.ID == nextid).FirstOrDefault());
 
                         }
-                        return Json(_context.StoryCard.AsNoTracking().Where(a => a.ID == id).FirstOrDefault());
+
+                        StoryCard result1 = _context.StoryCard.AsNoTracking().Where(a => a.ID == nextid).Include(a=>a.StoryOptions).FirstOrDefault();
+                        return Json(result1);
                     }
                     else
                     {

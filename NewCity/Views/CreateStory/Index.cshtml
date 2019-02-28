@@ -157,7 +157,6 @@
 
         if (confirm("即将移动到新的页面，请确认已保存")) {
             $.post("/CreateStory/NextCard", { nextid: nextid, seriesid: seriesid, optionid: optionid }, function (data) {
-                debugger;
                 LoadNextCard(data);
             });
         }
@@ -165,6 +164,7 @@
 
     //加载下一张卡
     function LoadNextCard(data) {
+        debugger;
         //清空显示
         $("#StoryId").empty();
         $("#StoryName").empty();
@@ -173,30 +173,44 @@
         $("#Option").empty();
 
         //加载基本数据
+        debugger;
+        let id = data.id;
+        let name = data.storyName == "" || data.storyName == null ? "" : data.storyName;
+        let img = data.img == "" || data.img == null ? "" : data.img;
+        let text = data.text == "" || data.text == null ? "" : data.text;
+
+
         let StoryId = "<input name='storyCard.ID' hidden value='' />";
-        StoryId += "<p>" + data.id + "</p>";
-        let StoryName = "<p>"+ data.name +"</p>";
-        let Img = "<p>" + data.Img+"</p>";
-        let Content = "<textarea name='storyCard.Text' class='form-control' rows='10' >" + data.Content +"</textarea>";
-        let Option;
+        StoryId += "<p>" + id + "</p>";
+        let StoryName = "<p>"+ name +"</p>";
+        let Img = "<p>" + img+"</p>";
+        let Content = "<textarea name='storyCard.Text' class='form-control' rows='10' >" + text +"</textarea>";
+        let Option = "";
         //计算当前是第几个选项
-        let count = data.StoryOptions != null ? data.StoryOptions.length : 0;
+        let count = data.storyOptions != null ? data.storyOptions.length : 0;
         Option += "<input hidden id='optionCount' type='text' value='" + count +"' />";
-        for (let i in data.StoryOptions) {
-            let option;
-            option += "<input name='storyCard.StoryOptions[i].ID' hidden type='text value=" + data.StoryOptions[i].ID+" />";
-            option += "<button type='button' onclick='Condition(i)'>条件</button>";
-            option += "<input id='storyCard.StoryOptions[i].Condition' name='storyCard.StoryOptions[i].Condition' hidden type='text' value=" + data.StoryOptions[i].Condition+" />";
-            option += "<input name='storyCard.StoryOptions[i].Text' type='text' value=" + data.StoryOptions[i].Text+">"
-            option += "<button type='button' onclick='Effect(i)'>效果</button>"
-            option += "<input id='storyCard.StoryOptions[i].Effect' name='storyCard.StoryOptions[i].Effect' hidden type='text' value=" + data.StoryOptions[i].Effect +" />"
-            option += " <button type='button' onclick='Cancel('option-" + data.option[i].ID+"')'>取消</button>"
-            option += "<button type='button' onclick='NextCard(i,'@Model.First().StorySeriesID','" + data.StoryOptions[i].ID + "')'>→</button>"
+        for (let i in data.storyOptions) {
+            let option = "";
+            let id = data.storyOptions[i].id;
+            let condition = data.storyOptions[i].condition == "" || data.storyOptions[i].condition == null ? "" : data.storyOptions[i].condition;
+            let text = data.storyOptions[i].text == "" || data.storyOptions[i].text == null ? "" : data.storyOptions[i].text;
+            let effect = data.storyOptions[i].effect == "" || data.storyOptions[i].effect == null ? "" : data.storyOptions[i].effect;
+            let storySeriesID = data.storySeriesID;
+            let NextStoryCardID = data.storyOptions[i].nextStoryCardID == "" ? GuidEmpty : data.storyOptions[i].nextStoryCardID
 
-            let NextStoryCardID = data.StoryOptions[i].NextStoryCardID == "" ? GuidEmpty : data.StoryOptions[i].NextStoryCardID
-            option += "<input id='storyCard.StoryOptions[i].NextStoryCardID' name='storyCard.StoryOptions[i].NextStoryCardID' type='text' placeholder='为空则新建故事卡' value='"+NextStoryCardID+"'>"
+            option += "<input name='storyCard.StoryOptions["+i+"].ID' hidden type='text value=" + id+" />";
+            option += "<button type='button' onclick='Condition(" + i +")'>条件</button>";
+            option += "<input id='storyCard.StoryOptions[" + i + "].Condition' name='storyCard.StoryOptions[" + i +"].Condition' hidden type='text' value=" + condition+" />";
+            option += "<input name='storyCard.StoryOptions[" + i +"].Text' type='text' value=" + text+">"
+            option += "<button type='button' onclick='Effect(" + i +")'>效果</button>"
+            option += "<input id='storyCard.StoryOptions[" + i + "].Effect' name='storyCard.StoryOptions[" + i +"].Effect' hidden type='text' value=" + effect +" />"
+            option += " <button type='button' onclick='Cancel('option-" + id+"')'>取消</button>"
+            option += "<button type='button' onclick=NextCard('" + i + "','" + storySeriesID+"','" + id + "')>→</button>"
 
-            Option += "<div class='row' id='option-" + data.StoryOptions[i].id+"'>" + option+"</div>";
+            
+            option += "<input id='storyCard.StoryOptions[" + i + "].NextStoryCardID' name='storyCard.StoryOptions[" + i +"].NextStoryCardID' type='text' placeholder='为空则新建故事卡' value='"+NextStoryCardID+"'>"
+
+            Option += "<div class='row' id='option-" + id+"'>" + option+"</div>";
         }
         //赋值
         $("#StoryId").append(StoryId);
