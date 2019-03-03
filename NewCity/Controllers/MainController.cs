@@ -13,6 +13,7 @@ using System.Web;
 using Newtonsoft.Json;
 using NewCity.Enum;
 
+
 namespace NewCity.Controllers
 {
     public class MainController : BaseController
@@ -30,7 +31,6 @@ namespace NewCity.Controllers
             
             List<StoryCard> OperaList = new List<StoryCard>();
 
-
             if (isCreator())
             {
                 ViewData["Creator"] = true;
@@ -38,6 +38,16 @@ namespace NewCity.Controllers
             else
             {
                 ViewData["Creator"] = false;
+            }
+
+            //有无创建人物
+            UserCharacter userCharacter = _context.UserCharacter.AsNoTracking().Where(u => u.UserId == userid).FirstOrDefault();
+            if (userCharacter == null) {
+                CreateCharacter();
+            }
+            //有无默认场景
+            if (_context.CharacterSchedule.AsNoTracking().Where(c => c.CharacterID == userCharacter.ID && c.IsMain).FirstOrDefault() != null) {
+                DefaultLocation();
             }
 
             //是否在场景
@@ -72,9 +82,16 @@ namespace NewCity.Controllers
         }
 
         [HttpPost]
-        public async Task<JsonResult> NextCard(Guid? optionID)
+        public async Task<JsonResult> NextCard(Guid optionID)
         {
             var userid = GetUserId();
+
+            //查看是否新建角色
+            int type = new DefaultValue().CheckCharacterType(optionID);
+            if (type != 0) {
+                CreateNewCharacterAsync(userid,type);
+            }
+
             var Schedule = _context.UserCharacter.AsNoTracking().Where(a => a.UserId == userid)
                 .Join(_context.CharacterSchedule, a => a.ID,b=>b.CharacterID,(a,b)=>new { IsStory = b.IsStory, StorySeriesID=b.StorySeriesID, StoryCardID =b.StoryCardID })
                 .FirstOrDefault();
@@ -206,6 +223,59 @@ namespace NewCity.Controllers
                         break;
                 }
             }
+        }
+
+        /// <summary>
+        /// 返回创建人物故事卡
+        /// </summary>
+        private IActionResult CreateCharacter() {
+            ViewBag.ReadList = _context.StoryCard.AsNoTracking().Include(a => a.StoryOptions).AsNoTracking().SingleOrDefault(a => a.ID == new DefaultValue().createCharacter);
+            ViewBag.InLocation = false;   
+            return View();
+        }
+
+        /// <summary>
+        /// 执行创建人物 ,设置为主要角色,并返回主界面
+        /// </summary>
+        /// <param name="userid"></param>
+        private async Task CreateNewCharacterAsync(Guid userid, int characterType) {
+            Guid DefaultLocation = new DefaultValue().characterNextCard(characterType);//默认地点
+            switch (characterType) {
+                case (int)enumCharacterType.作家:
+                    //作者角色
+                    UserCharacter character = new UserCharacter() {
+                        ID = Guid.NewGuid(),
+                        UserId = userid,
+                        CharacterName = string.Empty,
+                    };
+                    //赋予默认地点卡片
+                   
+                    //记录日程表
+                    CharacterSchedule schedule = new CharacterSchedule()
+                    {
+                        ID = Guid.NewGuid(),
+                        CharacterID = character.ID,
+                        StorySeriesID  = DefaultLocation,
+                        StoryCardID,
+                        IsMain,
+                        IsStory
+                    };
+                    _context.UserCharacter.Add(character);
+                    
+                    break;
+            }
+
+            await NextCard(Guid.Empty);
+        }
+
+        /// <summary>
+        /// 返回默认地点故事卡
+        /// </summary>
+        private IActionResult DefaultLocation() {
+            ViewBag.ReadList = _context.StorySeries.AsNoTracking().Where(s => s.ID == new DefaultValue().defaultlocation).FirstOrDefault();
+            ViewBag.OperaList = _context.StoryCard.AsNoTracking().Where(s => s.StorySeriesID == new DefaultValue().defaultlocation).ToList();
+            ViewBag.InLocation = true;
+            return View();
         }
 
         private void Increase(StoryStatus storyStatus)

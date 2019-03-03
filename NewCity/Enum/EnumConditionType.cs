@@ -10,13 +10,5 @@ namespace NewCity.Enum
 
     public enum enumEffectType { 增加 = 0, 减少 = 1, 赋值 = 2}
 
-    public class EnumConditionType
-    {
-        public string[] enumConditionType = { ">", "<", "=", "≠" };
-    }
-
-    public class EnumEffectType
-    {
-        public string[] enumConditionType = { "增加", "减少", "赋值" };
-    }
+    public enum enumCharacterType { 作家 = 1 };
 }

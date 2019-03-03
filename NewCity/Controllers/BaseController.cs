@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using NewCity.Data;
+using NewCity.Models;
 
 namespace NewCity.Controllers
 {
@@ -12,6 +13,8 @@ namespace NewCity.Controllers
     {
         public readonly SignInManager<IdentityUser> _SignInManager;
         public readonly UserManager<IdentityUser> _userManager;
+
+        
         /// <summary>
         /// NewCityDbContext数据库对象
         /// </summary>
@@ -21,7 +24,7 @@ namespace NewCity.Controllers
         {
             _SignInManager = SignInManager;
             _userManager = UserManager;
-            _context = context;            
+            _context = context;
         }
 
 
