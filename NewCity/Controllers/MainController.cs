@@ -89,7 +89,7 @@ namespace NewCity.Controllers
             //查看是否新建角色
             int type = new DefaultValue().CheckCharacterType(optionID);
             if (type != 0) {
-                CreateNewCharacterAsync(userid,type);
+                await CreateNewCharacterAsync(userid, type);
             }
 
             var Schedule = _context.UserCharacter.AsNoTracking().Where(a => a.UserId == userid)
@@ -249,19 +249,18 @@ namespace NewCity.Controllers
                         CharacterName = string.Empty,
                     };
                     //赋予默认地点卡片
-                   
+                    
                     //记录日程表
                     CharacterSchedule schedule = new CharacterSchedule()
                     {
                         ID = Guid.NewGuid(),
                         CharacterID = character.ID,
                         StorySeriesID  = DefaultLocation,
-                        StoryCardID,
-                        IsMain,
-                        IsStory
+                        StoryCardID = Guid.Empty,
+                        IsMain = true,
+                        IsStory = false,
                     };
                     _context.UserCharacter.Add(character);
-                    
                     break;
             }
 
