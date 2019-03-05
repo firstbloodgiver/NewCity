@@ -125,6 +125,10 @@ namespace NewCity.Controllers
             else
             {
                 //地图场景处理
+                var storycards = _context.StorySeries.AsNoTracking().Where(a => a.ID == Schedule.StorySeriesID).FirstOrDefault();
+                
+
+                return Json(card);
             }
             return Json("不存在的后续故事卡片！");
         }

@@ -15,31 +15,39 @@
 
     </div>
     <div class="col-md-6" style="background-color:aqua">
-
         <div class="row">
             @if (ViewBag.InLocation && ViewBag.ReadList != null)
             {
-                <div class="col-md-4">
-                    <img src="@ViewBag.ReadList.IMG" />
-                </div>
-                <div class="col-md-8">
-                    <p>@ViewBag.ReadList.Text</p>
-                </div>
-                @foreach (var option in ViewBag.OperaList)
-                {
-                    <div class="row">
-                        <p>@option.StorySeriesName</p>
-                        <button class="btn-default" onclick="NextCard(@option.ID)">继续</button>
+                <div class="row">
+                    <div class="col-md-4">
+                        <img src="@ViewBag.ReadList.IMG" />
                     </div>
-                }
+                    <div class="col-md-8">
+                        <p>@ViewBag.ReadList.Text</p>
+                    </div>
+                </div>
+                <div class="row" id="Option">
+                    @foreach (var option in ViewBag.OperaList)
+                    {
+                        <div class="row">
+                            <p>@option.StorySeriesName</p>
+                            <button class="btn-default" onclick="NextCard(@option.ID)">继续</button>
+                        </div>
+                    }
+                </div>
+
             }
             else if (!ViewBag.InLocation && ViewBag.ReadList != null)
             {
-                <div class="col-md-4">
-                    <img src="@(ViewBag.ReadList.IMG)" />
+                <div class="row">
+                    <div class="col-md-4">
+                        <img src="@(ViewBag.ReadList.IMG)" />
+                    </div>
+                    <div class="col-md-8">
+                        <p>@ViewBag.ReadList.Text</p>
+                    </div>
                 </div>
-                <div class="col-md-8">
-                    <p>@ViewBag.ReadList.Text</p>
+                <div class="row" id="Option">
                     @foreach (var option in ViewBag.ReadList.StoryOptions)
                     {
                         <div class="row">
@@ -49,11 +57,7 @@
                 </div>
             }
         </div>
-        <div class="row">
-            <div id="Option">
-
-            </div>
-        </div>
+       
     </div>
     <div class="col-md-3" style="background-color:burlywood">
         属性
@@ -94,9 +98,9 @@
     }
     //清除内容框
     function CleanContent() {
-        $('#Content').children().remove();
-        $('#Img').children().remove();
-        $('#Option').children().remove();
+        $('#Content').empty();
+        $('#Img').empty();
+        $('#Option').empty();
     }
 
 
