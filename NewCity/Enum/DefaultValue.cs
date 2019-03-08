@@ -34,7 +34,7 @@ namespace NewCity.Enum
         /// </summary>
         public Guid characterNextCard(int characterType)
         {
-            switch (optionID.ToString())
+            switch (characterType)
             {
                 case 1:
                     //作家
@@ -42,7 +42,7 @@ namespace NewCity.Enum
 
 
             }
-            return 0;
+            return ;
         }
     }
 }

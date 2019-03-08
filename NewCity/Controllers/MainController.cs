@@ -111,7 +111,7 @@ namespace NewCity.Controllers
                 {
                     var card = await _context
                        .StoryCard
-                       .AsNoTracking()
+                       .AsNoTracking()  
                        .Include(s => s.StoryOptions)
                        .FirstOrDefaultAsync(m => m.ID == opt.NextStoryCardID);
 
@@ -127,7 +127,6 @@ namespace NewCity.Controllers
                 //地图场景处理
                 var storycards = _context.StorySeries.AsNoTracking().Where(a => a.ID == Schedule.StorySeriesID).FirstOrDefault();
                 
-
                 return Json(card);
             }
             return Json("不存在的后续故事卡片！");
