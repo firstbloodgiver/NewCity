@@ -19,11 +19,11 @@
             @if (ViewBag.InLocation && ViewBag.ReadList != null)
             {
                 <div class="row">
-                    <div class="col-md-4">
-                        <img src="@ViewBag.ReadList.IMG" />
+                    <div class="col-md-4" >
+                        <img id="Img" src="@ViewBag.ReadList.IMG" />
                     </div>
                     <div class="col-md-8">
-                        <p>@ViewBag.ReadList.Text</p>
+                        <p id="Text">@ViewBag.ReadList.Text</p>
                     </div>
                 </div>
                 <div class="row" id="Option">
@@ -41,10 +41,10 @@
             {
                 <div class="row">
                     <div class="col-md-4">
-                        <img src="@(ViewBag.ReadList.IMG)" />
+                        <img id="Img" src="@(ViewBag.ReadList.IMG)" />
                     </div>
                     <div class="col-md-8">
-                        <p>@ViewBag.ReadList.Text</p>
+                        <p id="Text">@ViewBag.ReadList.Text</p>
                     </div>
                 </div>
                 <div class="row" id="Option">
@@ -92,9 +92,8 @@
     }
     //添加内容框内容
     function AddContent(text) {
-
-        $('#Content').append("<div>" + text + "</div>");
-
+        //$('#Img')
+        $('#Text').append(text);
     }
     //清除内容框
     function CleanContent() {

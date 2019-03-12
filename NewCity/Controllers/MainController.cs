@@ -45,11 +45,10 @@ namespace NewCity.Controllers
             if (userCharacter == null) {
                 CreateCharacter();
             }
-            //有无默认场景
+            //有无进行中的事情
             if (_context.CharacterSchedule.AsNoTracking().Where(c => c.CharacterID == userCharacter.ID && c.IsMain).FirstOrDefault() != null) {
                 DefaultLocation();
             }
-
             //是否在场景
             if (InLocation(userid, out StorySeriesID))
             {
@@ -126,7 +125,14 @@ namespace NewCity.Controllers
             {
                 //地图场景处理
                 var storycards = _context.StorySeries.AsNoTracking().Where(a => a.ID == Schedule.StorySeriesID).FirstOrDefault();
-                
+                var card = new
+                {
+                    StorySeriesID = storycards.ID,
+                    StoryName = storycards.SeriesName,
+                    Text = storycards.Text,
+                    IMG = storycards.IMG,
+                    StoryOptions = _context.StoryCard.Where(a => a.StorySeriesID == storycards.ID).ToList()
+                };
                 return Json(card);
             }
             return Json("不存在的后续故事卡片！");
