@@ -19,7 +19,7 @@
             @if (ViewBag.InLocation && ViewBag.ReadList != null)
             {
                 <div class="row">
-                    <div class="col-md-4" >
+                    <div class="col-md-4">
                         <img id="Img" src="@ViewBag.ReadList.IMG" />
                     </div>
                     <div class="col-md-8">
@@ -35,7 +35,6 @@
                         </div>
                     }
                 </div>
-
             }
             else if (!ViewBag.InLocation && ViewBag.ReadList != null)
             {
@@ -75,8 +74,8 @@
             function (result) {
                 debugger;
                 CleanContent();
-                AddContent(result.text);
-                AddOption(result)
+                AddContent(result.Text);
+                AddOption(result.StoryOptions)
             }
         )
     }
