@@ -34,15 +34,14 @@ namespace NewCity.Enum
         /// </summary>
         public Guid characterNextCard(int characterType)
         {
+            
             switch (characterType)
             {
                 case 1:
                     //作家
-                    return ;
-
-
+                    return new Guid("83409419-48E4-43EB-B23F-7FB664946152");
             }
-            return ;
+            return Guid.Empty;
         }
     }
 }
