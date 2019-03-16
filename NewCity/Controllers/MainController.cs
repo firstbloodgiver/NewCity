@@ -46,9 +46,9 @@ namespace NewCity.Controllers
                 CreateCharacter();
             }
             //有无进行中的事情
-            if (_context.CharacterSchedule.AsNoTracking().Where(c => c.CharacterID == userCharacter.ID && c.IsMain).FirstOrDefault() != null) {
-                DefaultLocation();
-            }
+            //if (_context.CharacterSchedule.AsNoTracking().Where(c => c.CharacterID == userCharacter.ID && c.IsMain).FirstOrDefault() != null) {
+            //    DefaultLocation();
+            //}
             //是否在场景
             if (InLocation(userid, out StorySeriesID))
             {
@@ -85,15 +85,10 @@ namespace NewCity.Controllers
         {
             var userid = GetUserId();
 
-            //查看是否新建角色
-            int type = new DefaultValue().CheckCharacterType(optionID);
-            if (type != 0) {
-                await CreateNewCharacterAsync(userid, type);
-            }
-
             var Schedule = _context.UserCharacter.AsNoTracking().Where(a => a.UserId == userid)
-                .Join(_context.CharacterSchedule, a => a.ID,b=>b.CharacterID,(a,b)=>new { IsStory = b.IsStory, StorySeriesID=b.StorySeriesID, StoryCardID =b.StoryCardID })
-                .FirstOrDefault();
+                .Join(_context.CharacterSchedule, a => a.ID,b=>b.CharacterID,(a,b)=>new { IsStory = b.IsStory,IsMain = b.IsMain 
+                ,StorySeriesID=b.StorySeriesID, StoryCardID =b.StoryCardID, CharacterID=b.CharacterID })
+                .Where(a=>a.IsMain == true).FirstOrDefault();
             if (Schedule.IsStory)
             {
                 List<StoryOption> Options = new List<StoryOption>();
@@ -114,7 +109,7 @@ namespace NewCity.Controllers
                        .Include(s => s.StoryOptions)
                        .FirstOrDefaultAsync(m => m.ID == opt.NextStoryCardID);
 
-                    Execute(opt.Effect);
+                    Execute(opt.Effect, Schedule.CharacterID);
 
                     UpdateCharacterSchedule(userid, opt);
 
@@ -147,6 +142,7 @@ namespace NewCity.Controllers
             Guid CharacterID = _context.UserCharacter.AsNoTracking().Where(a => a.UserId == userid).FirstOrDefault().ID;
             var characterSchedule = _context.CharacterSchedule.Where(a => a.CharacterID == CharacterID).FirstOrDefault();
             characterSchedule.StoryCardID = opt.NextStoryCardID;
+            characterSchedule.IsMain = true;
             _context.Update(characterSchedule);
             _context.SaveChanges();
         }
@@ -216,7 +212,7 @@ namespace NewCity.Controllers
         /// 执行进行选项时下一部操作
         /// </summary>
         /// <param name="Effect"></param>
-        private void Execute(string Effect) {
+        private void Execute(string Effect,Guid CharacterID) {
             List<StoryStatus> storyStatuses = JsonConvert.DeserializeObject<List<StoryStatus>>(Effect);
             //暂时只能修改状态
             foreach (var obj in storyStatuses) {
@@ -230,6 +226,9 @@ namespace NewCity.Controllers
                     case (int)enumEffectType.赋值:
                         Assign(obj);
                         break;
+                    case (int)enumEffectType.场景转移:
+                        MoveLocation(obj, CharacterID);
+                        break;
                 }
             }
         }
@@ -238,44 +237,31 @@ namespace NewCity.Controllers
         /// 返回创建人物故事卡
         /// </summary>
         private IActionResult CreateCharacter() {
+            UserCharacter character = new UserCharacter() {
+                ID = Guid.NewGuid(),
+                UserId = GetUserId(),
+            };
+            _context.UserCharacter.Add(character);
+
+            CharacterSchedule schedule = new CharacterSchedule() {
+                ID = Guid.NewGuid(),
+                CharacterID = character.ID,
+                StoryCardID = new DefaultValue().createCharacter,
+                IsMain = true,
+                IsStory = true,
+            };
+            _context.CharacterSchedule.Add(schedule);
+
+            _context.SaveChanges();
+
             ViewBag.ReadList = _context.StoryCard.AsNoTracking().Include(a => a.StoryOptions).AsNoTracking().SingleOrDefault(a => a.ID == new DefaultValue().createCharacter);
-            ViewBag.InLocation = false;   
+            ViewBag.InLocation = false;
+
+
             return View();
         }
 
-        /// <summary>
-        /// 执行创建人物 ,设置为主要角色,并返回主界面
-        /// </summary>
-        /// <param name="userid"></param>
-        private async Task CreateNewCharacterAsync(Guid userid, int characterType) {
-            Guid DefaultLocation = new DefaultValue().characterNextCard(characterType);//默认地点
-            switch (characterType) {
-                case (int)enumCharacterType.作家:
-                    //作者角色
-                    UserCharacter character = new UserCharacter() {
-                        ID = Guid.NewGuid(),
-                        UserId = userid,
-                        CharacterName = string.Empty,
-                    };
-                    //赋予默认地点卡片
-                    
-                    //记录日程表
-                    CharacterSchedule schedule = new CharacterSchedule()
-                    {
-                        ID = Guid.NewGuid(),
-                        CharacterID = character.ID,
-                        StorySeriesID  = DefaultLocation,
-                        StoryCardID = Guid.Empty,
-                        IsMain = true,
-                        IsStory = false,
-                    };
-                    _context.UserCharacter.Add(character);
-                    break;
-            }
-
-            await NextCard(Guid.Empty);
-        }
-
+        
         /// <summary>
         /// 返回默认地点故事卡
         /// </summary>
@@ -286,6 +272,7 @@ namespace NewCity.Controllers
             return View();
         }
 
+        #region 卡片执行操作
         private void Increase(StoryStatus storyStatus)
         {
             StoryStatus status = _context.StoryStatus.Where(a => a.StorySeries == storyStatus.StorySeries && a.Name == storyStatus.Name).FirstOrDefault();
@@ -316,6 +303,42 @@ namespace NewCity.Controllers
             }
         }
 
+        public JsonResult MoveLocation(StoryStatus storyStatus,Guid CharacterID) {
+            //记录
+            CharacterSchedule schedule = _context.CharacterSchedule.Where(a => a.StorySeriesID == Guid.Parse(storyStatus.StorySeries)).FirstOrDefault();
+            if (schedule != null) {
+                schedule.IsMain = true;
+                schedule.StoryCardID = Guid.Parse(storyStatus.Value);
+                _context.CharacterSchedule.Update(schedule);
+
+
+            }
+            else
+            {
+                 schedule = new CharacterSchedule() {
+                     ID = new Guid(),
+                     CharacterID = CharacterID,
+                     StorySeriesID = Guid.Parse(storyStatus.StorySeries),
+                     StoryCardID = Guid.Parse(storyStatus.Value),
+                     IsMain = true,
+                     IsStory = false
+                 };
+            }
+
+            _context.SaveChanges();
+
+            var storycards = _context.StorySeries.AsNoTracking().Where(a => a.ID == Guid.Parse(storyStatus.Value)).FirstOrDefault();
+            var card = new
+            {
+                StorySeriesID = storycards.ID,
+                StoryName = storycards.SeriesName,
+                Text = storycards.Text,
+                IMG = storycards.IMG,
+                StoryOptions = _context.StoryCard.Where(a => a.StorySeriesID == storycards.ID).ToList()
+            };
+            return Json(card);
+        }
+        #endregion
     }
 
 }

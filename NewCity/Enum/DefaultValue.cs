@@ -17,31 +17,5 @@ namespace NewCity.Enum
         /// </summary>
         public readonly Guid defaultlocation = new Guid("F9168C5E-CEB2-4faa-B6BF-329BF39FA1E4");
 
-        public int CheckCharacterType(Guid optionID) {
-            switch (optionID.ToString())
-            {
-                case "6B29FC40-CA47-1067-B31D-00DD010662DA":
-                    //作家
-                    return 1;
-
-
-            }
-            return 0;
-        }
-
-        /// <summary>
-        /// 新建角色后默认地点
-        /// </summary>
-        public Guid characterNextCard(int characterType)
-        {
-            
-            switch (characterType)
-            {
-                case 1:
-                    //作家
-                    return new Guid("83409419-48E4-43EB-B23F-7FB664946152");
-            }
-            return Guid.Empty;
-        }
     }
 }
