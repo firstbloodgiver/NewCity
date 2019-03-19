@@ -31,7 +31,7 @@
                     {
                         <div class="row">
                             <p>@option.StorySeriesName</p>
-                            <button class="btn-default" onclick="NextCard(@option.ID)">继续</button>
+                            <button class="btn-default" onclick="NextCard('@option.ID')">继续</button>
                         </div>
                     }
                 </div>
@@ -50,7 +50,7 @@
                     @foreach (var option in ViewBag.ReadList.StoryOptions)
                     {
                         <div class="row">
-                            <button class="btn-default" onclick="NextCard(@option.ID)">@option.Text</button>
+                            <button class="btn-default" onclick="NextCard('@option.ID')">@option.Text</button>
                         </div>
                     }
                 </div>
@@ -68,25 +68,26 @@
 <script>
 
     function NextCard(optionID) {
+        debugger;
         $.post(
             '/Main/NextCard',
             { optionID: optionID },
             function (result) {
-                debugger;
+                debugger;   
                 CleanContent();
-                AddContent(result.Text);
-                AddOption(result.StoryOptions)
+                AddContent(result.text);
+                AddOption(result.storyOptions)
             }
         )
     }
 
     //添加选项
     function AddOption(option) {
-        for (let i = 1; i < option.length; i++) {
-            if (option.NextCard) {
-                $('#Option').append("<button onclick = " + NextCard(option.ID) + " > option.Text</button>")
+        debugger;
+        for (var i in option) {
+            if (option[i].nextStoryCardID) {   
+                $('#Option').append("<button onclick = NextCard('"+option[i].id+"')>" + option[i].text + "</button>")
             }
-
         }
     }
     //添加内容框内容
@@ -96,7 +97,7 @@
     }
     //清除内容框
     function CleanContent() {
-        $('#Content').empty();
+        $('#Text').empty();
         $('#Img').empty();
         $('#Option').empty();
     }

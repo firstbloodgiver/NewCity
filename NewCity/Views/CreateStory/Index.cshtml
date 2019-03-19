@@ -321,6 +321,7 @@
     //设置效果
     var effectcount = 0; //当前页面有多少个条件
     function Effect(number) {
+        debugger;
         var EffectForm = document.getElementById("EffectForm");
         EffectForm.innerHTML = "";
         effectcount = 0;
@@ -328,13 +329,14 @@
         $("#EffectForm").append(q);
         //let effect = JSON.parse($("#storyCard.StoryOptions[" + number + "].Effect").val());
         let ef = document.getElementById("storyCard.StoryOptions[" + number + "].Effect").value;
-        if (ef) {
+        if (ef && ef!='/') {
             let effect = JSON.parse(ef);
             let effectlength = 0;
             for (let obj in effect) {
                 effectlength++;
             }
             for (let i = 0; i < effectlength / 3; i++) {
+                let Hide = "<input  type='text'  name='storyStates[" + i + "].StorySeries' value='1' style='display: none;'/>";
                 let Name = "<input  type='text' name='storyStates[" + i + "].Name' id='ef-storyStates[" + i + "].Name'/>";
                 let Type = "<select  name='storyStates[" + i + "].Type' id='ef-storyStates[" + i + "].Type'>"
                     + "<option value='0'>增加</option>"
@@ -343,7 +345,7 @@
                     + "</select>";
                 let Value = "<input  type='text' name='storyStates[" + i + "].Value' id='ef-storyStates[" + i + "].Value'/>";
                 let Delete = "<button onclick='EffectCancel(" + i + ")'>取消</button>";
-                let context = Name + Type + Value + Delete;
+                let context = Hide + Name + Type + Value + Delete;
                 let toappend = "<div class='row' id='effect" + i + "'>" + context + "</div>"
                 $("#EffectForm").append(toappend)
                 effectcount++;
@@ -366,6 +368,7 @@
     //增加效果
     function AddEffect() {
         let i = effectcount;
+        let Hide = "<input  type='text'  name='storyStates[" + i + "].StorySeries' value='1' style='display: none;'/>";
         let Name = "<input  type='text'  name='storyStates[" + i + "].Name' id='ef-storyStates[" + i + "].Name'/>";
         let Type = "<select  name='storyStates[" + i + "].Type' id='ef-storyStates[" + i + "].Type'>"
             + "<option value='0'>增加</option>"
@@ -374,7 +377,7 @@
             + "</select>";
         let Value = "<input  type='text' name='storyStates[" + i + "].Value' id='ef-storyStates[" + i + "].Value'/>";
         let Delete = "<button onclick='EffectCancel(" + i + ")'>取消</button>";
-        let context = Name + Type + Value + Delete;
+        let context = Hide + Name + Type + Value + Delete;
         let toappend = "<div class='row' id='effect" + i + "'>" + context + "</div>"
         $("#EffectForm").append(toappend)
         effectcount++;

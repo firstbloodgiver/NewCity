@@ -45,36 +45,42 @@ namespace NewCity.Controllers
             if (userCharacter == null) {
                 CreateCharacter();
             }
-            //有无进行中的事情
-            //if (_context.CharacterSchedule.AsNoTracking().Where(c => c.CharacterID == userCharacter.ID && c.IsMain).FirstOrDefault() != null) {
-            //    DefaultLocation();
-            //}
-            //是否在场景
-            if (InLocation(userid, out StorySeriesID))
-            {
-                StorySeries ReadList = new StorySeries();
-                ReadList = _context.StorySeries.AsNoTracking().Where(s => s.ID == StorySeriesID).FirstOrDefault();
-                OperaList = _context.StoryCard.AsNoTracking().Where(s => s.StorySeriesID == StorySeriesID).ToList();
-                ViewBag.ReadList = ReadList;
-                ViewBag.OperaList = OperaList;
-            }
             else
             {
-                StoryCard ReadList = new StoryCard();
-                var storycardID = _context.UserCharacter.AsNoTracking().Where(a => a.UserId == userid)
-                    .Join(_context.CharacterSchedule, a => a.ID, b => b.CharacterID, (a, b) => new { storycardID = b.StoryCardID,b.IsMain })
-                    .FirstOrDefault(b=>b.IsMain==true);
-                ReadList = _context.StoryCard.AsNoTracking().Include(a=>a.StoryOptions).AsNoTracking().SingleOrDefault(a => a.ID == storycardID.storycardID);
-                //去除不符合显示条件的选项
-                List<StoryOption> storyOptions = new List<StoryOption>();
-                foreach (var option in ReadList.StoryOptions) {
-                    if (Check(option.Condition, ReadList.StorySeriesID.ToString())) {
-                        storyOptions.Add(option);
-                    }
+                //有无进行中的事情
+                //if (_context.CharacterSchedule.AsNoTracking().Where(c => c.CharacterID == userCharacter.ID && c.IsMain).FirstOrDefault() != null) {
+                //    DefaultLocation();
+                //}
+                //是否在场景
+                if (InLocation(userid, out StorySeriesID))
+                {
+                    StorySeries ReadList = new StorySeries();
+                    ReadList = _context.StorySeries.AsNoTracking().Where(s => s.ID == StorySeriesID).FirstOrDefault();
+                    OperaList = _context.StoryCard.AsNoTracking().Where(s => s.StorySeriesID == StorySeriesID).ToList();
+                    ViewBag.ReadList = ReadList;
+                    ViewBag.OperaList = OperaList;
                 }
-                ReadList.StoryOptions = storyOptions;
-                ViewBag.ReadList = ReadList;
+                else
+                {
+                    StoryCard ReadList = new StoryCard();
+                    var storycardID = _context.UserCharacter.AsNoTracking().Where(a => a.UserId == userid)
+                        .Join(_context.CharacterSchedule, a => a.ID, b => b.CharacterID, (a, b) => new { storycardID = b.StoryCardID, b.IsMain })
+                        .FirstOrDefault(b => b.IsMain == true);
+                    ReadList = _context.StoryCard.AsNoTracking().Include(a => a.StoryOptions).AsNoTracking().SingleOrDefault(a => a.ID == storycardID.storycardID);
+                    //去除不符合显示条件的选项
+                    List<StoryOption> storyOptions = new List<StoryOption>();
+                    foreach (var option in ReadList.StoryOptions)
+                    {
+                        if (Check(option.Condition, ReadList.StorySeriesID.ToString()))
+                        {
+                            storyOptions.Add(option);
+                        }
+                    }
+                    ReadList.StoryOptions = storyOptions;
+                    ViewBag.ReadList = ReadList;
+                }
             }
+
             
 
             return View();
@@ -155,31 +161,40 @@ namespace NewCity.Controllers
         /// <returns></returns>
         private bool Check(string Condition,string StorySeriesID)
         {
-            List<StoryStatus> storyStatuses = JsonConvert.DeserializeObject<List<StoryStatus>>(Condition);
-            foreach (var status in storyStatuses) {
-                var DBstatus = _context.StoryStatus.AsNoTracking().Where(a => a.StorySeries == StorySeriesID && a.Name == status.Name).FirstOrDefault();
-                if (DBstatus != null) {
-                    int dbstatus = Convert.ToInt32(DBstatus.Value);
-                    int statues = Convert.ToInt32(status.Value);
-                    bool result = false;
-                    switch (Convert.ToInt32(status.Type)) {
-                        case (int)enumConditionType.大于:
-                            result = dbstatus > statues ? true : false;
-                            break;
-                        case (int)enumConditionType.小于:
-                            result = dbstatus < statues ? true : false;
-                            break;
-                        case (int)enumConditionType.等于:
-                            result = dbstatus == statues ? true : false;
-                            break;
-                        case (int)enumConditionType.不等于:
-                            result = dbstatus != statues ? true : false;
-                            break;
+            if (!string.IsNullOrWhiteSpace(Condition)) {
+                List<StoryStatus> storyStatuses = JsonConvert.DeserializeObject<List<StoryStatus>>(Condition);
+                foreach (var status in storyStatuses)
+                {
+                    var DBstatus = _context.StoryStatus.AsNoTracking().Where(a => a.StorySeries == StorySeriesID && a.Name == status.Name).FirstOrDefault();
+                    if (DBstatus != null)
+                    {
+                        int dbstatus = Convert.ToInt32(DBstatus.Value);
+                        int statues = Convert.ToInt32(status.Value);
+                        bool result = false;
+                        switch (Convert.ToInt32(status.Type))
+                        {
+                            case (int)enumConditionType.大于:
+                                result = dbstatus > statues ? true : false;
+                                break;
+                            case (int)enumConditionType.小于:
+                                result = dbstatus < statues ? true : false;
+                                break;
+                            case (int)enumConditionType.等于:
+                                result = dbstatus == statues ? true : false;
+                                break;
+                            case (int)enumConditionType.不等于:
+                                result = dbstatus != statues ? true : false;
+                                break;
+                        }
+                        if (result == false) return false;
                     }
-                    if (result == false) return false;
                 }
+                return true;
             }
-            return true;
+            else
+            {
+                return true;
+            }
         }
 
         /// <summary>
@@ -213,30 +228,34 @@ namespace NewCity.Controllers
         /// </summary>
         /// <param name="Effect"></param>
         private void Execute(string Effect,Guid CharacterID) {
-            List<StoryStatus> storyStatuses = JsonConvert.DeserializeObject<List<StoryStatus>>(Effect);
-            //暂时只能修改状态
-            foreach (var obj in storyStatuses) {
-                switch (Convert.ToInt32(obj.Type)) {
-                    case (int)enumEffectType.增加:
-                        Increase(obj);
-                        break;
-                    case (int)enumEffectType.减少:
-                        Reduce(obj);
-                        break;
-                    case (int)enumEffectType.赋值:
-                        Assign(obj);
-                        break;
-                    case (int)enumEffectType.场景转移:
-                        MoveLocation(obj, CharacterID);
-                        break;
+            if (!string.IsNullOrWhiteSpace(Effect)) {
+                List<Istatus> storyStatuses = JsonConvert.DeserializeObject<List<Istatus>>(Effect);
+                foreach (var obj in storyStatuses)
+                {
+                    switch (Convert.ToInt32(obj.Type))
+                    {
+                        case (int)enumEffectType.增加:
+                            Increase(obj);
+                            break;
+                        case (int)enumEffectType.减少:
+                            Reduce(obj);
+                            break;
+                        case (int)enumEffectType.赋值:
+                            Assign(obj);
+                            break;
+                        case (int)enumEffectType.场景转移:
+                            MoveLocation(obj, CharacterID);
+                            break;
+                    }
                 }
             }
+
         }
 
         /// <summary>
         /// 返回创建人物故事卡
         /// </summary>
-        private IActionResult CreateCharacter() {
+        private void CreateCharacter() {
             UserCharacter character = new UserCharacter() {
                 ID = Guid.NewGuid(),
                 UserId = GetUserId(),
@@ -257,8 +276,6 @@ namespace NewCity.Controllers
             ViewBag.ReadList = _context.StoryCard.AsNoTracking().Include(a => a.StoryOptions).AsNoTracking().SingleOrDefault(a => a.ID == new DefaultValue().createCharacter);
             ViewBag.InLocation = false;
 
-
-            return View();
         }
 
         
@@ -273,7 +290,7 @@ namespace NewCity.Controllers
         }
 
         #region 卡片执行操作
-        private void Increase(StoryStatus storyStatus)
+        private void Increase(Istatus storyStatus)
         {
             StoryStatus status = _context.StoryStatus.Where(a => a.StorySeries == storyStatus.StorySeries && a.Name == storyStatus.Name).FirstOrDefault();
             if (status != null) {
@@ -282,7 +299,7 @@ namespace NewCity.Controllers
                 _context.SaveChanges();
             }
         }
-        private void Reduce(StoryStatus storyStatus)
+        private void Reduce(Istatus storyStatus)
         {
             StoryStatus status = _context.StoryStatus.Where(a => a.StorySeries == storyStatus.StorySeries && a.Name == storyStatus.Name).FirstOrDefault();
             if (status != null)
@@ -292,7 +309,7 @@ namespace NewCity.Controllers
                 _context.SaveChanges();
             }
         }
-        private void Assign(StoryStatus storyStatus)
+        private void Assign(Istatus storyStatus)
         {
             StoryStatus status = _context.StoryStatus.Where(a => a.StorySeries == storyStatus.StorySeries && a.Name == storyStatus.Name).FirstOrDefault();
             if (status != null)
@@ -303,23 +320,20 @@ namespace NewCity.Controllers
             }
         }
 
-        public JsonResult MoveLocation(StoryStatus storyStatus,Guid CharacterID) {
+        public JsonResult MoveLocation(Istatus storyStatus,Guid CharacterID) {
             //记录
             CharacterSchedule schedule = _context.CharacterSchedule.Where(a => a.StorySeriesID == Guid.Parse(storyStatus.StorySeries)).FirstOrDefault();
             if (schedule != null) {
                 schedule.IsMain = true;
-                schedule.StoryCardID = Guid.Parse(storyStatus.Value);
+                schedule.StorySeriesID = Guid.Parse(storyStatus.Value);
                 _context.CharacterSchedule.Update(schedule);
-
-
             }
             else
             {
                  schedule = new CharacterSchedule() {
                      ID = new Guid(),
                      CharacterID = CharacterID,
-                     StorySeriesID = Guid.Parse(storyStatus.StorySeries),
-                     StoryCardID = Guid.Parse(storyStatus.Value),
+                     StorySeriesID = Guid.Parse(storyStatus.Value),
                      IsMain = true,
                      IsStory = false
                  };
@@ -340,5 +354,7 @@ namespace NewCity.Controllers
         }
         #endregion
     }
+
+
 
 }
