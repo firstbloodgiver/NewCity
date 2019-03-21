@@ -114,12 +114,79 @@ namespace NewCity.Controllers
                        .AsNoTracking()  
                        .Include(s => s.StoryOptions)
                        .FirstOrDefaultAsync(m => m.ID == opt.NextStoryCardID);
+                    JsonResult result = Json(card);
+                    #region
+                    //将所有在主页面中的状态设为false
+                    var tempSchedule = _context.CharacterSchedule.Where(a => a.CharacterID == Schedule.CharacterID).ForEachAsync(a => a.IsMain = false);
+                    _context.Update(tempSchedule);
 
-                    Execute(opt.Effect, Schedule.CharacterID);
+                    Guid CharacterID = _context.UserCharacter.AsNoTracking().Where(a => a.UserId == userid).FirstOrDefault().ID;
+                    var characterSchedule = _context.CharacterSchedule.Where(a => a.CharacterID == CharacterID).FirstOrDefault();
+                    characterSchedule.StoryCardID = opt.NextStoryCardID;
+                    characterSchedule.IsMain = true;
+                    _context.Update(characterSchedule);
+                    #endregion
 
-                    UpdateCharacterSchedule(userid, opt);
+                    #region
+                    if (!string.IsNullOrWhiteSpace(opt.Effect))
+                    {
+                        List<Istatus> storyStatuses = JsonConvert.DeserializeObject<List<Istatus>>(opt.Effect);
+                        foreach (var obj in storyStatuses)
+                        {
+                            switch (Convert.ToInt32(obj.Type))
+                            {
+                                case (int)enumEffectType.增加:
+                                    Increase(obj);
+                                    break;
+                                case (int)enumEffectType.减少:
+                                    Reduce(obj);
+                                    break;
+                                case (int)enumEffectType.赋值:
+                                    Assign(obj);
+                                    break;
+                                case (int)enumEffectType.场景转移:
+                                    //MoveLocation(obj, Schedule.CharacterID);
+                                    //记录
+                                    CharacterSchedule schedule = _context.CharacterSchedule.Where(a => a.StorySeriesID == Guid.Parse(obj.StorySeries) && a.CharacterID == Schedule.CharacterID).FirstOrDefault();
+                                    if (schedule != null)
+                                    {
+                                        schedule.IsMain = true;
+                                        schedule.StorySeriesID = Guid.Parse(obj.Value);
+                                        _context.CharacterSchedule.Update(schedule);
+                                    }
+                                    else
+                                    {
+                                        schedule = new CharacterSchedule()
+                                        {
+                                            ID = new Guid(),
+                                            CharacterID = CharacterID,
+                                            StorySeriesID = Guid.Parse(obj.Value),
+                                            IsMain = true,
+                                            IsStory = false
+                                        };
 
-                    return Json(card);
+                                        _context.CharacterSchedule.Add(schedule);
+                                    }
+
+
+                                    var cards = _context.StorySeries.AsNoTracking().Where(a => a.ID == Guid.Parse(obj.Value)).FirstOrDefault();
+                                    var resultcard =  new 
+                                    {
+                                        StorySeriesID = cards.ID,
+                                        StoryName = cards.SeriesName,
+                                        Text = cards.Text,
+                                        IMG = cards.IMG,
+                                        StoryOptions = _context.StoryCard.Where(a => a.StorySeriesID == cards.ID).ToList()
+                                    };
+                                    result = Json(resultcard);
+                                       
+                                    break;
+                            }
+                        }
+                    }
+                    _context.SaveChanges();
+                    #endregion
+                    return result;
                 }
             }
             else
@@ -138,20 +205,7 @@ namespace NewCity.Controllers
             }
             return Json("不存在的后续故事卡片！");
         }
-        /// <summary>
-        /// 更新角色当前故事卡进度
-        /// </summary>
-        /// <param name="userid"></param>
-        /// <param name="opt"></param>
-        private void UpdateCharacterSchedule(Guid userid, StoryOption opt)
-        {
-            Guid CharacterID = _context.UserCharacter.AsNoTracking().Where(a => a.UserId == userid).FirstOrDefault().ID;
-            var characterSchedule = _context.CharacterSchedule.Where(a => a.CharacterID == CharacterID).FirstOrDefault();
-            characterSchedule.StoryCardID = opt.NextStoryCardID;
-            characterSchedule.IsMain = true;
-            _context.Update(characterSchedule);
-            _context.SaveChanges();
-        }
+
 
         /// <summary>
         /// 检查是否符合显示条件
@@ -223,34 +277,7 @@ namespace NewCity.Controllers
             return true;
         }
 
-        /// <summary>
-        /// 执行进行选项时下一部操作
-        /// </summary>
-        /// <param name="Effect"></param>
-        private void Execute(string Effect,Guid CharacterID) {
-            if (!string.IsNullOrWhiteSpace(Effect)) {
-                List<Istatus> storyStatuses = JsonConvert.DeserializeObject<List<Istatus>>(Effect);
-                foreach (var obj in storyStatuses)
-                {
-                    switch (Convert.ToInt32(obj.Type))
-                    {
-                        case (int)enumEffectType.增加:
-                            Increase(obj);
-                            break;
-                        case (int)enumEffectType.减少:
-                            Reduce(obj);
-                            break;
-                        case (int)enumEffectType.赋值:
-                            Assign(obj);
-                            break;
-                        case (int)enumEffectType.场景转移:
-                            MoveLocation(obj, CharacterID);
-                            break;
-                    }
-                }
-            }
 
-        }
 
         /// <summary>
         /// 返回创建人物故事卡
@@ -296,7 +323,7 @@ namespace NewCity.Controllers
             if (status != null) {
                 status.Value = (Convert.ToInt32(status.Value)+Convert.ToInt32(storyStatus.Value)).ToString();
                 _context.Update(status);
-                _context.SaveChanges();
+
             }
         }
         private void Reduce(Istatus storyStatus)
@@ -306,7 +333,7 @@ namespace NewCity.Controllers
             {
                 status.Value = (Convert.ToInt32(status.Value) - Convert.ToInt32(storyStatus.Value)).ToString();
                 _context.Update(status);
-                _context.SaveChanges();
+
             }
         }
         private void Assign(Istatus storyStatus)
@@ -316,42 +343,11 @@ namespace NewCity.Controllers
             {
                 status.Value = storyStatus.Value;
                 _context.Update(status);
-                _context.SaveChanges();
+
             }
         }
 
-        public JsonResult MoveLocation(Istatus storyStatus,Guid CharacterID) {
-            //记录
-            CharacterSchedule schedule = _context.CharacterSchedule.Where(a => a.StorySeriesID == Guid.Parse(storyStatus.StorySeries)).FirstOrDefault();
-            if (schedule != null) {
-                schedule.IsMain = true;
-                schedule.StorySeriesID = Guid.Parse(storyStatus.Value);
-                _context.CharacterSchedule.Update(schedule);
-            }
-            else
-            {
-                 schedule = new CharacterSchedule() {
-                     ID = new Guid(),
-                     CharacterID = CharacterID,
-                     StorySeriesID = Guid.Parse(storyStatus.Value),
-                     IsMain = true,
-                     IsStory = false
-                 };
-            }
-
-            _context.SaveChanges();
-
-            var storycards = _context.StorySeries.AsNoTracking().Where(a => a.ID == Guid.Parse(storyStatus.Value)).FirstOrDefault();
-            var card = new
-            {
-                StorySeriesID = storycards.ID,
-                StoryName = storycards.SeriesName,
-                Text = storycards.Text,
-                IMG = storycards.IMG,
-                StoryOptions = _context.StoryCard.Where(a => a.StorySeriesID == storycards.ID).ToList()
-            };
-            return Json(card);
-        }
+       
         #endregion
     }
 

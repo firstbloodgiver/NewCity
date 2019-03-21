@@ -92,7 +92,8 @@ namespace NewCity.Controllers
                                 var o = storyCard.StoryOptions.Where(a => a.ID == option.ID).First();
                                 option.Condition = o.Condition;
                                 option.NextStoryCardID = o.NextStoryCardID;
-                                List<Istatus> storyStatuses = JsonConvert.DeserializeObject<List<Istatus>>(o.Effect);
+
+                                List<Istatus> storyStatuses = string.IsNullOrEmpty(o.Effect)?new List<Istatus>():JsonConvert.DeserializeObject<List<Istatus>>(o.Effect);
                                 foreach (var i in storyStatuses) {
                                     i.StorySeries = series.ID.ToString();
                                 }

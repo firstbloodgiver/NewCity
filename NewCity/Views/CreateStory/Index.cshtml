@@ -252,31 +252,28 @@
         let Cd = document.getElementById("storyCard.StoryOptions[" + number + "].Condition").value;
         if (Cd) {
             let condition = JSON.parse(Cd);
-            let conditionLength = 0; //条件长度
-            for (let obj in condition) {
-                conditionLength++;
-            }
 
-            for (let i = 0; i < conditionLength / 3; i++) {
-                let Name = "<input  type='text' name='storyStates[" + i + "].Name' id='cd-storyStates[" + i + "].Name'/>";
-                let Type = "<select  name='storyStates[" + i + "].Type' id='cd-storyStates[" + i + "].Type'>"
+            for (let i in condition) {
+                let Hide = "<input  type='text'  name='StorySeries' value='1' style='display: none;'/>";
+                let Name = "<input  type='text' name='Name' id='cd-storyStates[" + i + "].Name'/>";
+                let Type = "<select  name='Type' id='cd-storyStates[" + i + "].Type'>"
                     + "<option value='1'>></option>"
                     + "<option value='2'><</option>"
                     + "<option value='3'>=</option>"
                     + "<option value='4'>≠</option>"
                     + "</select>";
-                let Value = "<input  type='text' name='storyStates[" + i + "].Value' id='cd-storyStates[" + i + "].Value'/>";
+                let Value = "<input  type='text' name='Value' id='cd-storyStates[" + i + "].Value'/>";
                 let Delete = "<button onclick='ConditionCancel(" + i + ")'>取消</button>";
-                let context = Name + Type + Value + Delete;
+                let context = Hide+Name + Type + Value + Delete;
                 let toappend = "<div class='row' id='condition" + i + "'>" + context + "</div>"
                 $("#ConditionForm").append(toappend)
                 conditioncount++;
                 //赋值
 
-                document.getElementById("cd-storyStates[" + i + "].Name").value = condition["storyStates[" + i + "].Name"];
-                document.getElementById("cd-storyStates[" + i + "].Type").text = enumConditionType[condition["storyStates[" + i + "].Type"]];
-                document.getElementById("cd-storyStates[" + i + "].Type").value = condition["storyStates[" + i + "].Type"];
-                document.getElementById("cd-storyStates[" + i + "].Value").value = condition["storyStates[" + i + "].Value"];
+                document.getElementById("cd-storyStates[" + i + "].Name").value = condition[i]["Name"];
+                document.getElementById("cd-storyStates[" + i + "].Type").text = enumConditionType[condition[i]["Type"]];
+                document.getElementById("cd-storyStates[" + i + "].Type").value = condition[i]["Type"];
+                document.getElementById("cd-storyStates[" + i + "].Value").value = condition[i]["Value"];
 
             }
         }
@@ -303,16 +300,17 @@
     //增加条件
     function AddCondition() {
         let i = conditioncount;
-        let Name = "<input  type='text'  name='storyStates[" + i + "].Name' id='cd-storyStates[" + i + "].Name'/>";
-        let Type = "<select  name='storyStates[" + i + "].Type' id='cd-storyStates[" + i + "].Type'>"
+        let Hide = "<input  type='text'  name='StorySeries' value='1' style='display: none;'/>";
+        let Name = "<input  type='text'  name='Name' id='cd-storyStates[" + i + "].Name'/>";
+        let Type = "<select  name='Type' id='cd-storyStates[" + i + "].Type'>"
             + "<option value='1'>></option>"
             + "<option value='2'><</option>"
             + "<option value='3'>=</option>"
             + "<option value='4'>≠</option>"
             + "</select>";
-        let Value = "<input  type='text' name='storyStates[" + i + "].Value' id='cd-storyStates[" + i + "].Value'/>";
+        let Value = "<input  type='text' name='Value' id='cd-storyStates[" + i + "].Value'/>";
         let Delete = "<button onclick='ConditionCancel(" + i + ")'>取消</button>";
-        let context = Name + Type + Value + Delete;
+        let context = Hide+Name + Type + Value + Delete;
         let toappend = "<div class='row' id='condition" + i + "'>" + context + "</div>"
         $("#ConditionForm").append(toappend)
         conditioncount++;
@@ -321,39 +319,37 @@
     //设置效果
     var effectcount = 0; //当前页面有多少个条件
     function Effect(number) {
-        debugger;
         var EffectForm = document.getElementById("EffectForm");
         EffectForm.innerHTML = "";
         effectcount = 0;
         let q = "<input hidden type='text' id='EffectId' value='" + number + "'/>";
         $("#EffectForm").append(q);
         //let effect = JSON.parse($("#storyCard.StoryOptions[" + number + "].Effect").val());
+        debugger;
         let ef = document.getElementById("storyCard.StoryOptions[" + number + "].Effect").value;
         if (ef && ef!='/') {
             let effect = JSON.parse(ef);
-            let effectlength = 0;
-            for (let obj in effect) {
-                effectlength++;
-            }
-            for (let i = 0; i < effectlength / 3; i++) {
-                let Hide = "<input  type='text'  name='storyStates[" + i + "].StorySeries' value='1' style='display: none;'/>";
-                let Name = "<input  type='text' name='storyStates[" + i + "].Name' id='ef-storyStates[" + i + "].Name'/>";
-                let Type = "<select  name='storyStates[" + i + "].Type' id='ef-storyStates[" + i + "].Type'>"
+
+            for (let i in effect) {
+                let Hide = "<input  type='text'  name='StorySeries' value='1' style='display: none;'/>";
+                let Name = "<input  type='text' name='Name' id='ef-storyStates[" + i + "].Name'/>";
+                let Type = "<select  name='Type' id='ef-storyStates[" + i + "].Type'>"
                     + "<option value='0'>增加</option>"
                     + "<option value='1'>减少</option>"
                     + "<option value='2'>赋值</option>"
                     + "</select>";
-                let Value = "<input  type='text' name='storyStates[" + i + "].Value' id='ef-storyStates[" + i + "].Value'/>";
+                let Value = "<input  type='text' name='Value' id='ef-storyStates[" + i + "].Value'/>";
                 let Delete = "<button onclick='EffectCancel(" + i + ")'>取消</button>";
                 let context = Hide + Name + Type + Value + Delete;
                 let toappend = "<div class='row' id='effect" + i + "'>" + context + "</div>"
                 $("#EffectForm").append(toappend)
                 effectcount++;
                 //赋值
-                document.getElementById("ef-storyStates[" + i + "].Name").value = effect["storyStates[" + i + "].Name"];
-                document.getElementById("ef-storyStates[" + i + "].Type").text = enumEffectType[effect["storyStates[" + i + "].Type"]];
-                document.getElementById("ef-storyStates[" + i + "].Type").value = effect["storyStates[" + i + "].Type"];
-                document.getElementById("ef-storyStates[" + i + "].Value").value = effect["storyStates[" + i + "].Value"];
+                debugger;
+                document.getElementById("ef-storyStates[" + i + "].Name").value = effect[i]["Name"];
+                document.getElementById("ef-storyStates[" + i + "].Type").text = enumEffectType[effect[i]["Type"]];
+                document.getElementById("ef-storyStates[" + i + "].Type").value = effect[i]["Type"];
+                document.getElementById("ef-storyStates[" + i + "].Value").value = effect[i]["Value"];
 
             }
         }
@@ -368,14 +364,14 @@
     //增加效果
     function AddEffect() {
         let i = effectcount;
-        let Hide = "<input  type='text'  name='storyStates[" + i + "].StorySeries' value='1' style='display: none;'/>";
-        let Name = "<input  type='text'  name='storyStates[" + i + "].Name' id='ef-storyStates[" + i + "].Name'/>";
-        let Type = "<select  name='storyStates[" + i + "].Type' id='ef-storyStates[" + i + "].Type'>"
+        let Hide = "<input  type='text'  name='StorySeries' value='1' style='display: none;'/>";
+        let Name = "<input  type='text'  name='Name' id='ef-storyStates[" + i + "].Name'/>";
+        let Type = "<select  name='Type' id='ef-storyStates[" + i + "].Type'>"
             + "<option value='0'>增加</option>"
             + "<option value='1'>减少</option>"
             + "<option value='2'>赋值</option>"
             + "</select>";
-        let Value = "<input  type='text' name='storyStates[" + i + "].Value' id='ef-storyStates[" + i + "].Value'/>";
+        let Value = "<input  type='text' name='Value' id='ef-storyStates[" + i + "].Value'/>";
         let Delete = "<button onclick='EffectCancel(" + i + ")'>取消</button>";
         let context = Hide + Name + Type + Value + Delete;
         let toappend = "<div class='row' id='effect" + i + "'>" + context + "</div>"
@@ -401,21 +397,22 @@
     }
 
     function FormtoJson(form) {
-        var o = {};
-        var a = form.serializeArray();
-        for (let obj in a) {
-            if (o[a[obj].name]) {
-                if (!o[a[obj].name].push) {
-                    o[a[obj].name] = [o[a[obj].name]]
-                }
-                o[a[obj].name].push(a[obj].value) || "";
-            }
-            else {
-                o[a[obj].name] = a[obj].value || '';
-            }
-        }
+        let a = form.serializeArray();
 
-        return JSON.stringify(o);
+        let result = new Array();
+        for (let i = 0,j = 0 ; i < a.length-1; i += 4,j++) {
+            let temp = {};
+            temp[a[i].name] = a[i].value;
+            
+            temp[a[i + 1].name] = a[i + 1].value;
+          
+            temp[a[i + 2].name] = a[i + 2].value;
+
+            temp[a[i + 3].name] = a[i + 3].value;
+
+            result.push(temp);
+        }
+        return JSON.stringify(result);
     }
 
 </script>
