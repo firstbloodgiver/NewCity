@@ -30,7 +30,7 @@
                     @foreach (var option in ViewBag.OperaList)
                     {
                         <div class="row">
-                            <p>@option.StorySeriesName</p>
+                            <p>@option.StoryName</p>
                             <button class="btn-default" onclick="NextCard('@option.ID')">继续</button>
                         </div>
                     }

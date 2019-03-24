@@ -47,10 +47,6 @@ namespace NewCity.Controllers
             }
             else
             {
-                //有无进行中的事情
-                //if (_context.CharacterSchedule.AsNoTracking().Where(c => c.CharacterID == userCharacter.ID && c.IsMain).FirstOrDefault() != null) {
-                //    DefaultLocation();
-                //}
                 //是否在场景
                 if (InLocation(userid, out StorySeriesID))
                 {
@@ -260,14 +256,11 @@ namespace NewCity.Controllers
             var location = _context.UserCharacter.AsNoTracking().Where(p => p.UserId == userid)
                 .Join(_context.CharacterSchedule.Where(a=>a.IsMain == true),u => u.ID,c => c.CharacterID,(u,c)=>new { c.IsStory,c.StorySeriesID }).FirstOrDefault();
 
-
-
             StorySeriesID = Guid.Empty;
-
             if (location != null) {
+                StorySeriesID = location.StorySeriesID;
                 if (location.IsStory == true)
                 {
-                    StorySeriesID = location.StorySeriesID;
                     ViewBag.InLocation = false;
                     return false;
                 }
