@@ -115,11 +115,9 @@ namespace NewCity.Controllers
                        .Include(s => s.StoryOptions)
                        .FirstOrDefaultAsync(m => m.ID == opt.NextStoryCardID);
                     JsonResult result = Json(card);
-                    #region
-                    //将所有在主页面中的状态设为false
-                    var tempSchedule = _context.CharacterSchedule.Where(a => a.CharacterID == Schedule.CharacterID).ForEachAsync(a => a.IsMain = false);
-                    _context.Update(tempSchedule);
-
+                    #region  
+                    SetMain(Schedule.CharacterID);
+                    //保存进度
                     Guid CharacterID = _context.UserCharacter.AsNoTracking().Where(a => a.UserId == userid).FirstOrDefault().ID;
                     var characterSchedule = _context.CharacterSchedule.Where(a => a.CharacterID == CharacterID).FirstOrDefault();
                     characterSchedule.StoryCardID = opt.NextStoryCardID;
@@ -145,8 +143,8 @@ namespace NewCity.Controllers
                                     Assign(obj);
                                     break;
                                 case (int)enumEffectType.场景转移:
-                                    //MoveLocation(obj, Schedule.CharacterID);
                                     //记录
+                                    SetMain(Schedule.CharacterID);
                                     CharacterSchedule schedule = _context.CharacterSchedule.Where(a => a.StorySeriesID == Guid.Parse(obj.StorySeries) && a.CharacterID == Schedule.CharacterID).FirstOrDefault();
                                     if (schedule != null)
                                     {
@@ -260,19 +258,21 @@ namespace NewCity.Controllers
         private bool InLocation(Guid userid, out Guid StorySeriesID)
         {
             var location = _context.UserCharacter.AsNoTracking().Where(p => p.UserId == userid)
-                .Join(_context.CharacterSchedule,u => u.ID,c => c.CharacterID,(u,c)=>new { c.IsStory,c.StorySeriesID }).ToList();
+                .Join(_context.CharacterSchedule.Where(a=>a.IsMain == true),u => u.ID,c => c.CharacterID,(u,c)=>new { c.IsStory,c.StorySeriesID }).FirstOrDefault();
+
+
 
             StorySeriesID = Guid.Empty;
 
-            foreach (var state in location)
-            {
-                if(state.IsStory == true)
+            if (location != null) {
+                if (location.IsStory == true)
                 {
-                    StorySeriesID = state.StorySeriesID;
+                    StorySeriesID = location.StorySeriesID;
                     ViewBag.InLocation = false;
                     return false;
                 }
             }
+
             ViewBag.InLocation = true;
             return true;
         }
@@ -314,6 +314,20 @@ namespace NewCity.Controllers
             ViewBag.OperaList = _context.StoryCard.AsNoTracking().Where(s => s.StorySeriesID == new DefaultValue().defaultlocation).ToList();
             ViewBag.InLocation = true;
             return View();
+        }
+
+        /// <summary>
+        /// 将所有在主页面中的状态设为false
+        /// 用于初始化
+        /// </summary>
+        /// <param name="CharacterID"></param>
+        private void SetMain(Guid CharacterID) {
+            List<CharacterSchedule> tempSchedule = _context.CharacterSchedule.Where(a => a.CharacterID == CharacterID).ToList();
+            foreach (var obj in tempSchedule)
+            {
+                obj.IsMain = false;
+                _context.CharacterSchedule.Update(obj);
+            }
         }
 
         #region 卡片执行操作
