@@ -11,6 +11,7 @@ namespace NewCity.Enum
         /// 创建人物故事卡
         /// </summary>
         public readonly Guid createCharacter = new Guid("936DA01F-9ABD-4d9d-80C7-02AF85C822A8");
+        public readonly Guid ScreateCharacter = new Guid("6967359b-5e3b-4568-bc25-575af3b98a16");
 
         /// <summary>
         /// 默认地点系列

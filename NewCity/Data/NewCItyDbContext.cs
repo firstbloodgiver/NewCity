@@ -20,7 +20,7 @@ namespace NewCity.Data
         public DbSet<NewCity.Models.UserCharacter> UserCharacter { get; set; }
         public DbSet<NewCity.Models.CharacterSchedule> CharacterSchedule { get; set; }
         public DbSet<NewCity.Models.Creator> Creator { get; set; }
-
+        public DbSet<NewCity.Models.HomeNews> HomeNews { get; set; }
         public DbSet<NewCity.Models.CharacterItem> CharacterItem { get; set; }
         public DbSet<NewCity.Models.CharacterLog> CharacterLog { get; set; }
         public DbSet<NewCity.Models.Item> Item { get; set; }

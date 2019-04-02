@@ -16,4 +16,6 @@ namespace NewCity.Enum
     }
 
     public enum enumCharacterType { 作家 = 1 };
+
+    public enum HomeType {轮播 = 0,主体语 = 1,内容 = 2 }
 }

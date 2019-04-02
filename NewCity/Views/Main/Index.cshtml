@@ -4,16 +4,34 @@
 
 }
 
-<h2>Main</h2> 
+<h2>Main</h2>
 @if (ViewData["Creator"].ToString() == "True")
 {
     <li><a asp-area="" asp-controller="Creator" asp-action="Index">Creator</a></li>
 }
 <div class="container-fluid">
-    <div class="col-md-3" style="background-color:aquamarine">
-        物品
+    <div class=" col-md-3">
+        <ul class="nav nav-tabs">
+            <li class="active">
+                <a href="#Item" data-toggle="tab">物品</a>
 
+            </li>
+            <li>
+                <a href="#Schedule" data-toggle="tab">事件</a>
+
+            </li>
+        </ul>
+        <div class="tab-content" style="background-color:aquamarine">
+            <div class="tab-pane fade in active row" id="Item">
+                物品
+            </div>
+            <div class="tab-pane fade row" id="Schedule">
+                事件
+            </div>
+        </div>
     </div>
+
+
     <div class="col-md-6" style="background-color:aqua">
         <div class="row">
             @if (ViewBag.InLocation && ViewBag.ReadList != null)
@@ -56,24 +74,36 @@
                 </div>
             }
         </div>
-       
+
     </div>
     <div class="col-md-3" style="background-color:burlywood">
         属性
+        <div class="row" id="Status">
 
+        </div>
     </div>
 </div>
 
 
+
+
 <script>
 
+    //初始读取
+    window.onload = function () {
+        GetItem();
+        GetState();
+        GetSchedule();
+    }
+
+
     function NextCard(optionID) {
-        debugger;
+
         $.post(
             '/Main/NextCard',
             { optionID: optionID },
             function (result) {
-                debugger;   
+
                 CleanContent();
                 AddContent(result.text);
                 AddOption(result.storyOptions)
@@ -83,11 +113,9 @@
 
     //添加选项
     function AddOption(option) {
-        debugger;
+
         for (var i in option) {
-            if (option[i].nextStoryCardID) {   
-                $('#Option').append("<button onclick = NextCard('"+option[i].id+"')>" + option[i].text + "</button>")
-            }
+            $('#Option').append("<button onclick = NextCard('" + option[i].id + "')>" + option[i].text + "</button>")
         }
     }
     //添加内容框内容
@@ -102,17 +130,67 @@
         $('#Option').empty();
     }
 
+
+
+    //获取人物状态
+    function GetState() {
+        $.get('/Main/GetState', function (data) {
+            debugger;
+            LoadRow(data, "Status");
+        })
+    }
+
+    //获取人物背包
     function GetItem() {
-        $.post('/Main/GetItem', function (data) {
+        $.get('/Main/GetItem', function (data) {
+            debugger;
+            let jsonObj = JSON.parse(data);
+            let html = '';
+            for (let i in jsonObj) {
+                debugger;
+                html += "<div class='row'>" + jsonObj[i].Name + ":" + jsonObj[i].Amount + "</div>"
+            }
+            let content = "<div class='row'>" + html + "</div>";
+            $("#Item").append(content);
+        });
+    }
+
+    //获取任务列表
+    function GetSchedule() {
+        $.get('/Main/GetSchedule', function (data) {
+ 
+            let jsonObj = JSON.parse(data);
+            let html = '';
+            for (let i in jsonObj) {
+          
+                html += "<div class='row'>" + jsonObj[i].SeriesName + ":" + jsonObj[i].Text + "</div>"
+            }
+            let content = "<div class='row'>" + html + "</div>";
+            $("#Schedule").append(content);
+        });
+    }
+
+    //获取任务历史
+    function GetHistory() {
+        $.get('/Main/GetHistory', function (data) {
 
         });
     }
 
-    function GetState() {
-        $.post('/Main/GetState', function (data) {
 
-        })
+    //创建Json的行
+    function LoadRow(json, traget) {
+        let jsonObj = JSON.parse(json);
+        let html = '';
+        for (let i in jsonObj) {
+            debugger;
+            html += "<div class='row'>" + i + ":" + jsonObj[i] + "</div>"
+        }
+        let content = "<div class='row'>" + html + "</div>";
+        $("#" + traget).append(content);
     }
+
+
 
 
 </script>

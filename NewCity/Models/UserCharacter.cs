@@ -23,6 +23,12 @@ namespace NewCity.Models
         public string CharacterName { get; set; }
 
         /// <summary>
+        /// 是否启用
+        /// </summary>
+        public bool IsActivate { get; set; }
+        
+
+        /// <summary>
         /// 角色故事进度
         /// </summary>
         public ICollection<CharacterSchedule> CharacterSchedules { get; set; }

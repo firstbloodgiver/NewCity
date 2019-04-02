@@ -85,7 +85,7 @@ namespace NewCity.Controllers
         [HttpPost]
         public async Task<JsonResult> NextCard(Guid optionID)
         {
-            var userid = GetUserId();
+            Guid userid = GetUserId();
 
             var Schedule = _context.UserCharacter.AsNoTracking().Where(a => a.UserId == userid)
                 .Join(_context.CharacterSchedule, a => a.ID,b=>b.CharacterID,(a,b)=>new { IsStory = b.IsStory,IsMain = b.IsMain 
@@ -118,7 +118,7 @@ namespace NewCity.Controllers
                     var characterSchedule = _context.CharacterSchedule.Where(a => a.CharacterID == CharacterID).FirstOrDefault();
                     characterSchedule.StoryCardID = opt.NextStoryCardID;
                     characterSchedule.IsMain = true;
-                    _context.Update(characterSchedule);
+                    _context.CharacterSchedule.Update(characterSchedule);
                     #endregion
 
                     #region
@@ -141,7 +141,7 @@ namespace NewCity.Controllers
                                 case (int)enumEffectType.场景转移:
                                     //记录
                                     SetMain(Schedule.CharacterID);
-                                    CharacterSchedule schedule = _context.CharacterSchedule.Where(a => a.StorySeriesID == Guid.Parse(obj.StorySeries) && a.CharacterID == Schedule.CharacterID).FirstOrDefault();
+                                    CharacterSchedule schedule = _context.CharacterSchedule.Where(a => a.StorySeriesID == Guid.Parse(obj.Value) && a.CharacterID == Schedule.CharacterID).FirstOrDefault();
                                     if (schedule != null)
                                     {
                                         schedule.IsMain = true;
@@ -200,6 +200,75 @@ namespace NewCity.Controllers
             return Json("不存在的后续故事卡片！");
         }
 
+        /// <summary>
+        /// 获取人物属性
+        /// </summary>
+        /// <returns></returns>
+        [HttpGet]
+        public string GetState() {
+            var state = _context.UserCharacter.AsNoTracking().Where(a => a.UserId == GetUserId() && a.IsActivate == true).FirstOrDefault();
+
+            if (state != null) {
+                var status = new
+                {
+                    ActionPoints = state.ActionPoints,
+                    Lucky = state.Lucky,
+                    Speed = state.Speed,
+                    Strength = state.Strength,
+                    Intelligence = state.Intelligence,
+                    Experience = state.Experience,
+                    Status = state.Status,
+                    Moral = state.Moral,
+                };
+                return JsonConvert.SerializeObject(status);
+            }
+            return "[]";
+
+        }
+
+
+        /// <summary>
+        /// 获取人物物品
+        /// </summary>
+        /// <returns></returns>
+        [HttpGet]
+        public string GetItem()
+        {
+            var items = _context.CharacterItem.AsNoTracking()
+                .Where(a => a.CharacterID == 
+                _context.UserCharacter.AsNoTracking().Where(u=>u.UserId == GetUserId() && u.IsActivate == true).FirstOrDefault().ID)
+                .Join(_context.Item,a=>a.ItemID,i=>i.ID,(a,i)=>new { Amount = a.Amount, Introduction = i.Introduction,Name = i.Name})
+                .ToList();
+
+            if (items != null)
+            {
+                return JsonConvert.SerializeObject(items);
+            }
+            return "[]";
+        }
+
+        /// <summary>
+        /// 获取人物任务表
+        /// </summary>
+        /// <returns></returns>
+        [HttpGet]
+        public string GetSchedule() {
+            var schedule = _context.CharacterSchedule.AsNoTracking()
+               .Where(a => a.CharacterID ==
+               _context.UserCharacter.AsNoTracking()
+               .Where(u => u.UserId == GetUserId() && u.IsActivate == true).FirstOrDefault().ID && a.IsStory == true)
+               .Join(_context.StorySeries,a=>a.StorySeriesID,s=>s.ID,(a,s)=>new {
+                   SeriesName = s.SeriesName,
+                   Text = s.Text
+               })
+               .ToList();
+
+            if (schedule != null)
+            {
+                return JsonConvert.SerializeObject(schedule);
+            }
+            return "[]";
+        }
 
         /// <summary>
         /// 检查是否符合显示条件
@@ -253,7 +322,7 @@ namespace NewCity.Controllers
         /// <returns></returns>
         private bool InLocation(Guid userid, out Guid StorySeriesID)
         {
-            var location = _context.UserCharacter.AsNoTracking().Where(p => p.UserId == userid)
+            var location = _context.UserCharacter.AsNoTracking().Where(p => p.UserId == userid && p.IsActivate == true)
                 .Join(_context.CharacterSchedule.Where(a=>a.IsMain == true),u => u.ID,c => c.CharacterID,(u,c)=>new { c.IsStory,c.StorySeriesID }).FirstOrDefault();
 
             StorySeriesID = Guid.Empty;
@@ -279,6 +348,7 @@ namespace NewCity.Controllers
             UserCharacter character = new UserCharacter() {
                 ID = Guid.NewGuid(),
                 UserId = GetUserId(),
+                IsActivate = true,
             };
             _context.UserCharacter.Add(character);
 
@@ -286,6 +356,7 @@ namespace NewCity.Controllers
                 ID = Guid.NewGuid(),
                 CharacterID = character.ID,
                 StoryCardID = new DefaultValue().createCharacter,
+                StorySeriesID = new DefaultValue().ScreateCharacter,
                 IsMain = true,
                 IsStory = true,
             };
@@ -297,6 +368,8 @@ namespace NewCity.Controllers
             ViewBag.InLocation = false;
 
         }
+
+
 
         
         /// <summary>
@@ -329,7 +402,7 @@ namespace NewCity.Controllers
             StoryStatus status = _context.StoryStatus.Where(a => a.StorySeries == storyStatus.StorySeries && a.Name == storyStatus.Name).FirstOrDefault();
             if (status != null) {
                 status.Value = (Convert.ToInt32(status.Value)+Convert.ToInt32(storyStatus.Value)).ToString();
-                _context.Update(status);
+                _context.StoryStatus.Update(status);
 
             }
         }
@@ -339,7 +412,7 @@ namespace NewCity.Controllers
             if (status != null)
             {
                 status.Value = (Convert.ToInt32(status.Value) - Convert.ToInt32(storyStatus.Value)).ToString();
-                _context.Update(status);
+                _context.StoryStatus.Update(status);
 
             }
         }
@@ -349,7 +422,7 @@ namespace NewCity.Controllers
             if (status != null)
             {
                 status.Value = storyStatus.Value;
-                _context.Update(status);
+                _context.StoryStatus.Update(status);
 
             }
         }

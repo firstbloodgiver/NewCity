@@ -3,15 +3,17 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using NewCity.Data;
 
 namespace NewCity.Data.Migrations
 {
     [DbContext(typeof(NewCityDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20190328081031_20190328")]
+    partial class _20190328
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -256,29 +258,6 @@ namespace NewCity.Data.Migrations
                     b.ToTable("Creator");
                 });
 
-            modelBuilder.Entity("NewCity.Models.HomeNews", b =>
-                {
-                    b.Property<int>("ID")
-                        .ValueGeneratedOnAdd()
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
-
-                    b.Property<string>("Content");
-
-                    b.Property<DateTime>("CreateTime");
-
-                    b.Property<Guid>("Creator");
-
-                    b.Property<string>("Img");
-
-                    b.Property<string>("Title");
-
-                    b.Property<int>("Type");
-
-                    b.HasKey("ID");
-
-                    b.ToTable("HomeNews");
-                });
-
             modelBuilder.Entity("NewCity.Models.Item", b =>
                 {
                     b.Property<Guid>("ID")
@@ -333,6 +312,26 @@ namespace NewCity.Data.Migrations
                     b.HasKey("ID");
 
                     b.ToTable("Location");
+                });
+
+            modelBuilder.Entity("NewCity.Models.News", b =>
+                {
+                    b.Property<Guid>("ID")
+                        .ValueGeneratedOnAdd();
+
+                    b.Property<string>("Content");
+
+                    b.Property<DateTime>("Create");
+
+                    b.Property<Guid>("Creator");
+
+                    b.Property<string>("Img");
+
+                    b.Property<string>("Type");
+
+                    b.HasKey("ID");
+
+                    b.ToTable("News");
                 });
 
             modelBuilder.Entity("NewCity.Models.StoryCard", b =>
