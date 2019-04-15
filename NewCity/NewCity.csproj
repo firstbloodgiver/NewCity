@@ -32,6 +32,16 @@
     <Compile Remove="Data\Migrations\20190215151403_20190215.Designer.cs" />
     <Compile Remove="Data\Migrations\20190218152137_20190218.cs" />
     <Compile Remove="Data\Migrations\20190218152137_20190218.Designer.cs" />
+    <Compile Remove="Data\Migrations\20190218155957_2019021801.cs" />
+    <Compile Remove="Data\Migrations\20190218155957_2019021801.Designer.cs" />
+    <Compile Remove="Data\Migrations\20190325084815_20190325.cs" />
+    <Compile Remove="Data\Migrations\20190325084815_20190325.Designer.cs" />
+    <Compile Remove="Data\Migrations\20190328081031_20190328.cs" />
+    <Compile Remove="Data\Migrations\20190328081031_20190328.Designer.cs" />
+    <Compile Remove="Data\Migrations\20190328082910_20190328-1.cs" />
+    <Compile Remove="Data\Migrations\20190328082910_20190328-1.Designer.cs" />
+    <Compile Remove="Data\Migrations\CreateIdentitySchema.cs" />
+    <Compile Remove="Data\Migrations\CreateIdentitySchema.Designer.cs" />
   </ItemGroup>
 
   <ItemGroup>

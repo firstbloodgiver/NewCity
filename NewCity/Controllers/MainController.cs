@@ -26,6 +26,10 @@ namespace NewCity.Controllers
         public IActionResult Index()
         {
             var userid = GetUserId();
+            if (userid == Guid.Empty) {
+                RedirectToAction("Index", "Home");
+            }
+
 
             Guid StorySeriesID = Guid.Empty;
             
@@ -211,14 +215,14 @@ namespace NewCity.Controllers
             if (state != null) {
                 var status = new
                 {
-                    ActionPoints = state.ActionPoints,
-                    Lucky = state.Lucky,
-                    Speed = state.Speed,
-                    Strength = state.Strength,
-                    Intelligence = state.Intelligence,
-                    Experience = state.Experience,
-                    Status = state.Status,
-                    Moral = state.Moral,
+                    行动力 = state.ActionPoints,
+                    敏捷 = state.Speed,
+                    力量 = state.Strength,
+                    智力 = state.Intelligence,
+                    幸运 = state.Lucky,
+                    社会经验 = state.Experience,
+                    地位 = state.Status,
+                    道德 = state.Moral,
                 };
                 return JsonConvert.SerializeObject(status);
             }

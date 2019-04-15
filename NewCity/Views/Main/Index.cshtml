@@ -3,83 +3,173 @@
     ViewData["Title"] = "Main";
 
 }
+<style>
+    #content {
+        background-color:black;
+        padding-top:20px;
+    }
+    #right{
+        background-color:black;
+        padding:1px 1px 1px 1px;
+    }
+    #main {
+        background-color: black;
+        border:5px solid rgb(135,125,112);
+    }
+    #left {
+        background-color: black;
+        padding: 1px 1px 1px 1px;
+    }
+    #right-content {
+        margin: 5px 5px 5px 5px;
+        background-color: rgb(174,165,132);
 
-<h2>Main</h2>
+    }
+    #left-content {
+        margin: 5px 5px 5px 5px;
+        background-color: rgb(174,165,132);
+
+    }
+    #main-content {
+
+        background-color: rgb(174,165,132);
+    }
+    #Option{
+        margin-top:50px
+    }
+
+    #Option > div{
+        margin-top:50px;
+    }
+    .option-content :hover {
+        background-color: aqua;
+        color: aquamarine;
+    }
+
+    .main-content-img {
+        margin-top: 20px;
+    }
+    .main-content-text {
+        margin-top: 20px;
+    }
+    .option-content {
+        background-color: rgb(187,165,125);
+        border: 3px solid rgb(135,125,112);
+    }
+    .option-content:hover {
+        background-color:rgb(200,195,165);
+    }
+    .status-row {
+        padding: 10px 10px 10px 10px;
+    }
+    .nav-tabs {
+        border-bottom: 1px hidden #ddd;
+    }
+        .nav-tabs > li.active > a, .nav-tabs > li.active > a:hover, .nav-tabs > li.active > a:focus {
+            border-color: rgb(174,165,132);
+            background-color: rgb(174,165,132);
+        }
+        .nav-tabs > li > a {
+            color: white
+        }
+</style>
+
+
 @if (ViewData["Creator"].ToString() == "True")
 {
     <li><a asp-area="" asp-controller="Creator" asp-action="Index">Creator</a></li>
 }
-<div class="container-fluid">
-    <div class=" col-md-3">
-        <ul class="nav nav-tabs">
-            <li class="active">
-                <a href="#Item" data-toggle="tab">物品</a>
+<div class="container-fluid" id="content">
+    <div class="col-md-3" id="left">
+        <div id="left-content">
+            <ul class="nav nav-tabs" style="background-color:black">
+                <li class="active">
+                    <a href="#Status" data-toggle="tab">属性</a>
 
-            </li>
-            <li>
-                <a href="#Schedule" data-toggle="tab">事件</a>
+                </li>
+                <li>
+                    <a href="#Item" data-toggle="tab">物品</a>
 
-            </li>
-        </ul>
-        <div class="tab-content" style="background-color:aquamarine">
-            <div class="tab-pane fade in active row" id="Item">
-                物品
-            </div>
-            <div class="tab-pane fade row" id="Schedule">
-                事件
+                </li>
+            </ul>
+            <div class="tab-content">
+                <div class="tab-pane fade in active row" id="Status">
+                    
+                </div>
+                <div class="tab-pane fade row" id="Item">
+                     
+                </div>
             </div>
         </div>
     </div>
-
-
-    <div class="col-md-6" style="background-color:aqua">
-        <div class="row">
+    <div id="main" class="col-md-6 container-fluid">
+        <div id="main-content">
             @if (ViewBag.InLocation && ViewBag.ReadList != null)
             {
-                <div class="row">
-                    <div class="col-md-4">
+                <div class="container-fluid">
+                    <div class="col-md-4 main-content-img">
+                        <p>123</p>
                         <img id="Img" src="@ViewBag.ReadList.IMG" />
                     </div>
-                    <div class="col-md-8">
+                    <div class="col-md-8 main-content-text">
                         <p id="Text">@ViewBag.ReadList.Text</p>
+                        <div class="row" id="Option">
+                            @foreach (var option in ViewBag.OperaList)
+                            {
+                                <div class="row">
+                                    <p>@option.StoryName</p>
+                                    <button class="btn-default" onclick="NextCard('@option.ID')">继续</button>
+                                </div>
+                            }
+                        </div>
                     </div>
                 </div>
-                <div class="row" id="Option">
-                    @foreach (var option in ViewBag.OperaList)
-                    {
-                        <div class="row">
-                            <p>@option.StoryName</p>
-                            <button class="btn-default" onclick="NextCard('@option.ID')">继续</button>
-                        </div>
-                    }
-                </div>
+                
             }
             else if (!ViewBag.InLocation && ViewBag.ReadList != null)
             {
-                <div class="row">
-                    <div class="col-md-4">
+                <div class="container-fluid">
+                    <div class="col-md-4  main-content-img">
+                        <p>123</p>
                         <img id="Img" src="@(ViewBag.ReadList.IMG)" />
                     </div>
-                    <div class="col-md-8">
+                    <div class="col-md-8  main-content-text">
                         <p id="Text">@ViewBag.ReadList.Text</p>
-                    </div>
-                </div>
-                <div class="row" id="Option">
-                    @foreach (var option in ViewBag.ReadList.StoryOptions)
-                    {
-                        <div class="row">
-                            <button class="btn-default" onclick="NextCard('@option.ID')">@option.Text</button>
+                        <div id="Option">
+                            @foreach (var option in ViewBag.ReadList.StoryOptions)
+                            {
+                                <div class="col-md-12 option-content"  onclick="NextCard('@option.ID')">
+                                    @option.Text
+                                </div>
+                            }
                         </div>
-                    }
+                    </div>
+                    
                 </div>
+                
             }
         </div>
-
     </div>
-    <div class="col-md-3" style="background-color:burlywood">
-        属性
-        <div class="row" id="Status">
+    <div id="right" class="col-md-3" >
+        <div id="right-content">
+            <ul class="nav nav-tabs" style="background-color:black">
+                <li class="active">
+                    <a href="#Task" data-toggle="tab">事件</a>
 
+                </li>
+                <li>
+                    <a href="#History" data-toggle="tab">历史</a>
+
+                </li>
+            </ul>
+            <div class="tab-content">
+                <div class="tab-pane fade in active row" id="Task">
+                    
+                </div>
+                <div class="tab-pane fade row" id="History">
+                    
+                </div>
+            </div>
         </div>
     </div>
 </div>
@@ -94,6 +184,8 @@
         GetItem();
         GetState();
         GetSchedule();
+
+        SetHeight();
     }
 
 
@@ -103,7 +195,7 @@
             '/Main/NextCard',
             { optionID: optionID },
             function (result) {
-
+                
                 CleanContent();
                 AddContent(result.text);
                 AddOption(result.storyOptions)
@@ -111,9 +203,10 @@
         )
     }
 
+
+
     //添加选项
     function AddOption(option) {
-
         for (var i in option) {
             $('#Option').append("<button onclick = NextCard('" + option[i].id + "')>" + option[i].text + "</button>")
         }
@@ -130,12 +223,21 @@
         $('#Option').empty();
     }
 
-
+    //设置主界面高度
+    function SetHeight() {
+        debugger;
+        let contentheight = $("#content").height();
+        let windowheight = window.innerHeight * 2 - window.outerHeight;
+        let h = contentheight > windowheight ? contentheight : windowheight;
+        $("#content").css("min-height", windowheight+50);
+        $("#left-content").css("min-height",windowheight-20);
+        $("#right-content").css("min-height",windowheight-20);
+        $("#main-content").css("min-height",windowheight-20);
+    }
 
     //获取人物状态
     function GetState() {
         $.get('/Main/GetState', function (data) {
-            debugger;
             LoadRow(data, "Status");
         })
     }
@@ -147,7 +249,7 @@
             let jsonObj = JSON.parse(data);
             let html = '';
             for (let i in jsonObj) {
-                debugger;
+  
                 html += "<div class='row'>" + jsonObj[i].Name + ":" + jsonObj[i].Amount + "</div>"
             }
             let content = "<div class='row'>" + html + "</div>";
@@ -183,8 +285,7 @@
         let jsonObj = JSON.parse(json);
         let html = '';
         for (let i in jsonObj) {
-            debugger;
-            html += "<div class='row'>" + i + ":" + jsonObj[i] + "</div>"
+            html += "<div class='status-row row'>" + i + ":" + jsonObj[i] + "</div>"
         }
         let content = "<div class='row'>" + html + "</div>";
         $("#" + traget).append(content);
