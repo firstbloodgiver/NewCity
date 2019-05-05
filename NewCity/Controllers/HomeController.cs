@@ -8,7 +8,7 @@ using NewCity.Models;
 using Microsoft.AspNetCore.Identity;
 using NewCity.Data;
 using NewCity.Enum;
-
+using Microsoft.EntityFrameworkCore;
 
 namespace NewCity.Controllers
 {
@@ -22,6 +22,7 @@ namespace NewCity.Controllers
 
         public IActionResult Index()
         {
+
             if (_SignInManager.IsSignedIn(User))
             {
                 return RedirectToAction("Index", "Main");

@@ -27,7 +27,11 @@ namespace NewCity.Controllers
         {
             var userid = GetUserId();
             if (userid == Guid.Empty) {
-                RedirectToAction("Index", "Home");
+                return RedirectToAction("Index", "Home");
+            }
+            if (isCreator())
+            {
+                return RedirectToAction("Index", "Creator");
             }
 
 
@@ -35,15 +39,8 @@ namespace NewCity.Controllers
             
             List<StoryCard> OperaList = new List<StoryCard>();
 
-            if (isCreator())
-            {
-                ViewData["Creator"] = true;
-            }
-            else
-            {
-                ViewData["Creator"] = false;
-            }
 
+            
             //有无创建人物
             UserCharacter userCharacter = _context.UserCharacter.AsNoTracking().Where(u => u.UserId == userid).FirstOrDefault();
             if (userCharacter == null) {

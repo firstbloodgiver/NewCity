@@ -63,8 +63,6 @@ namespace NewCity.Controllers
             var userid = GetUserId();
             if (series.Author == userid)
             {
-
-
                 try
                 {
                     card.Text = storyCard.Text;
