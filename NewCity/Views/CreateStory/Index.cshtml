@@ -1,8 +1,5 @@
 ﻿@model IEnumerable<NewCity.Models.StoryCard>
 @using NewCity.Enum;
-@{
-    ViewData["Title"] = "Creator";
-}
 <script src="~/js/enum.js"></script>
 <script src="~/lib/jquery/dist/jquery.min.js"></script>
 <!--故事卡包装为树。新建下一故事卡要在故事卡里面建-->
@@ -77,8 +74,6 @@
     </div>
 </div>
 
-
-
 <!--条件模态框-->
 <div id="ConditionModel" class="modal fade">
     <div class="modal-dialog">
@@ -129,6 +124,22 @@
 </div>
 
 <script>
+    //将来自控制器的故事卡转换为js对象,并显示到页面
+    $(function () {
+        debugger;
+        var CardObj = @Json.Serialize(Model.First());
+         
+        //CardObj.storyOptions.push(CardObj.storyOptions[1]);
+        //let json = JSON.stringify(CardObj);
+        //$.post("/CreateStory/savetest", { json: json });
+
+    });
+
+    //根据输入的卡片构建主界面
+    function CreaterView(card) {
+
+    }
+    
 
     function GetStoryCard() {
         //点击树加载该故事卡到主页面
@@ -137,6 +148,7 @@
 
     //form 返回的消息容器
     $("#fack").on('load', function () {
+        
         let a = window.frames["fack"].document.body.innerText;
         if (a != '') {
             alert(a);

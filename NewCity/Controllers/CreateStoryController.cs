@@ -20,6 +20,11 @@ namespace NewCity.Controllers
         {
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="id">修改的故事系列</param>
+        /// <returns></returns>
         public IActionResult Index(string id)
         {
             List<StoryCard> storyCards = _context.StoryCard.Where(a => a.StorySeriesID == Guid.Parse(id)).Include(a => a.StoryOptions).ToList();
@@ -36,7 +41,14 @@ namespace NewCity.Controllers
             return View(storyCards);
         }
 
-
+        [HttpPost]
+        public void savetest(string json)
+        {
+            if (!string.IsNullOrEmpty(json))
+            {
+                StoryCard a = JsonConvert.DeserializeObject<StoryCard>(json);
+            }
+        }
         /// <summary>
         /// 返回故事卡信息
         /// </summary>
