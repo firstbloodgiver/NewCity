@@ -41,14 +41,7 @@ namespace NewCity.Controllers
             return View(storyCards);
         }
 
-        [HttpPost]
-        public void savetest(string json)
-        {
-            if (!string.IsNullOrEmpty(json))
-            {
-                StoryCard a = JsonConvert.DeserializeObject<StoryCard>(json);
-            }
-        }
+        
         /// <summary>
         /// 返回故事卡信息
         /// </summary>
@@ -65,73 +58,15 @@ namespace NewCity.Controllers
         /// </summary>
         /// <returns></returns>
         [HttpPost]
-        public async Task<IActionResult> Save([Bind("ID,Text,IMG,BackgroundIMG,StoryOptions")]StoryCard storyCard)
+        public void Save(string json)
         {
-            //如果你是该故事系列的作者才可以保存
-
-            StoryCard card = _context.StoryCard.Where(a => a.ID == storyCard.ID).Include(i => i.StoryOptions).FirstOrDefault();
-
-            StorySeries series = _context.StorySeries.Where(a => a.ID == card.StorySeriesID).AsNoTracking().FirstOrDefault();
-            var userid = GetUserId();
-            if (series.Author == userid)
+            if (!string.IsNullOrEmpty(json))
             {
-                try
-                {
-                    card.Text = storyCard.Text;
-                    card.IMG = storyCard.IMG;
-                    if (storyCard.StoryOptions != null)
-                    {
-                        if (storyCard.StoryOptions.Count() != card.StoryOptions.Count())
-                        {
-                            //存在选项更改
-                            card.StoryOptions = null;
-                            var deletelist = _context.StoryOption.Where(a => a.StoryCardID == card.ID).ToList();
-                            _context.StoryOption.RemoveRange(deletelist);
-                            foreach (var option in storyCard.StoryOptions)
-                            {
-                                option.StoryCardID = card.ID;
-                                option.Condition = storyCard.StoryOptions.Where(a => a.ID == option.ID).First().Condition;
-                            }
-                            _context.StoryOption.AddRange(storyCard.StoryOptions);
-                            _context.SaveChanges();
-                        }
-                        else
-                        {
-                            foreach (var option in card.StoryOptions)
-                            {
-                                var o = storyCard.StoryOptions.Where(a => a.ID == option.ID).First();
-                                option.Condition = o.Condition;
-                                option.NextStoryCardID = o.NextStoryCardID;
-
-                                List<Istatus> storyStatuses = string.IsNullOrEmpty(o.Effect)?new List<Istatus>():JsonConvert.DeserializeObject<List<Istatus>>(o.Effect);
-                                foreach (var i in storyStatuses) {
-                                    i.StorySeries = series.ID.ToString();
-                                }
-                                o.Effect = JsonConvert.SerializeObject(storyStatuses);
-                                option.Effect = o.Effect;
-                            }
-                        }
-                    }
-                    else
-                    {
-                        card.StoryOptions = null;
-                        _context.SaveChanges();
-                    }
-
-                    _context.StoryCard.Update(card);
-                    await _context.SaveChangesAsync();
-                    return Json(true);
-                }
-                catch (Exception ex)
-                {
-                    return Json(ex);
-                }
-
-
+                StoryCard a = JsonConvert.DeserializeObject<StoryCard>(json);
             }
-
-            return Json(false);
         }
+
+
 
         /// <summary>
         /// 移动到下一卡片，若id无则新建

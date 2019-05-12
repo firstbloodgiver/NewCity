@@ -31,7 +31,7 @@
                 <button type="button" onclick="AddOption()">增加选项</button>
             </div>
             <div class="form-group">
-                <button type="submit" id="submit" class="btn">保存</button>
+                <button onclick="SaveCard()">保存</button>
             </div>
         </div>
     </div>
@@ -88,23 +88,23 @@
 
 <script>
     //将来自控制器的故事卡转换为js对象,并显示到页面
+    var CardObj;
+
     $(function () {
-        var CardObj = @Json.Serialize(Model.First());
+        CardObj = @Json.Serialize(Model.First());
         CreaterView(CardObj)
-        //CardObj.storyOptions.push(CardObj.storyOptions[1]);
-        //let json = JSON.stringify(CardObj);
-        //$.post("/CreateStory/savetest", { json: json });
+        
 
     });
 
     //根据输入的卡片构建主界面
     function CreaterView(card) {
-        let StoryId = card.ID
-        let StoryName = card.StoryName
-        let Img = card.IMG
-        let Content = card.Content
-        let BackgroundIMG = card.BackgroundIMG
-        let StoryOptions = card.StoryOptions
+        let StoryId = card.id
+        let StoryName = card.storyName
+        let Img = card.img
+        let Content = card.text
+        let BackgroundIMG = card.backgroundIMG
+        let StoryOptions = card.storyOptions
 
         EmptyView()
 
@@ -116,14 +116,7 @@
 
         for (let i = 0; i < StoryOptions.length; i++) {
 
-            let option;
-
-            option += "<button type='button' onclick='Condition("+ i +")'>条件</button>"
-            option += "<button type='button' onclick='Effect(" + i +")'>效果</button>"
-            option += " <button type='button' onclick='Cancel(" + i +")'>取消</button>"
-            option += "<button type='button' onclick=NextCard(" + i +")>→</button>"
-
-            $("#Option").append(option)
+            CreateOption(i);
         }
 
 
@@ -138,20 +131,14 @@
         $("#BackgroundIMG").empty()
 
     }
-    
-
     function GetStoryCard() {
         //点击树加载该故事卡到主页面
 
     }
-
-
     //取消选项
     function Cancel(optionid) {
         $("#" + optionid).remove();
     }
-
-
     //下一张卡
     function NextCard(id, seriesid, optionid) {
         let nextid = document.getElementById("storyCard.StoryOptions["+id+"].NextStoryCardID").value;
@@ -224,7 +211,33 @@
 
     //增加选项
     function AddOption() {
-        
+        debugger
+        let option = {
+            condition: null,
+            effect: null,
+            id: guid(),
+            nextStoryCardID: null,
+            storyCardID: CardObj.id,
+            text: null
+        }
+        CardObj.storyOptions.push(option);
+        CreateOption(CardObj.storyOptions.length)
+    }
+
+    function CreateOption(i) {
+        let option;
+
+        option += "<button type='button' onclick='Condition(" + i + ")'>条件</button>"
+        option += "<button type='button' onclick='Effect(" + i + ")'>效果</button>"
+        option += " <button type='button' onclick='Cancel(" + i + ")'>取消</button>"
+        option += "<button type='button' onclick=NextCard(" + i + ")>→</button>"
+
+        $("#Option").append(option)
+    }
+
+    function SaveCard() {
+        let json = JSON.stringify(CardObj);
+        $.post("/CreateStory/Save", { json: json });
     }
 
     //设置条件
