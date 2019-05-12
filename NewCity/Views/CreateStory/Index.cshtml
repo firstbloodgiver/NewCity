@@ -1,80 +1,43 @@
 ﻿@model IEnumerable<NewCity.Models.StoryCard>
-@using NewCity.Enum;
 <script src="~/js/enum.js"></script>
 <script src="~/lib/jquery/dist/jquery.min.js"></script>
 <!--故事卡包装为树。新建下一故事卡要在故事卡里面建-->
 <div class="container-fluid">
     <div class="row">
         @*<div class="col-md-3">
- 
-        </div>*@
+
+          </div>*@
         <div class="col-md-9">
-            <form target="fack" id="StoryCard" asp-action="Save" method="post">
-                <div class="row">
-                    <div id="StoryId">
-                        <input name="storyCard.ID" hidden value="@(Model.Count() > 0 ? Model.First().ID : Guid.Empty)" />
-                        @(Model.Count() > 0 ? Model.First().ID : Guid.Empty)
-                    </div>
-                    <div id="StoryName">
-                        @(Model.Count() > 0 ? Model.First().StoryName : "")
-                    </div>
+            <div class="row">
+                <div id="StoryId">
+                    
                 </div>
-                <div class="row">
-                    <div class="col-md-4" id="Img">
-                        <!--img-->
-                        @(Model.Count() > 0 ? Model.First().IMG : "")
-                    </div>
-                    <div class="col-md-8" id="Content">
-                        <!--text-->
-                        <textarea name="storyCard.Text" class="form-control" rows="10">@(Model.Count() > 0 ? Model.First().Text : "")</textarea>
-                    </div>
-                </div>
-                <div class="row" id="Option">
-                    @if (Model.Count() != 0)
-                    {
-                        <input hidden id="optionCount" type="text" value="@(Model.First().StoryOptions!=null?Model.First().StoryOptions.Count():0)" />
-                        int i = 0; //计算当前是第几个选项
-                        @if (Model.First().StoryOptions != null)
-                        {
-                            @foreach (var item in Model.First().StoryOptions)
-                            {
-                                <div class="row" id="option-@item.ID">
-                                    <input name="storyCard.StoryOptions[@i].ID" hidden type="text" value="@item.ID" />
-
-                                    <button type="button" onclick="Condition('@i')">条件</button>
-                                    <input id="storyCard.StoryOptions[@i].Condition" name="storyCard.StoryOptions[@i].Condition" hidden type="text" value="@(item.Condition)" />
-
-                                    <input name="storyCard.StoryOptions[@i].Text" type="text" value="@item.Text">
-
-                                    <button type="button" onclick="Effect('@i')">效果</button>
-                                    <input id="storyCard.StoryOptions[@i].Effect" name="storyCard.StoryOptions[@i].Effect" hidden type="text" value="@(item.Effect)" />
-
-                                    <button type="button" onclick="Cancel('option-@item.ID')">取消</button>
-
-                                    <button type="button" onclick="NextCard('@i','@Model.First().StorySeriesID','@item.ID')">→</button>
-                                    <input id="storyCard.StoryOptions[@i].NextStoryCardID" name="storyCard.StoryOptions[@i].NextStoryCardID" type="text" placeholder="为空则新建故事卡" value="@(item.NextStoryCardID==null?Guid.Empty:item.NextStoryCardID)">
-                                </div>
-                                i++;
-                            }
-                        }
-
-                    }
-
+                <div id="StoryName">
 
                 </div>
-                <div class="form-group">
-                    <button type="button" onclick="AddOption()">增加选项</button>
+            </div>
+            <div class="row">
+                <div class="col-md-4" id="Img">
+                    
                 </div>
-                <div class="form-group">
-                    <button type="submit" id="submit" class="btn">保存</button>
+                <div class="col-md-8" id="Content">
+
                 </div>
-            </form>
-            <iframe name="fack" id="fack" hidden></iframe>
+            </div>
+            <div class="row" id="Option">
+                
+            </div>
+            <div class="form-group">
+                <button type="button" onclick="AddOption()">增加选项</button>
+            </div>
+            <div class="form-group">
+                <button type="submit" id="submit" class="btn">保存</button>
+            </div>
         </div>
     </div>
 </div>
 
-<!--条件模态框-->
+<!--条件模态框--> 
 <div id="ConditionModel" class="modal fade">
     <div class="modal-dialog">
         <div class="modal-content">
@@ -126,9 +89,8 @@
 <script>
     //将来自控制器的故事卡转换为js对象,并显示到页面
     $(function () {
-        debugger;
         var CardObj = @Json.Serialize(Model.First());
-         
+        CreaterView(CardObj)
         //CardObj.storyOptions.push(CardObj.storyOptions[1]);
         //let json = JSON.stringify(CardObj);
         //$.post("/CreateStory/savetest", { json: json });
@@ -137,6 +99,43 @@
 
     //根据输入的卡片构建主界面
     function CreaterView(card) {
+        let StoryId = card.ID
+        let StoryName = card.StoryName
+        let Img = card.IMG
+        let Content = card.Content
+        let BackgroundIMG = card.BackgroundIMG
+        let StoryOptions = card.StoryOptions
+
+        EmptyView()
+
+        $("#StoryId").append(StoryId)
+        $("#StoryName").append(StoryName)
+        $("#Img").append(Img)
+        $("#Content").append(Content)
+        $("#BackgroundIMG").append(BackgroundIMG)
+
+        for (let i = 0; i < StoryOptions.length; i++) {
+
+            let option;
+
+            option += "<button type='button' onclick='Condition("+ i +")'>条件</button>"
+            option += "<button type='button' onclick='Effect(" + i +")'>效果</button>"
+            option += " <button type='button' onclick='Cancel(" + i +")'>取消</button>"
+            option += "<button type='button' onclick=NextCard(" + i +")>→</button>"
+
+            $("#Option").append(option)
+        }
+
+
+    }
+
+    function EmptyView()
+    {
+        $("#StoryId").empty()
+        $("#StoryName").empty()
+        $("#Img").empty()
+        $("#Content").empty()
+        $("#BackgroundIMG").empty()
 
     }
     
@@ -146,15 +145,6 @@
 
     }
 
-    //form 返回的消息容器
-    $("#fack").on('load', function () {
-        
-        let a = window.frames["fack"].document.body.innerText;
-        if (a != '') {
-            alert(a);
-            window.location.reload();
-        }
-    });
 
     //取消选项
     function Cancel(optionid) {
@@ -234,26 +224,11 @@
 
     //增加选项
     function AddOption() {
-        let optioncount = $("#optionCount").val();  //选项计数
-        if (!optioncount) {
-            optioncount = 0;
-        }
-        let id = guid();
-        let optionID = "<input hidden type='text' name='storyCard.StoryOptions[" + optioncount + "].ID' value='" + id + "' />";
-        let condition = "<button type='button' onclick='Condition(" + optioncount + ")'>条件</button> <input hidden id='storyCard.StoryOptions[" + optioncount + "].Condition' name='storyCard.StoryOptions[" + optioncount + "].Condition' type='text' value='' />";
-        let text = "<input type='text' name='storyCard.StoryOptions[" + optioncount + "].Text' value=''>";
-        let effect = " <button type='button' onclick='Effect(" + optioncount + ")'>效果</button> <input id='storyCard.StoryOptions[" + optioncount + "].Effect' name='storyCard.StoryOptions[" + optioncount + "].Effect' hidden type='text' value='' />";
-        let cancel = " <button type='button' onclick=Cancel('option-" + id + "')>取消</button> <button type='button' onclick='NextCard('" + optioncount+"','@Model.First().StorySeriesID','" + id+"')'>→</button>";
-        let nextcard = "<input id='storyCard.StoryOptions[" + optioncount + "].NextStoryCardID' name='storyCard.StoryOptions[" + optioncount + "].NextStoryCardID' type='text' >";
-        let toappend = "<div class='row' id=option-" + id + ">" + optionID + condition + text + effect + cancel + nextcard + "</div>"
-        $("#Option").append(toappend)
-        $("#optionCount").val(optioncount);
-        optioncount++;
+        
     }
 
     //设置条件
-    var conditioncount = 0; //当前页面有多少个条件
-    function Condition(number) {
+    function Condition(i) {
         //清空条件模态框
         var ConditionForm = document.getElementById("ConditionForm");
         ConditionForm.innerHTML = "";
@@ -295,40 +270,19 @@
 
     //取消条件
     function ConditionCancel(conditionID) {
-        $("#condition" + conditionID + "").remove();
-        conditioncount--;
+
     }
 
     function SaveCondition() {
-        let i = $("#ConditionId").val();
-        //let value = $("#ConditionForm").serialize();
-        let value = FormtoJson($("#ConditionForm"));
 
-        document.getElementById("storyCard.StoryOptions[" + i + "].Condition").value = value;
-        $("#ConditionModel").modal('hide')
     }
 
     //增加条件
     function AddCondition() {
-        let i = conditioncount;
-        let Hide = "<input  type='text'  name='StorySeries' value='1' style='display: none;'/>";
-        let Name = "<input  type='text'  name='Name' id='cd-storyStates[" + i + "].Name'/>";
-        let Type = "<select  name='Type' id='cd-storyStates[" + i + "].Type'>"
-            + "<option value='1'>></option>"
-            + "<option value='2'><</option>"
-            + "<option value='3'>=</option>"
-            + "<option value='4'>≠</option>"
-            + "</select>";
-        let Value = "<input  type='text' name='Value' id='cd-storyStates[" + i + "].Value'/>";
-        let Delete = "<button onclick='ConditionCancel(" + i + ")'>取消</button>";
-        let context = Hide+Name + Type + Value + Delete;
-        let toappend = "<div class='row' id='condition" + i + "'>" + context + "</div>"
-        $("#ConditionForm").append(toappend)
-        conditioncount++;
+        
     }
 
     //设置效果
-    var effectcount = 0; //当前页面有多少个条件
     function Effect(number) {
         var EffectForm = document.getElementById("EffectForm");
         EffectForm.innerHTML = "";
@@ -407,24 +361,7 @@
         return (S4() + S4() + "-" + S4() + "-" + S4() + "-" + S4() + "-" + S4() + S4() + S4());
     }
 
-    function FormtoJson(form) {
-        let a = form.serializeArray();
-
-        let result = new Array();
-        for (let i = 0,j = 0 ; i < a.length-1; i += 4,j++) {
-            let temp = {};
-            temp[a[i].name] = a[i].value;
-            
-            temp[a[i + 1].name] = a[i + 1].value;
-          
-            temp[a[i + 2].name] = a[i + 2].value;
-
-            temp[a[i + 3].name] = a[i + 3].value;
-
-            result.push(temp);
-        }
-        return JSON.stringify(result);
-    }
+    
 
 </script>
 
