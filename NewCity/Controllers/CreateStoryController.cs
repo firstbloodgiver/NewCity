@@ -58,12 +58,19 @@ namespace NewCity.Controllers
         /// </summary>
         /// <returns></returns>
         [HttpPost]
-        public void Save(string json)
+        [ValidateAntiForgeryToken]
+        public JsonResult Save(string json)
         {
+            var ResultJson = new JsonResult(false);
             if (!string.IsNullOrEmpty(json))
             {
-                StoryCard a = JsonConvert.DeserializeObject<StoryCard>(json);
+                StoryCard card = JsonConvert.DeserializeObject<StoryCard>(json);
+                 
+                _context.StoryCard.Update(card);
+                _context.SaveChanges();
+                ResultJson.Value = true;
             }
+            return ResultJson;
         }
 
 

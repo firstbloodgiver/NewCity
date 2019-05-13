@@ -31,7 +31,11 @@
                 <button type="button" onclick="AddOption()">增加选项</button>
             </div>
             <div class="form-group">
-                <button onclick="SaveCard()">保存</button>
+                <form asp-action="Save">
+                    <input name="json" id="json"/>
+                    <button type="submit" onclick="SaveCard()">保存</button>
+                </form>
+               
             </div>
         </div>
     </div>
@@ -99,22 +103,17 @@
 
     //根据输入的卡片构建主界面
     function CreaterView(card) {
-        let StoryId = card.id
-        let StoryName = card.storyName
-        let Img = card.img
-        let Content = card.text
-        let BackgroundIMG = card.backgroundIMG
-        let StoryOptions = card.storyOptions
+        debugger;
 
         EmptyView()
 
-        $("#StoryId").append(StoryId)
-        $("#StoryName").append(StoryName)
-        $("#Img").append(Img)
-        $("#Content").append(Content)
-        $("#BackgroundIMG").append(BackgroundIMG)
+        $("#StoryId").append(card.id)
+        $("#StoryName").append(card.storyName)
+        $("#Img").append(card.img)
+        $("#Content").append(card.text)
+        $("#BackgroundIMG").append(card.backgroundIMG)
 
-        for (let i = 0; i < StoryOptions.length; i++) {
+        for (let i = 0; i < card.storyOptions.length; i++) {
 
             CreateOption(i);
         }
@@ -216,7 +215,7 @@
             condition: null,
             effect: null,
             id: guid(),
-            nextStoryCardID: null,
+            nextStoryCardID: emptyguid(),
             storyCardID: CardObj.id,
             text: null
         }
@@ -229,15 +228,17 @@
 
         option += "<button type='button' onclick='Condition(" + i + ")'>条件</button>"
         option += "<button type='button' onclick='Effect(" + i + ")'>效果</button>"
-        option += " <button type='button' onclick='Cancel(" + i + ")'>取消</button>"
+        option += "<button type='button' onclick='Cancel(" + i + ")'>取消</button>"
         option += "<button type='button' onclick=NextCard(" + i + ")>→</button>"
 
         $("#Option").append(option)
     }
 
     function SaveCard() {
+        debugger;
         let json = JSON.stringify(CardObj);
-        $.post("/CreateStory/Save", { json: json });
+        $("#json").val(json);
+        
     }
 
     //设置条件
@@ -373,7 +374,9 @@
     function guid() {
         return (S4() + S4() + "-" + S4() + "-" + S4() + "-" + S4() + "-" + S4() + S4() + S4());
     }
-
+    function emptyguid() {
+        return "00000000-0000-0000-0000-000000000000";
+    }
     
 
 </script>
