@@ -65,8 +65,12 @@ namespace NewCity.Controllers
             if (!string.IsNullOrEmpty(json))
             {
                 StoryCard card = JsonConvert.DeserializeObject<StoryCard>(json);
-                 
-                _context.StoryCard.Update(card);
+                StoryCard storyCard = _context.StoryCard.Include(a => a.StoryOptions).Where(a => a.ID == card.ID).SingleOrDefault();
+                storyCard.Text = card.Text;
+                storyCard.IMG = card.IMG;
+                storyCard.BackgroundIMG = card.BackgroundIMG;
+                storyCard.StoryOptions = card.StoryOptions;
+                _context.StoryCard.Update(storyCard);
                 _context.SaveChanges();
                 ResultJson.Value = true;
             }
