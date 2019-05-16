@@ -6,11 +6,11 @@
     <div class="row">
         @*<div class="col-md-3">
 
-          </div>*@
+            </div>*@
         <div class="col-md-9">
             <div class="row">
                 <div id="StoryId">
-                    
+
                 </div>
                 <div id="StoryName">
 
@@ -18,21 +18,21 @@
             </div>
             <div class="row">
                 <div class="col-md-4" id="Img">
-                    
+
                 </div>
                 <div class="col-md-8" id="Content">
 
                 </div>
             </div>
             <div class="row" id="Option">
-                
+
             </div>
             <div class="form-group">
                 <button type="button" onclick="AddOption()">增加选项</button>
             </div>
             <div class="form-group">
                 <form asp-action="Save">
-                    <input name="json" id="json"/>
+                    <input name="json" id="json" />
                     <button type="submit" onclick="SaveCard()">保存</button>
                 </form>
             </div>
@@ -40,7 +40,7 @@
     </div>
 </div>
 
-<!--条件模态框--> 
+<!--条件模态框-->
 <div id="ConditionModel" class="modal fade">
     <div class="modal-dialog">
         <div class="modal-content">
@@ -83,7 +83,7 @@
                 <h4 class="modal-title" id="myModalLabel">模态框（Modal）标题</h4>
             </div>
             <div class="modal-body">
-                
+
             </div>
         </div>
     </div>
@@ -193,7 +193,7 @@
             option += " <button type='button' onclick='Cancel('option-" + id+"')'>取消</button>"
             option += "<button type='button' onclick=NextCard('" + i + "','" + storySeriesID+"','" + id + "')>→</button>"
 
-            
+
             option += "<input id='storyCard.StoryOptions[" + i + "].NextStoryCardID' name='storyCard.StoryOptions[" + i +"].NextStoryCardID' type='text' placeholder='为空则新建故事卡' value='"+NextStoryCardID+"'>"
 
             Option += "<div class='row' id='option-" + id+"'>" + option+"</div>";
@@ -243,7 +243,7 @@
         }
         let json = JSON.stringify(CardObj);
         $("#json").val(json);
-        
+
     }
 
     //设置条件
@@ -258,11 +258,14 @@
                 + "<option value='2'><</option>"
                 + "<option value='3'>=</option>"
                 + "<option value='4'>≠</option>"
-                +"<select/>" 
+
+                +"<select/>"
+
                 +"</div>"
             $('#Condition').append(context)
         }
         
+
 
         $('#ConditionModel').modal('show');
 
@@ -280,7 +283,7 @@
 
     //增加条件
     function AddCondition() {
-        
+
     }
 
     //设置效果
@@ -364,7 +367,7 @@
     function emptyguid() {
         return "00000000-0000-0000-0000-000000000000";
     }
-    
+
 
 </script>
 
