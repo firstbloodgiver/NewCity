@@ -112,13 +112,11 @@
         $("#BackgroundIMG").append(card.backgroundIMG)
 
         for (let i = 0; i < card.storyOptions.length; i++) {
-
             CreateOption(i);
         }
 
 
     }
-
     function EmptyView()
     {
         $("#StoryId").empty()
@@ -248,23 +246,21 @@
 
     //设置条件
     function Condition(i) {
-        let context = "";
+        
         for (let j = 0; j < CardObj.storyOptions.length; j++) {
-            let context =
-                "<div id='conditionid'" + i + ">" +
-                "<input/>" +
-                "<select>" +
+             let context =
+                 "<div id='conditionid" + i + "'>" +
+                 "<input value=" + CardObj.storyOptions[j].condition.name + "/>" +
+                 "<select id='conditionidselect" + i + "'>" 
                 + "<option value='1'>></option>"
                 + "<option value='2'><</option>"
                 + "<option value='3'>=</option>"
                 + "<option value='4'>≠</option>"
-
                 +"<select/>"
-
-                +"</div>"
+                + "</div>"
+            $("#conditionidselect" + i).val(CardObj.storyOptions[j].condition)
             $('#Condition').append(context)
         }
-        
 
 
         $('#ConditionModel').modal('show');
@@ -277,8 +273,9 @@
         CardObj.storyOptions.condition[conditionID].remove();
     }
 
+    //把页面修改的内容保存
     function SaveCondition() {
-
+        CardObj.storyOptions
     }
 
     //增加条件
@@ -347,15 +344,7 @@
         $("#EffectForm").append(toappend)
         effectcount++;
     }
-    //保存效果
-    function SaveEffect() {
-        let i = $("#EffectId").val();
-        //let value = $("#ConditionForm").serialize();
-        let value = FormtoJson($("#EffectForm"));
 
-        document.getElementById("storyCard.StoryOptions[" + i + "].Effect").value = value;
-        $("#EffectModel").modal('hide')
-    }
 
     //生成uuid
     function S4() {
