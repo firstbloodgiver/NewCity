@@ -50,8 +50,8 @@
             </div>
             <div class="modal-body">
                 <div id="Condition"></div>
-                <button onclick="AddCondition()">+</button>
-                <button onclick="SaveCondition()">确定</button>
+                <div id="Conditionoperation"></div>
+                
             </div>
         </div>
     </div>
@@ -96,9 +96,9 @@
     $(function () {
         CardObj = @Json.Serialize(Model.First());
         CreaterView(CardObj)
-
     });
 
+    /////////////////////////主界面
     //根据输入的卡片构建主界面
     function CreaterView(card) {
         debugger;
@@ -117,6 +117,18 @@
 
 
     }
+    function CreateOption(i) {
+        let option;
+
+        option += i + 1 + "."
+        option += "<button type='button' onclick='CreateCondition(" + i + ")'>条件</button>"
+        option += "<input id=option" + i + " value=" + CardObj.storyOptions[i].text + " />"
+        option += "<button type='button' onclick='Effect(" + i + ")'>效果</button>"
+        option += "<button type='button' onclick='Cancel(" + i + ")'>取消</button>"
+        option += "<button type='button' onclick=NextCard(" + i + ")>→</button>"
+
+        $("#Option").append(option)
+    }
     function EmptyView()
     {
         $("#StoryId").empty()
@@ -126,85 +138,11 @@
         $("#BackgroundIMG").empty()
 
     }
-    function GetStoryCard() {
-        //点击树加载该故事卡到主页面
-
-    }
     //取消选项
     function Cancel(optionid) {
         $("#" + optionid).remove();
         CardObj.storyOptions.remove(optionid);
     }
-    //下一张卡
-    function NextCard(id, seriesid, optionid) {
-        let nextid = document.getElementById("storyCard.StoryOptions["+id+"].NextStoryCardID").value;
-
-        if (confirm("即将移动到新的页面，请确认已保存")) {
-            $.post("/CreateStory/NextCard", { nextid: nextid, seriesid: seriesid, optionid: optionid }, function (data) {
-                LoadNextCard(data);
-            });
-        }
-    }
-
-    //加载下一张卡
-    function LoadNextCard(data) {
-        debugger;
-        //清空显示
-        $("#StoryId").empty();
-        $("#StoryName").empty();
-        $("#Img").empty();
-        $("#Content").empty();
-        $("#Option").empty();
-
-        //加载基本数据
-        debugger;
-        let id = data.id;
-        let name = data.storyName == "" || data.storyName == null ? "" : data.storyName;
-        let img = data.img == "" || data.img == null ? "" : data.img;
-        let text = data.text == "" || data.text == null ? "" : data.text;
-
-
-        let StoryId = "<input name='storyCard.ID' hidden value='' />";
-        StoryId += "<p>" + id + "</p>";
-        let StoryName = "<p>"+ name +"</p>";
-        let Img = "<p>" + img+"</p>";
-        let Content = "<textarea name='storyCard.Text' class='form-control' rows='10' >" + text +"</textarea>";
-        let Option = "";
-        //计算当前是第几个选项
-        let count = data.storyOptions != null ? data.storyOptions.length : 0;
-        Option += "<input hidden id='optionCount' type='text' value='" + count +"' />";
-        for (let i in data.storyOptions) {
-            let option = "";
-            let id = data.storyOptions[i].id;
-            let condition = data.storyOptions[i].condition == "" || data.storyOptions[i].condition == null ? "" : data.storyOptions[i].condition;
-            let text = data.storyOptions[i].text == "" || data.storyOptions[i].text == null ? "" : data.storyOptions[i].text;
-            let effect = data.storyOptions[i].effect == "" || data.storyOptions[i].effect == null ? "" : data.storyOptions[i].effect;
-            let storySeriesID = data.storySeriesID;
-            let NextStoryCardID = data.storyOptions[i].nextStoryCardID == "" ? GuidEmpty : data.storyOptions[i].nextStoryCardID
-
-            option += "<input name='storyCard.StoryOptions["+i+"].ID' hidden type='text value=" + id+" />";
-            option += "<button type='button' onclick='Condition(" + i +")'>条件</button>";
-            option += "<input id='storyCard.StoryOptions[" + i + "].Condition' name='storyCard.StoryOptions[" + i +"].Condition' hidden type='text' value=" + condition+" />";
-            option += "<input name='storyCard.StoryOptions[" + i +"].Text' type='text' value=" + text+">"
-            option += "<button type='button' onclick='Effect(" + i +")'>效果</button>"
-            option += "<input id='storyCard.StoryOptions[" + i + "].Effect' name='storyCard.StoryOptions[" + i +"].Effect' hidden type='text' value=" + effect +" />"
-            option += " <button type='button' onclick='Cancel('option-" + id+"')'>取消</button>"
-            option += "<button type='button' onclick=NextCard('" + i + "','" + storySeriesID+"','" + id + "')>→</button>"
-
-
-            option += "<input id='storyCard.StoryOptions[" + i + "].NextStoryCardID' name='storyCard.StoryOptions[" + i +"].NextStoryCardID' type='text' placeholder='为空则新建故事卡' value='"+NextStoryCardID+"'>"
-
-            Option += "<div class='row' id='option-" + id+"'>" + option+"</div>";
-        }
-        //赋值
-        $("#StoryId").append(StoryId);
-        $("#StoryName").append(StoryName);
-        $("#Img").append(Img);
-        $("#Content").append(Content);
-        $("#Option").append(Option);
-
-    }
-
     //增加选项
     function AddOption() {
         debugger
@@ -212,27 +150,13 @@
             condition: null,
             effect: null,
             id: guid(),
-            nextStoryCardID: emptyguid(),
+            nextStoryCardID: emptyguid,
             storyCardID: CardObj.id,
             text: ""
         }
         CardObj.storyOptions.push(option);
         CreateOption(CardObj.storyOptions.length)
     }
-
-    function CreateOption(i) {
-        let option;
-
-        option += i + 1 +"."
-        option += "<button type='button' onclick='Condition(" + i + ")'>条件</button>"
-        option += "<input id=option" + i + " value=" + CardObj.storyOptions[i].text + " />"
-        option += "<button type='button' onclick='Effect(" + i + ")'>效果</button>"
-        option += "<button type='button' onclick='Cancel(" + i + ")'>取消</button>"
-        option += "<button type='button' onclick=NextCard(" + i + ")>→</button>"
-
-        $("#Option").append(option)
-    }
-
     function SaveCard() {
         debugger;
         for (let i = 0; i < CardObj.storyOptions.length; i++) {
@@ -243,28 +167,65 @@
         $("#json").val(json);
 
     }
+    ///////////////////////////////end
 
+    ////////////////////////////////条件
     //设置条件
-    function Condition(i) {
-        
-        for (let j = 0; j < CardObj.storyOptions.length; j++) {
-             let context =
-                 "<div id='conditionid" + i + "'>" +
-                 "<input value=" + CardObj.storyOptions[j].condition.name + "/>" +
-                 "<select id='conditionidselect" + i + "'>" 
-                + "<option value='1'>></option>"
-                + "<option value='2'><</option>"
-                + "<option value='3'>=</option>"
-                + "<option value='4'>≠</option>"
-                +"<select/>"
-                + "</div>"
-            $("#conditionidselect" + i).val(CardObj.storyOptions[j].condition)
-            $('#Condition').append(context)
-        }
+    function CreateCondition(i) {
+        EmptyCondition();
 
+        for (let j = 0; j < CardObj.storyOptions.length; j++) {
+            Condition(j,i);
+        }
+        let string = "<button onclick='AddCondition("+i+")'>+</button><button onclick = 'SaveCondition()' > 确定</button>";
+        $('#Conditionoperation').append(string);
 
         $('#ConditionModel').modal('show');
+    }
 
+    //添加条件
+    function AddCondition(storyoption){
+        let option = {
+            Name: "",
+            Type: "",
+            Value: ""
+        }
+        CardObj.storyOptions[storyoption].condition.push(option);
+        Condition(CardObj.storyOptions.length, storyoption)
+    }
+
+    //保存
+    function SaveCondition() {
+        $("#Conditionoperation>.conditionname").each(function (a) {
+
+        })
+        $("#Conditionoperation>.conditionvalue").each(function (a) {
+
+        })
+        $("#Conditionoperation>.conditionidselect").each(function (a) {
+
+        })
+    }
+
+    function EmptyCondition() {
+        $('#Condition').empty();
+        $('#Conditionoperation').empty();
+    }
+
+    function Condition(condition,storyoption) {
+        let context =
+            "<div id='conditionid" + condition+1 + "'>" +
+            "<input class='conditionname' value=" + CardObj.storyOptions[storyoption].condition.name + "/>" +
+            "<select id='conditionidselect" + condition + "'>"
+            + "<option value='1'>></option>"
+            + "<option value='2'><</option>"
+            + "<option value='3'>=</option>"
+            + "<option value='4'>≠</option>"
+            + "<select/>" +
+            "<input  class='conditionvalue'  value=" + CardObj.storyOptions[storyoption].condition.value + "/>" +
+            "</div>"
+        $("#conditionidselect" + condition).val(CardObj.storyOptions[storyoption].condition)
+        $('#Condition').append(context)
     }
 
     //取消条件
@@ -272,90 +233,13 @@
         $("#conditionid" + conditionID).remove();
         CardObj.storyOptions.condition[conditionID].remove();
     }
+    /////////////////////////////////end
+    
+    //////////////////////////////效果
 
-    //把页面修改的内容保存
-    function SaveCondition() {
-        CardObj.storyOptions
-    }
-
-    //增加条件
-    function AddCondition() {
-
-    }
-
-    //设置效果
-    function Effect(number) {
-        var EffectForm = document.getElementById("EffectForm");
-        EffectForm.innerHTML = "";
-        effectcount = 0;
-        let q = "<input hidden type='text' id='EffectId' value='" + number + "'/>";
-        $("#EffectForm").append(q);
-        //let effect = JSON.parse($("#storyCard.StoryOptions[" + number + "].Effect").val());
-        debugger;
-        let ef = document.getElementById("storyCard.StoryOptions[" + number + "].Effect").value;
-        if (ef && ef!='/') {
-            let effect = JSON.parse(ef);
-
-            for (let i in effect) {
-                let Hide = "<input  type='text'  name='StorySeries' value='1' style='display: none;'/>";
-                let Name = "<input  type='text' name='Name' id='ef-storyStates[" + i + "].Name'/>";
-                let Type = "<select  name='Type' id='ef-storyStates[" + i + "].Type'>"
-                    + "<option value='0'>增加</option>"
-                    + "<option value='1'>减少</option>"
-                    + "<option value='2'>赋值</option>"
-                    + "</select>";
-                let Value = "<input  type='text' name='Value' id='ef-storyStates[" + i + "].Value'/>";
-                let Delete = "<button onclick='EffectCancel(" + i + ")'>取消</button>";
-                let context = Hide + Name + Type + Value + Delete;
-                let toappend = "<div class='row' id='effect" + i + "'>" + context + "</div>"
-                $("#EffectForm").append(toappend)
-                effectcount++;
-                //赋值
-                debugger;
-                document.getElementById("ef-storyStates[" + i + "].Name").value = effect[i]["Name"];
-                document.getElementById("ef-storyStates[" + i + "].Type").text = enumEffectType[effect[i]["Type"]];
-                document.getElementById("ef-storyStates[" + i + "].Type").value = effect[i]["Type"];
-                document.getElementById("ef-storyStates[" + i + "].Value").value = effect[i]["Value"];
-
-            }
-        }
-
-        $('#EffectModel').modal('show');
-    }
-
-    function EffectCancel(num) {
-        $("#effect" + num + "").remove();
-        effectcount--;
-    }
-    //增加效果
-    function AddEffect() {
-        let i = effectcount;
-        let Hide = "<input  type='text'  name='StorySeries' value='1' style='display: none;'/>";
-        let Name = "<input  type='text'  name='Name' id='ef-storyStates[" + i + "].Name'/>";
-        let Type = "<select  name='Type' id='ef-storyStates[" + i + "].Type'>"
-            + "<option value='0'>增加</option>"
-            + "<option value='1'>减少</option>"
-            + "<option value='2'>赋值</option>"
-            + "</select>";
-        let Value = "<input  type='text' name='Value' id='ef-storyStates[" + i + "].Value'/>";
-        let Delete = "<button onclick='EffectCancel(" + i + ")'>取消</button>";
-        let context = Hide + Name + Type + Value + Delete;
-        let toappend = "<div class='row' id='effect" + i + "'>" + context + "</div>"
-        $("#EffectForm").append(toappend)
-        effectcount++;
-    }
+    //////////////////////////////end
 
 
-    //生成uuid
-    function S4() {
-        return (((1 + Math.random()) * 0x10000) | 0).toString(16).substring(1);
-    }
-    function guid() {
-        return (S4() + S4() + "-" + S4() + "-" + S4() + "-" + S4() + "-" + S4() + S4() + S4());
-    }
-    function emptyguid() {
-        return "00000000-0000-0000-0000-000000000000";
-    }
 
 
 </script>
