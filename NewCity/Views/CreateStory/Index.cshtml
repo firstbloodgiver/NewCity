@@ -177,7 +177,7 @@
         for (let j = 0; j < CardObj.storyOptions.length; j++) {
             Condition(j,i);
         }
-        let string = "<button onclick='AddCondition("+i+")'>+</button><button onclick = 'SaveCondition()' > 确定</button>";
+        let string = "<button onclick='AddCondition("+i+")'>+</button><button onclick = 'SaveCondition("+i+")' > 确定</button>";
         $('#Conditionoperation').append(string);
 
         $('#ConditionModel').modal('show');
@@ -185,47 +185,40 @@
 
     //添加条件
     function AddCondition(storyoption){
-        let option = {
-            Name: "",
-            Type: "",
-            Value: ""
-        }
-        CardObj.storyOptions[storyoption].condition.push(option);
         Condition(CardObj.storyOptions.length, storyoption)
     }
 
     //保存
     function SaveCondition() {
-        $("#Conditionoperation>.conditionname").each(function (a) {
+        $("#Conditionoperation>.conditionname").each(function (index, element) {
 
         })
-        $("#Conditionoperation>.conditionvalue").each(function (a) {
+        $("#Conditionoperation>.conditionvalue").each(function (index, element) {
 
         })
-        $("#Conditionoperation>.conditionidselect").each(function (a) {
+        $("#Conditionoperation>.conditionidselect").each(function (index, element) {
 
         })
     }
 
-    function EmptyCondition() {
-        $('#Condition').empty();
-        $('#Conditionoperation').empty();
-    }
-
-    function Condition(condition,storyoption) {
+    function Condition(condition, storyoption) {
         let context =
-            "<div id='conditionid" + condition+1 + "'>" +
             "<input class='conditionname' value=" + CardObj.storyOptions[storyoption].condition.name + "/>" +
-            "<select id='conditionidselect" + condition + "'>"
+            "<select>"
             + "<option value='1'>></option>"
             + "<option value='2'><</option>"
             + "<option value='3'>=</option>"
             + "<option value='4'>≠</option>"
             + "<select/>" +
             "<input  class='conditionvalue'  value=" + CardObj.storyOptions[storyoption].condition.value + "/>" +
-            "</div>"
+
         $("#conditionidselect" + condition).val(CardObj.storyOptions[storyoption].condition)
         $('#Condition').append(context)
+    }
+
+    function EmptyCondition() {
+        $('#Condition').empty();
+        $('#Conditionoperation').empty();
     }
 
     //取消条件
