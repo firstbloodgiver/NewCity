@@ -27,7 +27,7 @@ namespace NewCity.Controllers
         /// <returns></returns>
         public IActionResult Index(string id)
         {
-            List<StoryCard> storyCards = _context.StoryCard.Where(a => a.StorySeriesID == Guid.Parse(id)).Include(a => a.StoryOptions).ToList();
+            List<StoryCard> storyCards = _context.StoryCard.AsNoTracking().Where(a => a.StorySeriesID == Guid.Parse(id)).Include(a => a.StoryOptions).ToList();
             if (storyCards.Count == 0) {
                 StoryCard card = new StoryCard() {
                     ID = Guid.NewGuid(),
@@ -49,7 +49,7 @@ namespace NewCity.Controllers
         /// <returns></returns>
         public string GetCard(string ID)
         {
-            StoryCard storyCard = _context.StoryCard.Where(a => a.ID == Guid.Parse(ID)).FirstOrDefault();
+            StoryCard storyCard = _context.StoryCard.AsNoTracking().FirstOrDefault(a => a.ID == Guid.Parse(ID));
             return JsonConvert.SerializeObject(storyCard);
         }
 
@@ -59,22 +59,28 @@ namespace NewCity.Controllers
         /// <returns></returns>
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public JsonResult Save(string json)
+        public async Task<IActionResult> Save(string json)
         {
-            var ResultJson = new JsonResult(false);
+            
             if (!string.IsNullOrEmpty(json))
             {
                 StoryCard card = JsonConvert.DeserializeObject<StoryCard>(json);
-                StoryCard storyCard = _context.StoryCard.Include(a => a.StoryOptions).Where(a => a.ID == card.ID).SingleOrDefault();
+                StoryCard storyCard = _context.StoryCard.Include(a => a.StoryOptions).FirstOrDefault(a=>a.ID == card.ID);
                 storyCard.Text = card.Text;
                 storyCard.IMG = card.IMG;
                 storyCard.BackgroundIMG = card.BackgroundIMG;
-                storyCard.StoryOptions = card.StoryOptions;
-                _context.StoryCard.Update(storyCard);
-                _context.SaveChanges();
-                ResultJson.Value = true;
+                //storyCard.StoryOptions = card.StoryOptions;
+
+                foreach (var obj in card.StoryOptions)
+                {
+                    storyCard.StoryOptions.FirstOrDefault(a => a.ID == obj.ID).Condition = obj.Condition;
+                }
+                await _context.SaveChangesAsync();
+                //return Index(card.StorySeriesID.ToString());
+                return RedirectToAction(nameof(Index),new { id = card.StorySeriesID.ToString() });
             }
-            return ResultJson;
+            return NotFound();
+
         }
 
 

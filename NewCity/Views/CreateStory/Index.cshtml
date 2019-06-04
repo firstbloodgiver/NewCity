@@ -170,10 +170,11 @@
 
     //序列化对象
     function Serialize() {
+        debugger
         CardObj = @Json.Serialize(Model.First());
 
         for (let i = 0; i < CardObj.storyOptions.length; i++) {
-            CardObj.storyOptions[i].condition = JSON.Serialize(CardObj.storyOptions[i].condition);
+            CardObj.storyOptions[i].condition = JSON.parse(CardObj.storyOptions[i].condition);
         }
     }
     ///////////////////////////////end
