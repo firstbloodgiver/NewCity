@@ -118,6 +118,7 @@
         option += "<div>"
         option += i + 1 + "."
         option += "<button type='button' onclick='CreateCondition(" + i + ")'>条件</button>"
+        debugger
         option += "<input id=option" + i + " value='" + CardObj.storyOptions[i].text + "' />"
         option += "<button type='button' onclick='CreateEffect(" + i + ")'>效果</button>"
         option += "<button type='button' onclick='Cancel(" + i + ")'>取消</button>"
@@ -148,7 +149,7 @@
             id: guid(),
             nextStoryCardID: emptyguid,
             storyCardID: CardObj.id,
-            text: " "
+            text: ""
         }
         CardObj.storyOptions.push(option);
         CreateOption(CardObj.storyOptions.length-1)
@@ -164,17 +165,18 @@
             CardObj.storyOptions[i].effect = JSON.stringify(CardObj.storyOptions[i].effect);
         }
         let json = JSON.stringify(CardObj);
-        $("#json").val(json);
 
+        $("#json").val(json);
     }
 
     //序列化对象
     function Serialize() {
-        debugger
+        debugger;
         CardObj = @Json.Serialize(Model.First());
 
         for (let i = 0; i < CardObj.storyOptions.length; i++) {
             CardObj.storyOptions[i].condition = JSON.parse(CardObj.storyOptions[i].condition);
+            CardObj.storyOptions[i].effect = JSON.parse(CardObj.storyOptions[i].effect);
         }
     }
     ///////////////////////////////end
@@ -222,10 +224,9 @@
     }
 
     function Condition(condition, storyoption) {
-        debugger;
-        let name =  " ";
-        let value =  " ";
-        let type = " ";
+        let name =  "";
+        let value =  "";
+        let type = "";
 
         if (CardObj.storyOptions[storyoption].condition.length >= condition + 1) {
             name = CardObj.storyOptions[storyoption].condition[condition].Name
@@ -263,7 +264,7 @@
     //设置效果
     function CreateEffect(i) {
         EmptyEffect();
-        for (let j = 0; j < CardObj.storyOptions.length; j++) {
+        for (let j = 0; j < CardObj.storyOptions[i].effect.length; j++) {
             Effect(j, i);
         }
         let string = "<button onclick='AddEffect(" + i + ")'>+</button><button onclick = 'SaveEffect(" + i + ")' > 确定</button>";
@@ -274,20 +275,31 @@
 
     //添加条件
     function AddEffect(storyoption) {
-        Effect(CardObj.storyOptions.length, storyoption)
+        Effect(CardObj.storyOptions[storyoption].effect.length, storyoption)
     }
 
     function Effect(effect, storyoption) {
+        let name = "";
+        let value = "";
+        let type = "";
+
+        if (CardObj.storyOptions[storyoption].effect.length >= effect + 1) {
+            name = CardObj.storyOptions[storyoption].effect[effect].Name
+            value = CardObj.storyOptions[storyoption].effect[effect].Value
+            type = CardObj.storyOptions[storyoption].effect[effect].Type
+        }
+
         let context =
-            "<input class='effectname' value=" + CardObj.storyOptions[storyoption].effect.name + "/>" +
-            "<select id='effectidselect'>"
+            "<div>"+
+            "<input class='effectname' value='" + name + "'/>" +
+            "<select class='effectidselect'>"
             + "<option value='0'>增加</option>"
             + "<option value='1'>减少</option>"
             + "<option value='2'>赋值</option>"
             + "<select/>" +
-            "<input  class='effectvalue'  value=" + CardObj.storyOptions[storyoption].effect.value + "/>" +
-
-            $("#effectidselect" + effect).val(CardObj.storyOptions[storyoption].effect.Type)
+            "<input  class='effectvalue'  value='" + value + "'/>" +
+            "</div>"
+            $("#effectidselect" + effect).val(type)
         $('#Effect').append(context)
     }
 
