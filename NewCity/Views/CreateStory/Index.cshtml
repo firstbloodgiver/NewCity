@@ -116,7 +116,7 @@
     }
     function CreateOption(i) {
         let option = "";
-        option += "<div>"
+        option += "<div id='"+ i +"'>"
         option += i + 1 + "."
         option += "<button type='button' onclick='CreateCondition(" + i + ")'>条件</button>"
         debugger
@@ -139,8 +139,9 @@
     }
     //取消选项
     function Cancel(optionid) {
+        debugger
         $("#" + optionid).remove();
-        CardObj.storyOptions.remove(optionid);
+        CardObj.storyOptions.splice(optionid,1)
     }
     //增加选项
     function AddOption() {
@@ -170,16 +171,36 @@
         $("#json").val(json);
     }
 
+    //前进到下一卡片
+    function NextCard(optionid) {
+        //let OptionObj = CardObj.storyOptions[optionid];
+        //$.post("/CreateStory/NextCard", { nextid: CardObj.storyOptions[optionid].nextStoryCardID, seriesid: CardObj.StorySeriesID, optionid: CardObj.storyOptions[optionid].id }, function (data) {
+        //    Serialize(data);
+        //    CreaterView(CardObj);
+        //})
+        window.location.href = '/CreateStory/Index/'+optionid
+    }
+
     //序列化对象
-    function Serialize() {
+    function Serialize(data) {
         debugger;
+        CardObj = JSON.parse(data)
+
+        SerializeOption();
+    }
+    function Serialize() {
         CardObj = @Json.Serialize(Model.First());
 
+        SerializeOption();
+    }
+    function SerializeOption(){
         for (let i = 0; i < CardObj.storyOptions.length; i++) {
             CardObj.storyOptions[i].condition = JSON.parse(CardObj.storyOptions[i].condition);
             CardObj.storyOptions[i].effect = JSON.parse(CardObj.storyOptions[i].effect);
         }
     }
+
+
     ///////////////////////////////end
 
     ////////////////////////////////条件
@@ -248,6 +269,8 @@
             "</div>" 
             $("#conditionidselect" + condition).val(type)
         $('#Condition').append(context)
+
+        $("#Condition option[value='"+ type +"']").attr("selected", true);
     }
 
     function EmptyCondition() {
@@ -304,6 +327,8 @@
             "</div>"
             $("#effectidselect" + effect).val(type)
         $('#Effect').append(context)
+
+        $("#Effect option[value='"+ type +"']").attr("selected", true);
     }
 
     function EmptyEffect() {

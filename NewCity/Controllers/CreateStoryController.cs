@@ -74,9 +74,26 @@ namespace NewCity.Controllers
                 foreach (var obj in card.StoryOptions)
                 {
                     var temp = storyCard.StoryOptions.FirstOrDefault(a => a.ID == obj.ID);
-                    temp.Condition = obj.Condition;
-                    temp.Effect = obj.Effect;
-                    temp.Text = obj.Text;
+                    if(temp == null)
+                    {
+                        StoryOption option = new StoryOption()
+                        {
+                            ID = obj.ID,
+                            StoryCardID = obj.StoryCardID,
+                            Text = obj.Text,
+                            NextStoryCardID = obj.NextStoryCardID,
+                            Condition = obj.Condition,
+                            Effect = obj.Effect
+                        };
+                        storyCard.StoryOptions.Add(option);
+                    }
+                    else
+                    {
+                        temp.Condition = obj.Condition;
+                        temp.Effect = obj.Effect;
+                        temp.Text = obj.Text;
+                    }    
+                    
                 }
                 await _context.SaveChangesAsync();
                 //return Index(card.StorySeriesID.ToString());
