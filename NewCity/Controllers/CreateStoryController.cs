@@ -27,12 +27,21 @@ namespace NewCity.Controllers
         /// <returns></returns>
         public IActionResult Index(string id)
         {
+            /*TODO
+             以下还有东西没有写，读取系列后，应该回到作者最后退出的卡片，而不是第一张。
+
+            1.增加作者的最后离开卡片ID记录
+            2.下一卡片的时候更改玩家的最后离开卡片记录
+            3.在下面知道这张卡片并显示出来。
+             */
+
             List<StoryCard> storyCards = _context.StoryCard.AsNoTracking().Where(a => a.StorySeriesID == Guid.Parse(id)).Include(a => a.StoryOptions).ToList();
             if (storyCards.Count == 0) {
                 StoryCard card = new StoryCard() {
                     ID = Guid.NewGuid(),
                     StorySeriesID = Guid.Parse(id),
                     StoryName = string.Empty,
+                    
                 };
                 storyCards.Add(card);
                 _context.StoryCard.Add(card);
@@ -170,6 +179,43 @@ namespace NewCity.Controllers
             };
             
             return Json(result);
+        }
+
+        public IActionResult NextCard(Guid Id)
+        {
+            string nextCardId = string.Empty;
+            try
+            {
+                StoryOption storyOption = _context.StoryOption.FirstOrDefault(a => a.ID == Id);
+                
+                if (string.IsNullOrEmpty(storyOption.NextStoryCardID.ToString()) || storyOption.NextStoryCardID == Guid.Empty)
+                {
+                    StoryCard storyCard = _context.StoryCard.FirstOrDefault(a => a.ID == storyOption.StoryCardID);
+
+                    StoryCard NewStoryCard = new StoryCard()
+                    {
+                        ID = Guid.NewGuid(),
+                        StorySeriesID = storyCard.StorySeriesID,
+                        StoryName = string.Empty,
+                    };
+                    _context.StoryCard.Add(NewStoryCard);
+                    _context.SaveChanges();
+
+                    nextCardId = NewStoryCard.ID.ToString();
+                }
+                else
+                {
+                    nextCardId = storyOption.NextStoryCardID.ToString();
+
+                }
+
+
+                return RedirectToAction(nameof(Index), new { id = nextCardId });
+            }
+            catch
+            {
+                return NotFound();
+            }
         }
     }
 
