@@ -75,6 +75,7 @@ namespace NewCity.Controllers
                 {
                     var temp = storyCard.StoryOptions.FirstOrDefault(a => a.ID == obj.ID);
                     temp.Condition = obj.Condition;
+                    temp.Effect = obj.Effect;
                     temp.Text = obj.Text;
                 }
                 await _context.SaveChangesAsync();

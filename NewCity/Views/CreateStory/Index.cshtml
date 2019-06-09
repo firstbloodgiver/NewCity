@@ -92,6 +92,7 @@
     var CardObj;
 
     $(function () {
+        debugger
         Serialize()
         CreaterView(CardObj)
     });
@@ -234,7 +235,7 @@
             type = CardObj.storyOptions[storyoption].condition[condition].Type
         }
         let context =
-            "<div>"+
+            "<div id='conditionid" + condition +"'>"+
             "<input class='conditionname' value='" + name + "'/>" +
             "<select class='conditionidselect'>"
             + "<option value='1'>></option>"
@@ -243,6 +244,7 @@
             + "<option value='4'>≠</option>"
             + "<select/>" +
             "<input  class='conditionvalue'  value='" + value + "'/>" + 
+            "<button onclick='ConditionCancel(" + condition + "," + storyoption + ")'>取消</button>" +
             "</div>" 
             $("#conditionidselect" + condition).val(type)
         $('#Condition').append(context)
@@ -254,9 +256,8 @@
     }
 
     //取消条件
-    function ConditionCancel(conditionID) {
-        $("#conditionid" + conditionID).remove();
-        CardObj.storyOptions.condition[conditionID].remove();
+    function ConditionCancel(condition, storyoption) {
+        $("#conditionid" + condition).remove();
     }
     /////////////////////////////////end
     
@@ -273,8 +274,9 @@
         $('#EffectModel').modal('show');
     }
 
-    //添加条件
+    //添加效果
     function AddEffect(storyoption) {
+        debugger
         Effect(CardObj.storyOptions[storyoption].effect.length, storyoption)
     }
 
@@ -290,7 +292,7 @@
         }
 
         let context =
-            "<div>"+
+            "<div id='effectid" + effect + "'>" +
             "<input class='effectname' value='" + name + "'/>" +
             "<select class='effectidselect'>"
             + "<option value='0'>增加</option>"
@@ -298,6 +300,7 @@
             + "<option value='2'>赋值</option>"
             + "<select/>" +
             "<input  class='effectvalue'  value='" + value + "'/>" +
+            "<button onclick='ConditionCancel(" + effect + "," + storyoption + ")'>取消</button>" +
             "</div>"
             $("#effectidselect" + effect).val(type)
         $('#Effect').append(context)
@@ -310,8 +313,30 @@
 
     //取消条件
     function EffectCancel(conditionID) {
-        $("#conditionid" + conditionID).remove();
-        CardObj.storyOptions.condition[conditionID].remove();
+        $("#effectid" + conditionID).remove();
+    }
+
+    function SaveEffect(storyoption) {
+        debugger
+        let effect = [];
+        $(".effectname").each(function () {
+            let c = {
+                Name: $(this).val(),
+                Type: "",
+                Value: ""
+            }
+            effect.push(c);
+
+        })
+        $(".effectvalue").each(function (i) {
+            effect[i].Value = $(this).val();
+        })
+        $(".effectidselect").each(function (i) {
+            effect[i].Type = $(this).val();
+        })
+        CardObj.storyOptions[storyoption].effect = effect;
+
+        $('#EffectModel').modal('hide');
     }
     //////////////////////////////end
 
