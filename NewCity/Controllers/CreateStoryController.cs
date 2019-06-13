@@ -27,32 +27,45 @@ namespace NewCity.Controllers
         /// <returns></returns>
         public IActionResult Index(string id)
         {
-
-            var Creatorschedule = _context.CreatorSchedule.FirstOrDefault(a => a.UserID == GetUserId());
-            if(Creatorschedule != null)
+            try
             {
-                Guid lastStoryCardID = Creatorschedule.StoryCardID;
-                ViewBag.LastCard = _context.StoryCard.AsNoTracking().FirstOrDefault(a => a.ID == lastStoryCardID);
+                var Creatorschedule = _context.CreatorSchedule.FirstOrDefault(a => a.UserID == GetUserId() && a.StorySeriesID == Guid.Parse(id));
+                if (Creatorschedule != null)
+                {
+                    Guid lastStoryCardID = Creatorschedule.StoryCardID;
+                    ViewBag.LastCard = _context.StoryCard.AsNoTracking().FirstOrDefault(a => a.ID == lastStoryCardID);
+                }
+                else
+                {
+                    StoryCard card = new StoryCard()
+                    {
+                        ID = Guid.NewGuid(),
+                        StorySeriesID = Guid.Parse(id),
+                        StoryName = string.Empty,
+
+                    };
+
+                    CreatorSchedule creatorSchedule = new CreatorSchedule()
+                    {
+                        ID = Guid.NewGuid(),
+                        UserID = GetUserId(),
+                        StorySeriesID = Guid.Parse(id),
+                        StoryCardID = card.ID
+                    };
+
+                    _context.StoryCard.Add(card);
+                    _context.SaveChanges();
+                    ViewBag.LastCard = card;
+                }
+
+                List<StoryCard> storyCards = _context.StoryCard.AsNoTracking().Where(a => a.StorySeriesID == Guid.Parse(id)).Include(a => a.StoryOptions).ToList();
+                return View(storyCards);
+            }
+            catch
+            {
+                return NotFound();
             }
             
-            List<StoryCard> storyCards = _context.StoryCard.AsNoTracking().Where(a => a.StorySeriesID == Guid.Parse(id)).Include(a => a.StoryOptions).ToList();
-            if (storyCards.Count == 0) {
-
-                StoryCard card = new StoryCard() {
-                    ID = Guid.NewGuid(),
-                    StorySeriesID = Guid.Parse(id),
-                    StoryName = string.Empty,
-                    
-                };
-
-                storyCards.Add(card);
-                _context.StoryCard.Add(card);
-
-                _context.SaveChanges();
-
-                ViewBag.LastCard = card;
-            }
-            return View(storyCards);
         }
 
         
@@ -133,10 +146,10 @@ namespace NewCity.Controllers
             try
             {
                 StoryOption storyOption = _context.StoryOption.FirstOrDefault(a => a.ID == Id);
-                
+                StoryCard storyCard = _context.StoryCard.FirstOrDefault(a => a.ID == storyOption.StoryCardID);
                 if (string.IsNullOrEmpty(storyOption.NextStoryCardID.ToString()) || storyOption.NextStoryCardID == Guid.Empty)
                 {
-                    StoryCard storyCard = _context.StoryCard.FirstOrDefault(a => a.ID == storyOption.StoryCardID);
+                    
 
                     StoryCard NewStoryCard = new StoryCard()
                     {
@@ -154,7 +167,7 @@ namespace NewCity.Controllers
                     nextCardId = storyOption.NextStoryCardID;
 
                 }
-                _context.CreatorSchedule.FirstOrDefault(a => a.ID == GetUserId()).StoryCardID = nextCardId;
+                _context.CreatorSchedule.FirstOrDefault(a => a.ID == GetUserId() && a.StorySeriesID == storyCard.StorySeriesID).StoryCardID = nextCardId;
                 _context.SaveChanges();
 
                 return RedirectToAction(nameof(Index), new { id = nextCardId });
