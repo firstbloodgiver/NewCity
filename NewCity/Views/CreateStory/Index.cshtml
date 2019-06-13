@@ -1,4 +1,7 @@
 ﻿@model IEnumerable<NewCity.Models.StoryCard>
+@{ 
+    StoryCard LastStoryCard = ViewBag.LastCard as StoryCard;
+}
 <script src="~/js/enum.js"></script>
 <script src="~/lib/jquery/dist/jquery.min.js"></script>
 <!--故事卡包装为树。新建下一故事卡要在故事卡里面建-->
@@ -6,7 +9,7 @@
     <div class="row">
         @*<div class="col-md-3">
 
-            </div>*@
+          </div>*@
         <div class="col-md-9">
             <div class="row">
                 <div id="StoryId">
@@ -189,7 +192,7 @@
         SerializeOption();
     }
     function Serialize() {
-        CardObj = @Json.Serialize(Model.First());
+        CardObj = @Json.Serialize(LastStoryCard);
 
         SerializeOption();
     }

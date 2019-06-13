@@ -27,25 +27,30 @@ namespace NewCity.Controllers
         /// <returns></returns>
         public IActionResult Index(string id)
         {
-            /*TODO
-             以下还有东西没有写，读取系列后，应该回到作者最后退出的卡片，而不是第一张。
 
-            1.增加作者的最后离开卡片ID记录
-            2.下一卡片的时候更改玩家的最后离开卡片记录
-            3.在下面知道这张卡片并显示出来。
-             */
-
+            var Creatorschedule = _context.CreatorSchedule.FirstOrDefault(a => a.UserID == GetUserId());
+            if(Creatorschedule != null)
+            {
+                Guid lastStoryCardID = Creatorschedule.StoryCardID;
+                ViewBag.LastCard = _context.StoryCard.AsNoTracking().FirstOrDefault(a => a.ID == lastStoryCardID);
+            }
+            
             List<StoryCard> storyCards = _context.StoryCard.AsNoTracking().Where(a => a.StorySeriesID == Guid.Parse(id)).Include(a => a.StoryOptions).ToList();
             if (storyCards.Count == 0) {
+
                 StoryCard card = new StoryCard() {
                     ID = Guid.NewGuid(),
                     StorySeriesID = Guid.Parse(id),
                     StoryName = string.Empty,
                     
                 };
+
                 storyCards.Add(card);
                 _context.StoryCard.Add(card);
+
                 _context.SaveChanges();
+
+                ViewBag.LastCard = card;
             }
             return View(storyCards);
         }
@@ -122,68 +127,9 @@ namespace NewCity.Controllers
         /// <param name="optionid">选项id</param>
         /// <returns></returns>
         [HttpPost]
-        public IActionResult NextCard(Guid nextid, Guid seriesid,Guid optionid) {
-            int statuscode = 0;
-            string ContentType = string.Empty;
-            if (nextid != Guid.Empty ) {
-                var card = _context.StoryCard.Where(a => a.ID == nextid).AsNoTracking().FirstOrDefault();
-                if (card != null ) {
-                    if (_context.StorySeries.Where(a => a.ID == card.StorySeriesID).AsNoTracking().FirstOrDefault().Author == GetUserId()) {
-                        var option = _context.StoryOption.Where(a => a.ID == optionid).FirstOrDefault();
-                        if (option.NextStoryCardID != nextid) {
-                            //if (_context.StoryOption.Where(a => a.NextStoryCardID == nextid).AsNoTracking().ToArray().Length == 0) {
-                            //删除
-                            //}
-                            option.NextStoryCardID = nextid;
-                            _context.StoryOption.Update(option);
-                            _context.SaveChanges();
-                            return Json(_context.StoryCard.AsNoTracking().Where(a => a.ID == nextid).FirstOrDefault());
-
-                        }
-
-                        StoryCard result1 = _context.StoryCard.AsNoTracking().Where(a => a.ID == nextid).Include(a=>a.StoryOptions).FirstOrDefault();
-                        return Json(result1);
-                    }
-                    else
-                    {
-                        statuscode = 3;
-                        ContentType = "权限不足！";
-                    }
-                }
-                else
-                {
-                    statuscode = 2;
-                    ContentType = "不存在该卡片！";
-                }
-
-            }
-            else
-            {
-                var option = _context.StoryOption.Where(a => a.ID == optionid).FirstOrDefault();
-                //新建卡片
-                StoryCard storyCard = new StoryCard()
-                {
-                    ID = Guid.NewGuid(),
-                    StorySeriesID  = seriesid,                    
-                };
-                option.NextStoryCardID = storyCard.ID;
-                _context.StoryOption.Update(option);
-                _context.StoryCard.Add(storyCard);
-                _context.SaveChanges();
-
-                return Json(storyCard);
-            }
-            JsonResult result = new JsonResult(false) {
-                StatusCode = statuscode,
-                ContentType = ContentType,
-            };
-            
-            return Json(result);
-        }
-
         public IActionResult NextCard(Guid Id)
         {
-            string nextCardId = string.Empty;
+            Guid nextCardId;
             try
             {
                 StoryOption storyOption = _context.StoryOption.FirstOrDefault(a => a.ID == Id);
@@ -199,16 +145,17 @@ namespace NewCity.Controllers
                         StoryName = string.Empty,
                     };
                     _context.StoryCard.Add(NewStoryCard);
-                    _context.SaveChanges();
+                    
 
-                    nextCardId = NewStoryCard.ID.ToString();
+                    nextCardId = NewStoryCard.ID;
                 }
                 else
                 {
-                    nextCardId = storyOption.NextStoryCardID.ToString();
+                    nextCardId = storyOption.NextStoryCardID;
 
                 }
-
+                _context.CreatorSchedule.FirstOrDefault(a => a.ID == GetUserId()).StoryCardID = nextCardId;
+                _context.SaveChanges();
 
                 return RedirectToAction(nameof(Index), new { id = nextCardId });
             }

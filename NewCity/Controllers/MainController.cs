@@ -46,7 +46,7 @@ namespace NewCity.Controllers
             if (userCharacter == null) {
                 CreateCharacter();
             }
-            else
+            else 
             {
                 //是否在场景
                 if (InLocation(userid, out StorySeriesID))

@@ -256,6 +256,22 @@ namespace NewCity.Data.Migrations
                     b.ToTable("Creator");
                 });
 
+            modelBuilder.Entity("NewCity.Models.CreatorSchedule", b =>
+                {
+                    b.Property<Guid>("ID")
+                        .ValueGeneratedOnAdd();
+
+                    b.Property<Guid>("StoryCardID");
+
+                    b.Property<Guid>("StorySeriesID");
+
+                    b.Property<Guid>("UserID");
+
+                    b.HasKey("ID");
+
+                    b.ToTable("CreatorSchedule");
+                });
+
             modelBuilder.Entity("NewCity.Models.HomeNews", b =>
                 {
                     b.Property<int>("ID")

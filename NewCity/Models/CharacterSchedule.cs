@@ -23,5 +23,7 @@ namespace NewCity.Models
         /// 是故事就读取StoryCardID 地点就读取StorySeriesID
         /// </summary>
         public bool IsStory { get; set; }
+
+
     }
 }
