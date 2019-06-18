@@ -33,7 +33,7 @@ namespace NewCity.Controllers
                 if (Creatorschedule != null)
                 {
                     Guid lastStoryCardID = Creatorschedule.StoryCardID;
-                    ViewBag.LastCard = _context.StoryCard.AsNoTracking().FirstOrDefault(a => a.ID == lastStoryCardID);
+                    ViewBag.LastCard = _context.StoryCard.AsNoTracking().Include(a=>a.StoryOptions).FirstOrDefault(a => a.ID == lastStoryCardID);
                 }
                 else
                 {
@@ -52,16 +52,16 @@ namespace NewCity.Controllers
                         StorySeriesID = Guid.Parse(id),
                         StoryCardID = card.ID
                     };
-
+                    _context.CreatorSchedule.Add(creatorSchedule);
                     _context.StoryCard.Add(card);
-                    _context.SaveChanges();
+                    
                     ViewBag.LastCard = card;
                 }
-
+                _context.SaveChanges();
                 List<StoryCard> storyCards = _context.StoryCard.AsNoTracking().Where(a => a.StorySeriesID == Guid.Parse(id)).Include(a => a.StoryOptions).ToList();
                 return View(storyCards);
             }
-            catch
+            catch(Exception ex)
             {
                 return NotFound();
             }
@@ -119,7 +119,7 @@ namespace NewCity.Controllers
                         temp.Condition = obj.Condition;
                         temp.Effect = obj.Effect;
                         temp.Text = obj.Text;
-                    }    
+                    }       
                     
                 }
                 await _context.SaveChangesAsync();
@@ -139,7 +139,6 @@ namespace NewCity.Controllers
         /// <param name="seriesid">故事系列id</param>
         /// <param name="optionid">选项id</param>
         /// <returns></returns>
-        [HttpPost]
         public IActionResult NextCard(Guid Id)
         {
             Guid nextCardId;
@@ -167,12 +166,13 @@ namespace NewCity.Controllers
                     nextCardId = storyOption.NextStoryCardID;
 
                 }
-                _context.CreatorSchedule.FirstOrDefault(a => a.ID == GetUserId() && a.StorySeriesID == storyCard.StorySeriesID).StoryCardID = nextCardId;
+                CreatorSchedule schedule = _context.CreatorSchedule.FirstOrDefault(a => a.UserID == GetUserId() && a.StorySeriesID == storyCard.StorySeriesID);
+                schedule.StoryCardID = nextCardId;
                 _context.SaveChanges();
 
-                return RedirectToAction(nameof(Index), new { id = nextCardId });
+                return RedirectToAction(nameof(Index), new { id = schedule.StorySeriesID });
             }
-            catch
+            catch(Exception ex)
             {
                 return NotFound();
             }

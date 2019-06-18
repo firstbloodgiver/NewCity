@@ -95,8 +95,9 @@
     var CardObj;
 
     $(function () {
-        debugger
+        debugger;
         Serialize()
+
         CreaterView(CardObj)
     });
 
@@ -122,7 +123,7 @@
         option += "<div id='"+ i +"'>"
         option += i + 1 + "."
         option += "<button type='button' onclick='CreateCondition(" + i + ")'>条件</button>"
-        debugger
+
         option += "<input id=option" + i + " value='" + CardObj.storyOptions[i].text + "' />"
         option += "<button type='button' onclick='CreateEffect(" + i + ")'>效果</button>"
         option += "<button type='button' onclick='Cancel(" + i + ")'>取消</button>"
@@ -142,7 +143,7 @@
     }
     //取消选项
     function Cancel(optionid) {
-        debugger
+
         $("#" + optionid).remove();
         CardObj.storyOptions.splice(optionid,1)
     }
@@ -155,11 +156,12 @@
             nextStoryCardID: emptyguid,
             storyCardID: CardObj.id,
             text: ""
-        }
+        };
         CardObj.storyOptions.push(option);
         CreateOption(CardObj.storyOptions.length-1)
     }
     function SaveCard() {
+        debugger;
         for (let i = 0; i < CardObj.storyOptions.length; i++) {
             //保存选项文本
             CardObj.storyOptions[i].text = $("#option" + i).val();
@@ -186,7 +188,6 @@
 
     //序列化对象
     function Serialize(data) {
-        debugger;
         CardObj = JSON.parse(data)
 
         SerializeOption();
@@ -196,11 +197,17 @@
 
         SerializeOption();
     }
-    function SerializeOption(){
-        for (let i = 0; i < CardObj.storyOptions.length; i++) {
-            CardObj.storyOptions[i].condition = JSON.parse(CardObj.storyOptions[i].condition);
-            CardObj.storyOptions[i].effect = JSON.parse(CardObj.storyOptions[i].effect);
+    function SerializeOption() {
+        if (CardObj.storyOptions != null) {
+            for (let i = 0; i < CardObj.storyOptions.length; i++) {
+                CardObj.storyOptions[i].condition = JSON.parse(CardObj.storyOptions[i].condition);
+                CardObj.storyOptions[i].effect = JSON.parse(CardObj.storyOptions[i].effect);
+            }
         }
+        else {
+            CardObj.storyOptions = new Array();
+        }
+        
     }
 
 
@@ -287,7 +294,7 @@
     }
     /////////////////////////////////end
     
-    //////////////////////////////效果
+    /////////////////////////////////效果
     //设置效果
     function CreateEffect(i) {
         EmptyEffect();
@@ -302,7 +309,7 @@
 
     //添加效果
     function AddEffect(storyoption) {
-        debugger
+
         Effect(CardObj.storyOptions[storyoption].effect.length, storyoption)
     }
 
@@ -345,7 +352,7 @@
     }
 
     function SaveEffect(storyoption) {
-        debugger
+
         let effect = [];
         $(".effectname").each(function () {
             let c = {
