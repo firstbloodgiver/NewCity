@@ -16,18 +16,19 @@
             @foreach (var item in storySeries)
             {
 
-                <div>
-                    <div>
-                        @item.SeriesName
-                    </div>
-                    <div>
-                        @item.Text
-                    </div>
-                    <a asp-controller="CreateStory" asp-action="Index" asp-route-id="@item.ID">编辑</a>
-                    <a>启用</a>
-                    <a>测试</a>
-                    <a onclick="DeleteConfirm('@item.ID')">删除</a>
-                </div>
+        <div>
+            <div>
+                @item.SeriesName
+            </div>
+            <div>
+                @item.Text
+            </div>
+            @*<a asp-controller="CreateStory" asp-action="Index" asp-route-id="@item.ID">编辑</a>*@
+            <a asp-controller="CreateStory" asp-action="FlowChart" asp-route-id="@item.ID">编辑</a>
+            <a>启用</a>
+            <a>测试</a>
+            <a onclick="DeleteConfirm('@item.ID')">删除</a>
+        </div>
             }
         }
     </div>

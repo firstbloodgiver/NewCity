@@ -69,6 +69,12 @@ namespace NewCity.Controllers
         }
 
         
+        public IActionResult FlowChart(string id)
+        {
+            _context.StoryCard.AsNoTracking().Include(a => a.StoryOptions).Where(a => a.StorySeriesID == Guid.Parse(id));
+            return View();
+        }
+
         /// <summary>
         /// 返回故事卡信息
         /// </summary>
