@@ -1,8 +1,50 @@
 ﻿
 @{
+    List<StoryCardTrees> ListStoryCard = ViewBag.StoryCardTree as List<StoryCardTrees>;
     ViewData["Title"] = "FlowChart";
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
+<style>
+    .StoryCard {
+        height: 60px;
+        width: 160px;
+        border: 1px solid blue;
+    }
 
+</style>
 <script src="~/js/jsplumb.js"></script>
+<script src="~/lib/jquery/dist/jquery.min.js"></script>
 
+
+
+<script>
+    var StoryCards = @Json.Serialize(ListStoryCard);
+    window.onload = function() {
+        createProcess()
+    }
+
+    function createProcess() {
+        debugger;
+        for (let i in StoryCards) {
+            let div = '';
+            for (var j in StoryCards[i].storyCard) {
+                let context = StoryCards[i].storyCard[j].storyCard.id + StoryCards[i].storyCard[j].storyCard.title;
+                div += "<div id='" + StoryCards[i].storyCard[j].storyCard.id + "' class='StoryCard' ondblclick  =ToCard('" + StoryCards[i].storyCard[j].storyCard.id + "','" + StoryCards[i].storyCard[j].storyCard.storySeriesID + "') style='float:left;margin-left:5px;margin-top:5px'>" + context+"</div>";
+            }
+            let content = "<div class='row'>" + div + "</div>";
+            $("#contener").append(content);
+        }
+    }
+
+    
+
+    //跳转到特定页面
+    function ToCard(CardId, SeriesId) {
+        debugger;
+        window.location.href = '/CreateStory/GetCard?StoryCardID=' + CardId + "&StorySeriesID=" + SeriesId
+    }
+
+
+</script>
+
+<div id="contener"></div>

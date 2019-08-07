@@ -44,7 +44,6 @@ namespace NewCity.Controllers
                 _context.Add(storySeries);
                 await _context.SaveChangesAsync();
             }
-            
             return Index();
         }
 

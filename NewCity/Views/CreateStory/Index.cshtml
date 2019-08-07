@@ -6,6 +6,7 @@
 <script src="~/lib/jquery/dist/jquery.min.js"></script>
 <!--故事卡包装为树。新建下一故事卡要在故事卡里面建-->
 <div class="container-fluid">
+    <div class="btn" onclick="ReturnTree('@LastStoryCard.StorySeriesID')">返回到树</div>
     <div class="row">
         @*<div class="col-md-3">
 
@@ -176,13 +177,14 @@
         $("#json").val(json);
     }
 
+    //返回到树界面
+    function ReturnTree(storySeriesID) {
+        debugger;
+        window.location.href = '/CreateStory/ReturnTree?StorySeriesID=' + storySeriesID
+    }
+
     //前进到下一卡片
     function NextCard(optionid) {
-        //let OptionObj = CardObj.storyOptions[optionid];
-        //$.post("/CreateStory/NextCard", { nextid: CardObj.storyOptions[optionid].nextStoryCardID, seriesid: CardObj.StorySeriesID, optionid: CardObj.storyOptions[optionid].id }, function (data) {
-        //    Serialize(data);
-        //    CreaterView(CardObj);
-        //})
         window.location.href = '/CreateStory/NextCard/' + CardObj.storyOptions[optionid].id
     }
 

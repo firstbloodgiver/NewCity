@@ -13,9 +13,11 @@ namespace NewCity.Models
         public Guid StorySeriesID { get; set; }
         public string StoryName { get; set; }
 
+        public string Title { get; set; }
         public string Text { get; set; }
         public string IMG { get; set; }
         public string BackgroundIMG { get; set; }
+        public bool IsHead { get; set; }
 
         public ICollection<StoryOption> StoryOptions { get; set; }
     }
