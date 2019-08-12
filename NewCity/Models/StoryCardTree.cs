@@ -7,7 +7,7 @@ namespace NewCity.Models
 {
     public class StoryCardTree
     {
-        public Guid FatherStoryCardId { get; set; }
+        public List<Guid> FatherStoryCardId { get; set; }
         public int Level { get; set; }
         public StoryCard StoryCard = new StoryCard();
     }

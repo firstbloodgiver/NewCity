@@ -132,17 +132,25 @@ namespace NewCity.Controllers
         {
             StoryCardTree storyCardTree = new StoryCardTree()
             {
-                FatherStoryCardId = fatherStoryCardId,
+                FatherStoryCardId = new List<Guid>(),
                 Level = level,
                 StoryCard = storyCard
             };
+            storyCardTree.FatherStoryCardId.Add(fatherStoryCardId);
             storyCardTrees.Add(storyCardTree);
             foreach (var option in storyCard.StoryOptions)
             {
-                StoryCard ChildStoryCard = storyCards.Where(a => a.ID == option.NextStoryCardID).First();
-                if (ChildStoryCard != null)
+                StoryCardTree storyCardT = storyCardTrees.FirstOrDefault(a => a.StoryCard.ID == option.NextStoryCardID);
+                if (storyCardT==null) {
+                    StoryCard ChildStoryCard = storyCards.Where(a => a.ID == option.NextStoryCardID).First();
+                    if (ChildStoryCard != null)
+                    {
+                        CreateTree(ChildStoryCard, storyCard.ID, level + 1);
+                    }
+                }
+                else
                 {
-                    CreateTree(ChildStoryCard, storyCard.ID, level + 1);
+                    storyCardT.FatherStoryCardId.Add(storyCard.ID);
                 }
             }
         }
