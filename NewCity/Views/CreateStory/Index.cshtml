@@ -8,10 +8,7 @@
 <div class="container-fluid">
     <div class="btn" onclick="ReturnTree('@LastStoryCard.StorySeriesID')">返回到树</div>
     <div class="row">
-        @*<div class="col-md-3">
-
-          </div>*@
-        <div class="col-md-9">
+        <div class="col-md-12">
             <div class="row">
                 <div id="StoryId">
 
@@ -21,9 +18,13 @@
                 </div>
             </div>
             <div class="row">
+                <div class="col-md-3" id="Title"></div>
+            </div>
+            <div class="row">
                 <div class="col-md-4" id="Img">
 
                 </div>
+                
                 <div class="col-md-8" id="Content">
 
                 </div>
@@ -96,7 +97,6 @@
     var CardObj;
 
     $(function () {
-        debugger;
         Serialize()
 
         CreaterView(CardObj)
@@ -107,17 +107,21 @@
     function CreaterView(card) {
         EmptyView()
 
+        let content = "<textarea id='Text' style=height:250px;width:100%>" + card.text+"</textarea>"
+        let title = "<input value=" + card.title +" />";
+
         $("#StoryId").append(card.id)
         $("#StoryName").append(card.storyName)  
+        $("#Title").append(title)
         $("#Img").append(card.img)
-        $("#Content").append(card.text)
+        $("#Content").append(content)
         $("#BackgroundIMG").append(card.backgroundIMG)
 
         if (card.storyOptions) {
             for (let i = 0; i < card.storyOptions.length; i++) {
                 CreateOption(i);
             }
-        }
+        } 
     }
     function CreateOption(i) {
         let option = "";
@@ -163,6 +167,8 @@
     }
     function SaveCard() {
         debugger;
+        CardObj.title = $('#Title').val();
+        CardObj.text = $('#Text').val();
         for (let i = 0; i < CardObj.storyOptions.length; i++) {
             //保存选项文本
             CardObj.storyOptions[i].text = $("#option" + i).val();
@@ -178,8 +184,7 @@
     }
 
     //返回到树界面
-    function ReturnTree(storySeriesID) {
-        debugger;
+    function ReturnTree(storySeriesID) { 
         window.location.href = '/CreateStory/ReturnTree?StorySeriesID=' + storySeriesID
     }
 

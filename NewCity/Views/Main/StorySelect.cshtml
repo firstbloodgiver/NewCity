@@ -1,0 +1,39 @@
+﻿
+@{
+    ViewData["Title"] = "StorySelect";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    List<StorySeries> storySeries = ViewBag.storySeriesList;
+    List<StoryCard> storyCards = ViewBag.storyCards;
+}
+
+<h2>StorySelect</h2>
+
+<!--用户先进入故事选择--继续故事或重新开始-》index，或选择新的故事-》NewStory-->
+<button onclick="newstory()">浏览新故事</button>
+<div class="container">
+    @foreach (var i in storySeries)
+    {
+        var card = storyCards.Where(a => a.StorySeriesID == i.ID).FirstOrDefault();
+        <div class="row">
+            <h1>@i.SeriesName</h1>
+            <p>@card.StoryName</p>
+            <button onclick="storycontinue('@i.ID')">继续</button>
+            <button onclick="restart('@i.ID')">重新开始</button>
+        </div>
+    }
+</div>
+
+<script>
+    function storycontinue(seriesID) {
+        window.location.href = '/Main/Index?StorySeriesID=' + storySeriesID
+    }
+
+    function newstory() {
+        window.location.href = '/Main/NewStory'
+
+    function restart(seriesID) {
+        window.location.href = '/Main/Restart?StorySeriesID=' + storySeriesID
+    }
+
+</script>
+

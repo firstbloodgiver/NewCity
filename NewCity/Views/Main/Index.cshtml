@@ -154,7 +154,7 @@
                     <a href="#Task" data-toggle="tab">事件</a>
 
                 </li>
-                <li>
+                <li> 
                     <a href="#History" data-toggle="tab">历史</a>
 
                 </li>
@@ -256,7 +256,7 @@
 
     //获取任务列表
     function GetSchedule() {
-        $.get('/Main/GetSchedule', function (data) {
+        $.get('/Main/GetSchedule', function (data) { 
  
             let jsonObj = JSON.parse(data);
             let html = '';

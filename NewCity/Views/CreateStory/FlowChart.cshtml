@@ -12,12 +12,7 @@
         border: 1px solid blue;
     }
 
-    /*.item {
-        position: absolute;
-        height: 80px;
-        width: 80px;
-        border: 1px solid blue;
-    }*/
+   
 </style>
 <script src="~/js/jsplumb.js"></script>
 <script src="~/lib/jquery/dist/jquery.min.js"></script>
@@ -31,18 +26,7 @@
     }
 
     jsPlumb.ready(function () {
-        //jsPlumb.connect({
-        //    source: 'item_left',
-        //    target: 'item_right',
-        //    endpoint: 'Dot',
-        //    connector: ['Straight'],
-        //    maxConnections: -1,
-        //    anchor: ['Top', 'Bottom'],
-        //    overlays: [['Arrow', { width: 12, length: 12, location: 0.5 }]]
-        //})
-
-        //jsPlumb.draggable('item_left')
-        //jsPlumb.draggable('item_right')
+       
         debugger;
         for (let i in StoryCards) {
             for (let j in StoryCards[i].storyCard) {
@@ -70,7 +54,7 @@
             let div = '';
             for (var j in StoryCards[i].storyCard) {
                 let context = StoryCards[i].storyCard[j].storyCard.id + StoryCards[i].storyCard[j].storyCard.title;
-                div += "<div id='" + StoryCards[i].storyCard[j].storyCard.id + "' class='StoryCard' style='margin-left:"+180*j+"px' ondblclick  =ToCard('" + StoryCards[i].storyCard[j].storyCard.id + "','" + StoryCards[i].storyCard[j].storyCard.storySeriesID + "') style='float:left;margin-left:5px;margin-top:5px'>" + context+"</div>";
+                div += "<div id='" + StoryCards[i].storyCard[j].storyCard.id + "' class='StoryCard' style='left:"+180*j+"px' ondblclick  =ToCard('" + StoryCards[i].storyCard[j].storyCard.id + "','" + StoryCards[i].storyCard[j].storyCard.storySeriesID + "') style='float:left;margin-left:5px;margin-top:5px'>" + context+"</div>";
             }
             let h = i == 0 ? 0 : 1;
             let content = "<div class='row' style='margin-top:"+80*h+"px'>" + div + "</div>";
@@ -90,5 +74,3 @@
 </script>
 
 <div id="contener"></div>
-@*<div><div id="item_left" class="item"></div></div>
-<div><div id="item_right" class="item" style="left: 150px"></div></div>*@

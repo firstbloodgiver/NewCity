@@ -23,6 +23,7 @@ namespace NewCity.Controllers
         {
         }
 
+        /*准备可弃用*/
         public IActionResult Index()
         {
             var userid = GetUserId();
@@ -58,7 +59,7 @@ namespace NewCity.Controllers
                     ViewBag.OperaList = OperaList;
                 }
                 else
-                {
+                 {
                     StoryCard ReadList = new StoryCard();
                     var storycardID = _context.UserCharacter.AsNoTracking().Where(a => a.UserId == userid)
                         .Join(_context.CharacterSchedule, a => a.ID, b => b.CharacterID, (a, b) => new { storycardID = b.StoryCardID, b.IsMain })
@@ -81,6 +82,106 @@ namespace NewCity.Controllers
             
 
             return View();
+        }
+
+        public IActionResult Index(string SeriesID)
+        {
+            Guid userid = GetUserId();
+            if (userid == Guid.Empty)
+            {
+                return RedirectToAction("Index", "Home");
+            }
+            if (isCreator())
+            {
+                return RedirectToAction("Index", "Creator");
+            }
+            var CharacterList = _context.UserCharacter.AsNoTracking().Where(a => a.UserId == userid).ToList();
+            List<Guid> characterID = new List<Guid>();
+            foreach (var character in CharacterList)
+            {
+                characterID.Add(character.ID);
+            }
+            var Schedule = _context.CharacterSchedule.AsNoTracking().Where(a => a.StorySeriesID == Guid.Parse(SeriesID) && characterID.Contains(a.CharacterID)).FirstOrDefault();
+            var Card = _context.StoryCard.Include(a => a.StoryOptions).AsNoTracking().Where(a => a.ID == Schedule.StoryCardID).FirstOrDefault();
+            //去除不显示得选项
+            List<StoryOption> storyOptions = new List<StoryOption>();
+            foreach (var option in Card.StoryOptions)
+            {
+                if (Check(option.Condition, Card.StorySeriesID.ToString()))
+                {
+                    storyOptions.Add(option);
+                }
+            }
+            ViewBag.StoryOptions = storyOptions;
+            ViewBag.StoryCard = Card;
+            return View();
+        }
+
+        public IActionResult StorySelect()
+        {
+
+            Guid userid = GetUserId();
+            if (userid == Guid.Empty)
+            {
+                return RedirectToAction("Index", "Home");
+            }
+            if (isCreator())
+            {
+                return RedirectToAction("Index", "Creator");
+            }
+            List<UserCharacter> userCharacters = _context.UserCharacter.AsNoTracking().Where(a => a.UserId == userid).ToList();
+            List<StorySeries> storySeriesList = new List<StorySeries>();
+            List<StoryCard> storyCards = new List<StoryCard>();
+            foreach(var crt in userCharacters)
+            {
+                CharacterSchedule characterSchedule = _context.CharacterSchedule.AsNoTracking().Where(a => a.CharacterID == crt.ID).FirstOrDefault();
+                StorySeries storySeries = _context.StorySeries.AsNoTracking().Where(a => a.ID == characterSchedule.StorySeriesID).FirstOrDefault();
+                StoryCard storyCard = _context.StoryCard.AsNoTracking().Where(a => a.ID == characterSchedule.StoryCardID).FirstOrDefault();
+                storySeriesList.Add(storySeries);
+                storyCards.Add(storyCard);
+            }
+            ViewBag.storySeriesList = storySeriesList;
+            ViewBag.storyCards = storyCards;
+            return View();
+        }
+
+        public async Task<IActionResult> NewStory(string sortOrder,string searchString,string currentFilter,int? pagenumber)
+        {
+            ViewData["CurrentFilter"] = searchString;
+            if(searchString != null)
+            {
+                pagenumber = 1;
+            }
+            else
+            {
+                searchString = currentFilter;
+            }
+            var storySeries = from s in _context.StorySeries select s;
+            if (!string.IsNullOrWhiteSpace(searchString))
+            {
+                storySeries = storySeries.Where(a => a.SeriesName.Contains(searchString));
+            }
+            switch (sortOrder)
+            {
+                case "Date":
+                    storySeries = storySeries.OrderBy(a => a.Creationdate);
+                    break;
+                default:
+                    storySeries = storySeries.OrderBy(a => a.Creationdate);
+                    break; 
+            }
+            int pageSize = 3; 
+            return View(await PaginatedList<StorySeries>.CreateAsync(storySeries.AsNoTracking(),pagenumber ?? 1,pageSize));
+        }
+
+        public IActionResult SeriesDetail(string SeriesID)
+        {
+            StorySeries storySeries = _context.StorySeries.AsNoTracking().Where(a => a.ID == Guid.Parse(SeriesID)).FirstOrDefault();
+            if (storySeries.IsTest)
+            {
+                return NotFound();
+            }
+            return View(storySeries);
         }
 
         [HttpPost]

@@ -1,0 +1,54 @@
+﻿
+@{
+    ViewData["Title"] = "NewStory";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+
+}
+@model PaginatedList<StorySeries>
+<h2>New</h2>
+<!--选择新的故事 故事简介-》StoryDetail-->
+<form asp-action="NewStory" method="get">
+    <div class="form-actions no-color">
+        <p>
+            Find by name: <input type="text" name="SearchString" value="@ViewData["currentFilter"]" />
+            <input type="submit" value="Search" class="btn btn-default" />
+        </p>
+    </div>
+</form>
+@foreach (var i in Model)
+{
+    <div class="col-md-4">
+        <h1>@i.SeriesName</h1>
+        <p>@i.Text</p>
+        <button onclick="seriesdetail('@i.ID')">详情</button>
+        <button>添加到列表</button>
+    </div>
+}
+
+@{
+    var prevDisabled = !Model.HasPreviousPage ? "disabled" : "";
+    var nextDisabled = !Model.HasNextPage ? "disabled" : "";
+}
+
+<a asp-action="Index"
+   asp-route-sortOrder="@ViewData["CurrentSort"]"
+   asp-route-pageNumber="@(Model.PageIndex - 1)"
+   asp-route-currentFilter="@ViewData["CurrentFilter"]"
+   class="btn btn-default @prevDisabled">
+    Previous
+</a>
+<a asp-action="Index"
+   asp-route-sortOrder="@ViewData["CurrentSort"]"
+   asp-route-pageNumber="@(Model.PageIndex + 1)"
+   asp-route-currentFilter="@ViewData["CurrentFilter"]"
+   class="btn btn-default @nextDisabled">
+    Next
+</a>
+
+
+<script>
+    function seriesdetail(SeriesID) {
+        window.location.href = '/Main/SeriesDetail?StorySeriesID=' + storySeriesID
+    }
+
+</script>
