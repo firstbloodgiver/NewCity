@@ -61,11 +61,37 @@ namespace NewCity.Controllers
                 List<StoryCard> storyCards = _context.StoryCard.AsNoTracking().Where(a => a.StorySeriesID == Guid.Parse(id)).Include(a => a.StoryOptions).ToList();
                 return View(storyCards);
             }
-            catch(Exception ex)
+            catch
             {
                 return NotFound();
             }
             
+        }
+
+        /// <summary>
+        /// 获取故事系列的状态
+        /// </summary>
+        /// <param name="StorySeriesID"></param>
+        /// <returns></returns>
+        [HttpPost]
+        public JsonResult getStatus(Guid StorySeriesID)
+        {
+            Guid userid = GetUserId();
+            try
+            {
+                //如果是系列作者才能查看
+                if(_context.StorySeries.AsNoTracking().Where(a => a.ID == StorySeriesID && a.Author == userid).FirstOrDefault() != null)
+                {
+                    var statuslist = _context.StoryStatus.AsNoTracking().Where(a => a.StorySeries == StorySeriesID.ToString()).ToList();
+                    return Json(statuslist); 
+                }
+
+            }
+            catch
+            {
+                return Json(false);
+            }
+            return Json(false);
         }
 
         /// <summary>
@@ -142,7 +168,7 @@ namespace NewCity.Controllers
             {
                 StoryCardTree storyCardT = storyCardTrees.FirstOrDefault(a => a.StoryCard.ID == option.NextStoryCardID);
                 if (storyCardT==null) {
-                    StoryCard ChildStoryCard = storyCards.Where(a => a.ID == option.NextStoryCardID).First();
+                    StoryCard ChildStoryCard = storyCards.Where(a => a.ID == option.NextStoryCardID).FirstOrDefault();
                     if (ChildStoryCard != null)
                     {
                         CreateTree(ChildStoryCard, storyCard.ID, level + 1);
@@ -207,6 +233,7 @@ namespace NewCity.Controllers
             {
                 StoryCard card = JsonConvert.DeserializeObject<StoryCard>(json);
                 StoryCard storyCard = _context.StoryCard.Include(a => a.StoryOptions).FirstOrDefault(a=>a.ID == card.ID);
+                storyCard.Title = card.Title;
                 storyCard.Text = card.Text;
                 storyCard.IMG = card.IMG;
                 storyCard.BackgroundIMG = card.BackgroundIMG;
@@ -243,8 +270,6 @@ namespace NewCity.Controllers
             return NotFound();
 
         }
-
-
 
         /// <summary>
         /// 移动到下一卡片，若id无则新建
@@ -284,6 +309,19 @@ namespace NewCity.Controllers
             {
                 return NotFound();
             }
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public IActionResult Addstatus(string storyseries, string status)
+        {
+            StoryStatus storyStatus = new StoryStatus() {
+                ID = Guid.NewGuid(),
+                StorySeries = storyseries,
+                Name = status
+
+            };
+            return Json(false);
         }
     }
 

@@ -11,28 +11,63 @@
 <!--用户先进入故事选择--继续故事或重新开始-》index，或选择新的故事-》NewStory-->
 <button onclick="newstory()">浏览新故事</button>
 <div class="container">
+    @if (storySeries.Count == 0)
+    {
+        <div>
+            <h1>未有进行中的故事</h1>
+            <p><a onclick="newstory()">寻找新故事</a></p>
+        </div>
+    }
+    <h1>进行中</h1>
     @foreach (var i in storySeries)
     {
-        var card = storyCards.Where(a => a.StorySeriesID == i.ID).FirstOrDefault();
-        <div class="row">
-            <h1>@i.SeriesName</h1>
-            <p>@card.StoryName</p>
-            <button onclick="storycontinue('@i.ID')">继续</button>
-            <button onclick="restart('@i.ID')">重新开始</button>
-        </div>
+        if (i.Status == NewCity.Enum.enumStoryStatus.进行中)
+        {
+            <div class="row">
+                <h2>@i.SeriesName</h2>
+                <p>@(storyCards.Where(a => a.StorySeriesID == i.ID).FirstOrDefault() == null ? "新故事" : storyCards.Where(a => a.StorySeriesID == i.ID).FirstOrDefault().StoryName)</p>
+                <button onclick="storycontinue('@i.ID')">继续</button>
+                <button onclick="restart('@i.ID')">重新开始</button>
+            </div>
+        }
+    }
+    <hr>
+    <h1>已完成</h1>
+    @foreach (var i in storySeries)
+    {
+        if (i.Status == NewCity.Enum.enumStoryStatus.结束)
+        {
+            <div class="row">
+                <h2>@i.SeriesName</h2>
+                <p>@(storyCards.Where(a => a.StorySeriesID == i.ID).FirstOrDefault() == null ? "新故事" : storyCards.Where(a => a.StorySeriesID == i.ID).FirstOrDefault().StoryName)</p>
+                <button onclick="storycontinue('@i.ID')">继续</button>
+                <button onclick="restart('@i.ID')">重新开始</button>
+            </div>
+        }
     }
 </div>
 
 <script>
     function storycontinue(seriesID) {
-        window.location.href = '/Main/Index?StorySeriesID=' + storySeriesID
+        debugger;
+        window.location.href = '/Main/Main?SeriesID=' + seriesID
     }
 
     function newstory() {
-        window.location.href = '/Main/NewStory'
+        window.location.href = '/Main/NewStory/'
+    }
 
     function restart(seriesID) {
-        window.location.href = '/Main/Restart?StorySeriesID=' + storySeriesID
+        $.post('/Main/Restart', { StorySeriesID: seriesID }, function (data) {
+            debugger;
+            if (data == true) {
+                window.location.href = '/Main/Main?SeriesID=' + seriesID
+            }
+            else {
+                alert("发生错误！");
+            }
+        });
+        
     }
 
 </script>

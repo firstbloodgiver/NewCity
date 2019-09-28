@@ -24,67 +24,64 @@ namespace NewCity.Controllers
         }
 
         /*准备可弃用*/
+        //public IActionResult Index()
+        //{
+        //    var userid = GetUserId();
+        //    if (userid == Guid.Empty) {
+        //        return RedirectToAction("Index", "Home");
+        //    }
+        //    if (isCreator())
+        //    {
+        //        return RedirectToAction("Index", "Creator");
+        //    }
+
+
+        //    Guid StorySeriesID = Guid.Empty;
+
+        //    List<StoryCard> OperaList = new List<StoryCard>();
+
+
+
+        //    //有无创建人物
+        //    UserCharacter userCharacter = _context.UserCharacter.AsNoTracking().Where(u => u.UserId == userid).FirstOrDefault();
+        //    if (userCharacter == null) {
+        //        CreateCharacter();
+        //    }
+        //    else 
+        //    {
+        //        //是否在场景
+        //        if (InLocation(userid, out StorySeriesID))
+        //        {
+        //            StorySeries ReadList = new StorySeries();
+        //            ReadList = _context.StorySeries.AsNoTracking().Where(s => s.ID == StorySeriesID).FirstOrDefault();
+        //            OperaList = _context.StoryCard.AsNoTracking().Where(s => s.StorySeriesID == StorySeriesID).ToList();
+        //            ViewBag.ReadList = ReadList;
+        //            ViewBag.OperaList = OperaList;
+        //        }
+        //        else
+        //         {
+        //            StoryCard ReadList = new StoryCard();
+        //            var storycardID = _context.UserCharacter.AsNoTracking().Where(a => a.UserId == userid)
+        //                .Join(_context.UserSchedule, a => a.ID, b => b.CharacterID, (a, b) => new { storycardID = b.StoryCardID, b.IsMain })
+        //                .FirstOrDefault(b => b.IsMain == true);
+        //            ReadList = _context.StoryCard.AsNoTracking().Include(a => a.StoryOptions).AsNoTracking().SingleOrDefault(a => a.ID == storycardID.storycardID);
+        //            //去除不符合显示条件的选项
+        //            List<StoryOption> storyOptions = new List<StoryOption>();
+        //            foreach (var option in ReadList.StoryOptions)
+        //            {
+        //                if (Check(option.Condition, ReadList.StorySeriesID.ToString()))
+        //                {
+        //                    storyOptions.Add(option);
+        //                }
+        //            }
+        //            ReadList.StoryOptions = storyOptions;
+        //            ViewBag.ReadList = ReadList;
+        //        }
+        //    }
+        //    return View();
+        //}
+
         public IActionResult Index()
-        {
-            var userid = GetUserId();
-            if (userid == Guid.Empty) {
-                return RedirectToAction("Index", "Home");
-            }
-            if (isCreator())
-            {
-                return RedirectToAction("Index", "Creator");
-            }
-
-
-            Guid StorySeriesID = Guid.Empty;
-            
-            List<StoryCard> OperaList = new List<StoryCard>();
-
-
-            
-            //有无创建人物
-            UserCharacter userCharacter = _context.UserCharacter.AsNoTracking().Where(u => u.UserId == userid).FirstOrDefault();
-            if (userCharacter == null) {
-                CreateCharacter();
-            }
-            else 
-            {
-                //是否在场景
-                if (InLocation(userid, out StorySeriesID))
-                {
-                    StorySeries ReadList = new StorySeries();
-                    ReadList = _context.StorySeries.AsNoTracking().Where(s => s.ID == StorySeriesID).FirstOrDefault();
-                    OperaList = _context.StoryCard.AsNoTracking().Where(s => s.StorySeriesID == StorySeriesID).ToList();
-                    ViewBag.ReadList = ReadList;
-                    ViewBag.OperaList = OperaList;
-                }
-                else
-                 {
-                    StoryCard ReadList = new StoryCard();
-                    var storycardID = _context.UserCharacter.AsNoTracking().Where(a => a.UserId == userid)
-                        .Join(_context.CharacterSchedule, a => a.ID, b => b.CharacterID, (a, b) => new { storycardID = b.StoryCardID, b.IsMain })
-                        .FirstOrDefault(b => b.IsMain == true);
-                    ReadList = _context.StoryCard.AsNoTracking().Include(a => a.StoryOptions).AsNoTracking().SingleOrDefault(a => a.ID == storycardID.storycardID);
-                    //去除不符合显示条件的选项
-                    List<StoryOption> storyOptions = new List<StoryOption>();
-                    foreach (var option in ReadList.StoryOptions)
-                    {
-                        if (Check(option.Condition, ReadList.StorySeriesID.ToString()))
-                        {
-                            storyOptions.Add(option);
-                        }
-                    }
-                    ReadList.StoryOptions = storyOptions;
-                    ViewBag.ReadList = ReadList;
-                }
-            }
-
-            
-
-            return View();
-        }
-
-        public IActionResult Index(string SeriesID)
         {
             Guid userid = GetUserId();
             if (userid == Guid.Empty)
@@ -95,13 +92,16 @@ namespace NewCity.Controllers
             {
                 return RedirectToAction("Index", "Creator");
             }
-            var CharacterList = _context.UserCharacter.AsNoTracking().Where(a => a.UserId == userid).ToList();
-            List<Guid> characterID = new List<Guid>();
-            foreach (var character in CharacterList)
+            else
             {
-                characterID.Add(character.ID);
+                return RedirectToAction(nameof(StorySelect));
             }
-            var Schedule = _context.CharacterSchedule.AsNoTracking().Where(a => a.StorySeriesID == Guid.Parse(SeriesID) && characterID.Contains(a.CharacterID)).FirstOrDefault();
+        }
+
+        public IActionResult Main(string SeriesID)
+        {
+            Guid userid = GetUserId();
+            var Schedule = _context.UserSchedule.Where(a => a.UserID == userid && a.StorySeriesID == Guid.Parse(SeriesID)).FirstOrDefault();
             var Card = _context.StoryCard.Include(a => a.StoryOptions).AsNoTracking().Where(a => a.ID == Schedule.StoryCardID).FirstOrDefault();
             //去除不显示得选项
             List<StoryOption> storyOptions = new List<StoryOption>();
@@ -119,36 +119,56 @@ namespace NewCity.Controllers
 
         public IActionResult StorySelect()
         {
-
             Guid userid = GetUserId();
             if (userid == Guid.Empty)
             {
                 return RedirectToAction("Index", "Home");
             }
-            if (isCreator())
-            {
-                return RedirectToAction("Index", "Creator");
-            }
-            List<UserCharacter> userCharacters = _context.UserCharacter.AsNoTracking().Where(a => a.UserId == userid).ToList();
+
+            List<UserSchedule> userSchedules = _context.UserSchedule.AsNoTracking().Where(a => a.UserID == userid).ToList();
             List<StorySeries> storySeriesList = new List<StorySeries>();
             List<StoryCard> storyCards = new List<StoryCard>();
-            foreach(var crt in userCharacters)
+            foreach (var schedules in userSchedules)
             {
-                CharacterSchedule characterSchedule = _context.CharacterSchedule.AsNoTracking().Where(a => a.CharacterID == crt.ID).FirstOrDefault();
-                StorySeries storySeries = _context.StorySeries.AsNoTracking().Where(a => a.ID == characterSchedule.StorySeriesID).FirstOrDefault();
-                StoryCard storyCard = _context.StoryCard.AsNoTracking().Where(a => a.ID == characterSchedule.StoryCardID).FirstOrDefault();
-                storySeriesList.Add(storySeries);
-                storyCards.Add(storyCard);
+                var Series = _context.StorySeries.AsNoTracking().Where(a => a.ID == schedules.StorySeriesID && a.Status == enumStoryStatus.进行中).FirstOrDefault();
+                var card = _context.StoryCard.AsNoTracking().Where(a => a.ID == schedules.StoryCardID).FirstOrDefault();
+                if (Series != null)
+                {
+                    Series.Status = schedules.ScheduleStatus;
+                    storySeriesList.Add(Series);
+                }
+                if (card != null)
+                {
+                    storyCards.Add(card);
+                }
             }
             ViewBag.storySeriesList = storySeriesList;
             ViewBag.storyCards = storyCards;
             return View();
         }
 
-        public async Task<IActionResult> NewStory(string sortOrder,string searchString,string currentFilter,int? pagenumber)
+        [HttpPost]
+        public JsonResult Restart(Guid StorySeriesID)
         {
+            try
+            {
+                var Schedule = _context.UserSchedule.Where(a => a.StorySeriesID == StorySeriesID && a.UserID == GetUserId()).First();
+                Schedule.StoryCardID = _context.StoryCard.AsNoTracking().Where(a => a.StorySeriesID == StorySeriesID && a.IsHead == true).First().ID;
+                Schedule.ScheduleStatus = enumStoryStatus.进行中;
+                _context.SaveChanges();
+                return Json(true);
+            }
+            catch
+            {
+                return Json(false);
+            }
+        }
+
+        public async Task<IActionResult> NewStory(string sortOrder, string searchString, string currentFilter, int? pagenumber)
+        {
+            Guid userid = GetUserId();
             ViewData["CurrentFilter"] = searchString;
-            if(searchString != null)
+            if (searchString != null)
             {
                 pagenumber = 1;
             }
@@ -156,11 +176,14 @@ namespace NewCity.Controllers
             {
                 searchString = currentFilter;
             }
-            var storySeries = from s in _context.StorySeries select s;
+
+            var storySeries = from s in _context.StorySeries where s.Status == enumStoryStatus.进行中 select s;
+
             if (!string.IsNullOrWhiteSpace(searchString))
             {
-                storySeries = storySeries.Where(a => a.SeriesName.Contains(searchString));
+                storySeries = storySeries.Where(a => a.SeriesName.Contains(searchString) && a.Status == enumStoryStatus.测试);
             }
+
             switch (sortOrder)
             {
                 case "Date":
@@ -168,65 +191,89 @@ namespace NewCity.Controllers
                     break;
                 default:
                     storySeries = storySeries.OrderBy(a => a.Creationdate);
-                    break; 
+                    break;
             }
-            int pageSize = 3; 
-            return View(await PaginatedList<StorySeries>.CreateAsync(storySeries.AsNoTracking(),pagenumber ?? 1,pageSize));
+            int pageSize = 3;
+            return View(await PaginatedList<StorySeries>.CreateAsync(storySeries, pagenumber ?? 1, pageSize));
         }
 
         public IActionResult SeriesDetail(string SeriesID)
         {
+            var userid = GetUserId();
+            bool HadAdd = false;
+
             StorySeries storySeries = _context.StorySeries.AsNoTracking().Where(a => a.ID == Guid.Parse(SeriesID)).FirstOrDefault();
-            if (storySeries.IsTest)
+            if (_context.UserSchedule.AsNoTracking().Where(a => a.UserID == userid && a.StorySeriesID == Guid.Parse(SeriesID)).FirstOrDefault() != null)
+            {
+                HadAdd = true;
+            }
+            ViewBag.HadAdd = HadAdd;
+            if (storySeries.Status == enumStoryStatus.测试)
             {
                 return NotFound();
             }
             return View(storySeries);
         }
 
+        /// <summary>
+        /// 添加到列表
+        /// </summary>
+        /// <param name="SeriesID"></param>
+        /// <returns></returns>
+        [HttpPost]
+        public JsonResult AddList(string SeriesID)
+        {
+            Guid serID = Guid.Parse(SeriesID);
+            if (_context.StorySeries.AsNoTracking().Where(a => a.ID == serID).FirstOrDefault() != null
+                && _context.UserSchedule.AsNoTracking().Where(a => a.StorySeriesID == serID).FirstOrDefault() == null)
+            {
+                var card = _context.StoryCard.AsNoTracking().Where(a => a.IsHead == true && a.StorySeriesID == serID).FirstOrDefault();
+                UserSchedule userSchedule = new UserSchedule()
+                {
+                    ID = Guid.NewGuid(),
+                    CharacterID = Guid.Empty,
+                    StorySeriesID = serID,
+                    StoryCardID = card == null ? Guid.Empty : card.ID,
+                    UserID = GetUserId()
+                };
+                _context.UserSchedule.Add(userSchedule);
+                _context.SaveChanges();
+                return Json(true);
+            }
+            else
+            {
+                return Json(false);
+            }
+        }
+
         [HttpPost]
         public async Task<JsonResult> NextCard(Guid optionID)
         {
             Guid userid = GetUserId();
-
-            var Schedule = _context.UserCharacter.AsNoTracking().Where(a => a.UserId == userid)
-                .Join(_context.CharacterSchedule, a => a.ID,b=>b.CharacterID,(a,b)=>new { IsStory = b.IsStory,IsMain = b.IsMain 
-                ,StorySeriesID=b.StorySeriesID, StoryCardID =b.StoryCardID, CharacterID=b.CharacterID })
-                .Where(a=>a.IsMain == true).FirstOrDefault();
-            if (Schedule.IsStory)
+            try
             {
-                List<StoryOption> Options = new List<StoryOption>();
-                var storycards = _context.StoryCard.AsNoTracking().Where(a => a.ID == Schedule.StoryCardID).Include(a => a.StoryOptions).FirstOrDefault();
-                foreach (var option in storycards.StoryOptions)
+                //查看该选项是否在故事卡片内并可以选择
+                var opti = _context.StoryOption.AsNoTracking().Where(a => a.ID == optionID).First();
+                var storycard = _context.StoryCard.Include(a => a.StoryOptions).AsNoTracking().Where(a => a.ID == opti.StoryCardID).First();
+                var Schedule = _context.UserSchedule.Where(a => a.UserID == GetUserId() && a.StoryCardID == storycard.ID).First();
+                if (Check(opti.Condition, storycard.StorySeriesID.ToString()))
                 {
-                    if (Check(option.Condition, storycards.StorySeriesID.ToString()))
+                    var Nextstorycard = _context.StoryCard.Include(a => a.StoryOptions).AsNoTracking().Where(a => a.ID == opti.NextStoryCardID).FirstOrDefault();
+                    JsonResult result = Json(storycard);
+                    if (Nextstorycard != null)
                     {
-                        Options.Add(option);
+                        result = Json(Nextstorycard);
+                        #region  
+                        //保存进度
+                        Schedule.StoryCardID = Nextstorycard.ID;
+                        await _context.SaveChangesAsync();
+                        #endregion
                     }
-                }
-                var opt = Options.Where(a => a.ID == optionID).FirstOrDefault();
-                if (opt != null)
-                {
-                    var card = await _context
-                       .StoryCard
-                       .AsNoTracking()  
-                       .Include(s => s.StoryOptions)
-                       .FirstOrDefaultAsync(m => m.ID == opt.NextStoryCardID);
-                    JsonResult result = Json(card);
-                    #region  
-                    SetMain(Schedule.CharacterID);
-                    //保存进度
-                    Guid CharacterID = _context.UserCharacter.AsNoTracking().Where(a => a.UserId == userid).FirstOrDefault().ID;
-                    var characterSchedule = _context.CharacterSchedule.Where(a => a.CharacterID == CharacterID).FirstOrDefault();
-                    characterSchedule.StoryCardID = opt.NextStoryCardID;
-                    characterSchedule.IsMain = true;
-                    _context.CharacterSchedule.Update(characterSchedule);
-                    #endregion
-
                     #region
-                    if (!string.IsNullOrWhiteSpace(opt.Effect))
+                    //执行操作效果
+                    if (!string.IsNullOrWhiteSpace(opti.Effect))
                     {
-                        List<Istatus> storyStatuses = JsonConvert.DeserializeObject<List<Istatus>>(opt.Effect);
+                        List<Istatus> storyStatuses = JsonConvert.DeserializeObject<List<Istatus>>(opti.Effect);
                         foreach (var obj in storyStatuses)
                         {
                             switch (Convert.ToInt32(obj.Type))
@@ -240,66 +287,57 @@ namespace NewCity.Controllers
                                 case (int)enumEffectType.赋值:
                                     Assign(obj);
                                     break;
-                                case (int)enumEffectType.场景转移:
+                                case (int)enumEffectType.结束处理:
+                                    GameOver(Schedule.StorySeriesID);
+                                    return result = Json("GameOver");
+                                    //case (int)enumEffectType.场景转移:
                                     //记录
-                                    SetMain(Schedule.CharacterID);
-                                    CharacterSchedule schedule = _context.CharacterSchedule.Where(a => a.StorySeriesID == Guid.Parse(obj.Value) && a.CharacterID == Schedule.CharacterID).FirstOrDefault();
-                                    if (schedule != null)
-                                    {
-                                        schedule.IsMain = true;
-                                        schedule.StorySeriesID = Guid.Parse(obj.Value);
-                                        _context.CharacterSchedule.Update(schedule);
-                                    }
-                                    else
-                                    {
-                                        schedule = new CharacterSchedule()
-                                        {
-                                            ID = new Guid(),
-                                            CharacterID = CharacterID,
-                                            StorySeriesID = Guid.Parse(obj.Value),
-                                            IsMain = true,
-                                            IsStory = false
-                                        };
+                                    //UserSchedule schedule = _context.UserSchedule.Where(a => a.StorySeriesID == Guid.Parse(obj.Value) && a.CharacterID == Schedule.CharacterID).FirstOrDefault();
+                                    //if (schedule != null)
+                                    //{
+                                    //    schedule.IsMain = true;
+                                    //    schedule.StorySeriesID = Guid.Parse(obj.Value);
+                                    //    _context.UserSchedule.Update(schedule);
+                                    //}
+                                    //else
+                                    //{
+                                    //    schedule = new UserSchedule()
+                                    //    {
+                                    //        ID = new Guid(),
+                                    //        CharacterID = CharacterID,
+                                    //        StorySeriesID = Guid.Parse(obj.Value),
+                                    //        IsMain = true,
+                                    //        IsStory = false
+                                    //    };
 
-                                        _context.CharacterSchedule.Add(schedule);
-                                    }
-
-
-                                    var cards = _context.StorySeries.AsNoTracking().Where(a => a.ID == Guid.Parse(obj.Value)).FirstOrDefault();
-                                    var resultcard =  new 
-                                    {
-                                        StorySeriesID = cards.ID,
-                                        StoryName = cards.SeriesName,
-                                        Text = cards.Text,
-                                        IMG = cards.IMG,
-                                        StoryOptions = _context.StoryCard.Where(a => a.StorySeriesID == cards.ID).ToList()
-                                    };
-                                    result = Json(resultcard);
-                                       
-                                    break;
+                                    //    _context.UserSchedule.Add(schedule);
+                                    //}
+                                    //var cards = _context.StorySeries.AsNoTracking().Where(a => a.ID == Guid.Parse(obj.Value)).FirstOrDefault();
+                                    //var resultcard = new
+                                    //{
+                                    //    StorySeriesID = cards.ID,
+                                    //    StoryName = cards.SeriesName,
+                                    //    Text = cards.Text,
+                                    //    IMG = cards.IMG,
+                                    //    StoryOptions = _context.StoryCard.Where(a => a.StorySeriesID == cards.ID).ToList()
+                                    //};
+                                    //result = Json(resultcard); 
+                                    //break;
                             }
                         }
                     }
-                    _context.SaveChanges();
                     #endregion
                     return result;
                 }
-            }
-            else
-            {
-                //地图场景处理
-                var storycards = _context.StorySeries.AsNoTracking().Where(a => a.ID == Schedule.StorySeriesID).FirstOrDefault();
-                var card = new
+                else
                 {
-                    StorySeriesID = storycards.ID,
-                    StoryName = storycards.SeriesName,
-                    Text = storycards.Text,
-                    IMG = storycards.IMG,
-                    StoryOptions = _context.StoryCard.Where(a => a.StorySeriesID == storycards.ID).ToList()
-                };
-                return Json(card);
+                    return Json(false);
+                }
             }
-            return Json("不存在的后续故事卡片！");
+            catch
+            {
+                return Json(false);
+            }
         }
 
         /// <summary>
@@ -307,10 +345,12 @@ namespace NewCity.Controllers
         /// </summary>
         /// <returns></returns>
         [HttpGet]
-        public string GetState() {
+        public string GetState()
+        {
             var state = _context.UserCharacter.AsNoTracking().Where(a => a.UserId == GetUserId() && a.IsActivate == true).FirstOrDefault();
 
-            if (state != null) {
+            if (state != null)
+            {
                 var status = new
                 {
                     行动力 = state.ActionPoints,
@@ -337,9 +377,9 @@ namespace NewCity.Controllers
         public string GetItem()
         {
             var items = _context.CharacterItem.AsNoTracking()
-                .Where(a => a.CharacterID == 
-                _context.UserCharacter.AsNoTracking().Where(u=>u.UserId == GetUserId() && u.IsActivate == true).FirstOrDefault().ID)
-                .Join(_context.Item,a=>a.ItemID,i=>i.ID,(a,i)=>new { Amount = a.Amount, Introduction = i.Introduction,Name = i.Name})
+                .Where(a => a.CharacterID ==
+                _context.UserCharacter.AsNoTracking().Where(u => u.UserId == GetUserId() && u.IsActivate == true).FirstOrDefault().ID)
+                .Join(_context.Item, a => a.ItemID, i => i.ID, (a, i) => new { Amount = a.Amount, Introduction = i.Introduction, Name = i.Name })
                 .ToList();
 
             if (items != null)
@@ -354,12 +394,14 @@ namespace NewCity.Controllers
         /// </summary>
         /// <returns></returns>
         [HttpGet]
-        public string GetSchedule() {
-            var schedule = _context.CharacterSchedule.AsNoTracking()
+        public string GetSchedule()
+        {
+            var schedule = _context.UserSchedule.AsNoTracking()
                .Where(a => a.CharacterID ==
                _context.UserCharacter.AsNoTracking()
                .Where(u => u.UserId == GetUserId() && u.IsActivate == true).FirstOrDefault().ID && a.IsStory == true)
-               .Join(_context.StorySeries,a=>a.StorySeriesID,s=>s.ID,(a,s)=>new {
+               .Join(_context.StorySeries, a => a.StorySeriesID, s => s.ID, (a, s) => new
+               {
                    SeriesName = s.SeriesName,
                    Text = s.Text
                })
@@ -378,9 +420,10 @@ namespace NewCity.Controllers
         /// <param name="Condition"></param>
         /// <param name="Condition"></param>
         /// <returns></returns>
-        private bool Check(string Condition,string StorySeriesID)
+        private bool Check(string Condition, string StorySeriesID)
         {
-            if (!string.IsNullOrWhiteSpace(Condition)) {
+            if (!string.IsNullOrWhiteSpace(Condition) && Condition != "[]")
+            {
                 List<StoryStatus> storyStatuses = JsonConvert.DeserializeObject<List<StoryStatus>>(Condition);
                 foreach (var status in storyStatuses)
                 {
@@ -425,10 +468,11 @@ namespace NewCity.Controllers
         private bool InLocation(Guid userid, out Guid StorySeriesID)
         {
             var location = _context.UserCharacter.AsNoTracking().Where(p => p.UserId == userid && p.IsActivate == true)
-                .Join(_context.CharacterSchedule.Where(a=>a.IsMain == true),u => u.ID,c => c.CharacterID,(u,c)=>new { c.IsStory,c.StorySeriesID }).FirstOrDefault();
+                .Join(_context.UserSchedule.Where(a => a.IsMain == true), u => u.ID, c => c.CharacterID, (u, c) => new { c.IsStory, c.StorySeriesID }).FirstOrDefault();
 
             StorySeriesID = Guid.Empty;
-            if (location != null) {
+            if (location != null)
+            {
                 StorySeriesID = location.StorySeriesID;
                 if (location.IsStory == true)
                 {
@@ -446,15 +490,18 @@ namespace NewCity.Controllers
         /// <summary>
         /// 返回创建人物故事卡
         /// </summary>
-        private void CreateCharacter() {
-            UserCharacter character = new UserCharacter() {
+        private void CreateCharacter()
+        {
+            UserCharacter character = new UserCharacter()
+            {
                 ID = Guid.NewGuid(),
                 UserId = GetUserId(),
                 IsActivate = true,
             };
             _context.UserCharacter.Add(character);
 
-            CharacterSchedule schedule = new CharacterSchedule() {
+            UserSchedule schedule = new UserSchedule()
+            {
                 ID = Guid.NewGuid(),
                 CharacterID = character.ID,
                 StoryCardID = new DefaultValue().createCharacter,
@@ -462,7 +509,7 @@ namespace NewCity.Controllers
                 IsMain = true,
                 IsStory = true,
             };
-            _context.CharacterSchedule.Add(schedule);
+            _context.UserSchedule.Add(schedule);
 
             _context.SaveChanges();
 
@@ -473,37 +520,27 @@ namespace NewCity.Controllers
 
 
 
-        
+
         /// <summary>
         /// 返回默认地点故事卡
         /// </summary>
-        private IActionResult DefaultLocation() {
+        private IActionResult DefaultLocation()
+        {
             ViewBag.ReadList = _context.StorySeries.AsNoTracking().Where(s => s.ID == new DefaultValue().defaultlocation).FirstOrDefault();
             ViewBag.OperaList = _context.StoryCard.AsNoTracking().Where(s => s.StorySeriesID == new DefaultValue().defaultlocation).ToList();
             ViewBag.InLocation = true;
             return View();
         }
 
-        /// <summary>
-        /// 将所有在主页面中的状态设为false
-        /// 用于初始化
-        /// </summary>
-        /// <param name="CharacterID"></param>
-        private void SetMain(Guid CharacterID) {
-            List<CharacterSchedule> tempSchedule = _context.CharacterSchedule.Where(a => a.CharacterID == CharacterID).ToList();
-            foreach (var obj in tempSchedule)
-            {
-                obj.IsMain = false;
-                _context.CharacterSchedule.Update(obj);
-            }
-        }
+        
 
         #region 卡片执行操作
         private void Increase(Istatus storyStatus)
         {
             StoryStatus status = _context.StoryStatus.Where(a => a.StorySeries == storyStatus.StorySeries && a.Name == storyStatus.Name).FirstOrDefault();
-            if (status != null) {
-                status.Value = (Convert.ToInt32(status.Value)+Convert.ToInt32(storyStatus.Value)).ToString();
+            if (status != null)
+            {
+                status.Value = (Convert.ToInt32(status.Value) + Convert.ToInt32(storyStatus.Value)).ToString();
                 _context.StoryStatus.Update(status);
 
             }
@@ -527,9 +564,17 @@ namespace NewCity.Controllers
                 _context.StoryStatus.Update(status);
 
             }
+        } 
+        private void GameOver(Guid StorySeriesID)
+        {
+            var Schedule = _context.UserSchedule.Where(a => a.StorySeriesID == StorySeriesID && a.UserID == GetUserId()).FirstOrDefault();
+            if (Schedule != null)
+            {
+                Schedule.ScheduleStatus = enumStoryStatus.结束;
+                _context.SaveChanges();
+            }
         }
 
-       
         #endregion
     }
 

@@ -24,7 +24,15 @@
                 @item.Text
             </div>
             <a asp-controller="CreateStory" asp-action="FlowChart" asp-route-id="@item.ID">编辑</a>
-            <a>启用</a>
+            @if (item.Status == NewCity.Enum.enumStoryStatus.测试)
+            {
+                <a onclick="Active('@item.ID')">启用</a>
+            }
+            else
+            {
+                <a onclick="AntiActive('@item.ID')">禁用</a>
+            }
+
             <a>测试</a>
             <a onclick="DeleteConfirm('@item.ID')">删除</a>
         </div>
@@ -62,7 +70,6 @@
 
 <script>
     function reload() {
-        debugger;
         window.location.reload();
     }
 
@@ -73,6 +80,16 @@
                 window.location.reload();
             })
         }
+    }
+    function Active(id) {
+        $.post("/Creator/Active", { id: id }, function (data) {
+            window.location.reload();
+        })
+    }
+    function AntiActive(id) {
+        $.post("/Creator/AntiActive", { id: id }, function (data) {
+            window.location.reload();
+        })
     }
 
 </script>

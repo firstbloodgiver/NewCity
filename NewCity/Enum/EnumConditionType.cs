@@ -12,7 +12,15 @@ namespace NewCity.Enum
         增加 = 0,
         减少 = 1,
         赋值 = 2,
-        场景转移 = 3
+        场景转移 = 3,
+        结束处理 = 4
+    }
+
+    public enum enumStoryStatus
+    {
+        测试 = 0,
+        结束 = 1,
+        进行中 = 2,
     }
 
     public enum enumCharacterType { 作家 = 1 };

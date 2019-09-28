@@ -218,30 +218,6 @@ namespace NewCity.Data.Migrations
                     b.ToTable("CharacterLog");
                 });
 
-            modelBuilder.Entity("NewCity.Models.CharacterSchedule", b =>
-                {
-                    b.Property<Guid>("ID")
-                        .ValueGeneratedOnAdd();
-
-                    b.Property<Guid>("CharacterID");
-
-                    b.Property<bool>("IsMain");
-
-                    b.Property<bool>("IsStory");
-
-                    b.Property<Guid>("StoryCardID");
-
-                    b.Property<Guid>("StorySeriesID");
-
-                    b.Property<Guid?>("UserCharacterID");
-
-                    b.HasKey("ID");
-
-                    b.HasIndex("UserCharacterID");
-
-                    b.ToTable("CharacterSchedule");
-                });
-
             modelBuilder.Entity("NewCity.Models.Creator", b =>
                 {
                     b.Property<Guid>("ID")
@@ -360,11 +336,15 @@ namespace NewCity.Data.Migrations
 
                     b.Property<string>("IMG");
 
+                    b.Property<bool>("IsHead");
+
                     b.Property<string>("StoryName");
 
                     b.Property<Guid>("StorySeriesID");
 
                     b.Property<string>("Text");
+
+                    b.Property<string>("Title");
 
                     b.HasKey("ID");
 
@@ -406,13 +386,11 @@ namespace NewCity.Data.Migrations
 
                     b.Property<string>("IMG");
 
-                    b.Property<bool>("IsPlayed");
-
-                    b.Property<bool>("IsTest");
-
                     b.Property<Guid>("LocationID");
 
                     b.Property<string>("SeriesName");
+
+                    b.Property<int>("Status");
 
                     b.Property<string>("Text");
 
@@ -475,6 +453,30 @@ namespace NewCity.Data.Migrations
                     b.ToTable("UserCharacter");
                 });
 
+            modelBuilder.Entity("NewCity.Models.UserSchedule", b =>
+                {
+                    b.Property<Guid>("ID")
+                        .ValueGeneratedOnAdd();
+
+                    b.Property<Guid>("CharacterID");
+
+                    b.Property<bool>("IsMain");
+
+                    b.Property<bool>("IsStory");
+
+                    b.Property<int>("ScheduleStatus");
+
+                    b.Property<Guid>("StoryCardID");
+
+                    b.Property<Guid>("StorySeriesID");
+
+                    b.Property<Guid>("UserID");
+
+                    b.HasKey("ID");
+
+                    b.ToTable("UserSchedule");
+                });
+
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
                 {
                     b.HasOne("Microsoft.AspNetCore.Identity.IdentityRole")
@@ -518,13 +520,6 @@ namespace NewCity.Data.Migrations
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade);
-                });
-
-            modelBuilder.Entity("NewCity.Models.CharacterSchedule", b =>
-                {
-                    b.HasOne("NewCity.Models.UserCharacter")
-                        .WithMany("CharacterSchedules")
-                        .HasForeignKey("UserCharacterID");
                 });
 
             modelBuilder.Entity("NewCity.Models.StoryCard", b =>

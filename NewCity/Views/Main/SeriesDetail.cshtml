@@ -1,0 +1,42 @@
+﻿
+@{
+    ViewData["Title"] = "StoryDetail";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+@model StorySeries;
+
+<h2>StoryDetail</h2>
+<button onclick="ToList()">返回</button>
+<div>
+    <h1>@Model.SeriesName</h1>
+    <div class="col-md-4"><img src="@Model.IMG" /></div>
+    <div class="col-md-8"><p>@Model.Text</p></div>
+    @if (ViewBag.HadAdd)
+    {
+        <button onclick="ToList()">返回列表</button>
+    }
+    else
+    {
+        <button onclick="AddList()">添加到列表</button>
+    }
+
+</div>
+
+<script>
+    function ToList() {
+        window.location.href = '/Main/StorySelect'
+    }
+    function AddList() {
+        let SeriesID = '@Model.ID';
+        $.post("/Main/AddList", { SeriesID: SeriesID }, function (data) {
+            debugger;
+            if (data == true) {
+                window.location.reload();
+            }
+            else {
+                alert("发生了一个错误！")
+            }
+            
+        })
+    }
+</script>

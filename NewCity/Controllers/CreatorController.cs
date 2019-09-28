@@ -18,7 +18,6 @@ namespace NewCity.Controllers
 
         public IActionResult Index()
         {
-
             string AccoundID = _userManager.GetUserId(User);
             if (_SignInManager.IsSignedIn(User)|| AccoundID != null)
             {
@@ -58,5 +57,29 @@ namespace NewCity.Controllers
             return Json(false);
         }
 
+        [HttpPost]
+        public async Task<IActionResult> Active(string id)
+        {
+            var storySeries = await _context.StorySeries.FirstOrDefaultAsync(m => m.ID == Guid.Parse(id));
+            if (storySeries.Author == GetUserId())
+            {
+                storySeries.Status = Enum.enumStoryStatus.进行中;
+                await _context.SaveChangesAsync();
+                return Json(true);
+            }
+            return Json(false);
+        }
+        [HttpPost]
+        public async Task<IActionResult> AntiActive(string id)
+        {
+            var storySeries = await _context.StorySeries.FirstOrDefaultAsync(m => m.ID == Guid.Parse(id));
+            if (storySeries.Author == GetUserId())
+            {
+                storySeries.Status = Enum.enumStoryStatus.测试;
+                await _context.SaveChangesAsync();
+                return Json(true);
+            }
+            return Json(false);
+        }
     }
 }

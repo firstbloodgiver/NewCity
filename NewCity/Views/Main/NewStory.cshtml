@@ -21,7 +21,6 @@
         <h1>@i.SeriesName</h1>
         <p>@i.Text</p>
         <button onclick="seriesdetail('@i.ID')">详情</button>
-        <button>添加到列表</button>
     </div>
 }
 
@@ -48,7 +47,8 @@
 
 <script>
     function seriesdetail(SeriesID) {
-        window.location.href = '/Main/SeriesDetail?StorySeriesID=' + storySeriesID
+        debugger;
+        window.location.href = '/Main/SeriesDetail?SeriesID=' + SeriesID
     }
 
 </script>

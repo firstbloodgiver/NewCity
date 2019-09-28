@@ -101,50 +101,24 @@
     </div>
     <div id="main" class="col-md-6 container-fluid">
         <div id="main-content">
-            @if (ViewBag.InLocation && ViewBag.ReadList != null)
-            {
-                <div class="container-fluid">
-                    <div class="col-md-4 main-content-img">
-                        <p>123</p>
-                        <img id="Img" src="@ViewBag.ReadList.IMG" />
-                    </div>
-                    <div class="col-md-8 main-content-text">
-                        <p id="Text">@ViewBag.ReadList.Text</p>
-                        <div class="row" id="Option">
-                            @foreach (var option in ViewBag.OperaList)
-                            {
-                                <div class="row">
-                                    <p>@option.StoryName</p>
-                                    <button class="btn-default" onclick="NextCard('@option.ID')">继续</button>
-                                </div>
-                            }
-                        </div>
+            <div class="container-fluid">
+                <div class="col-md-4 main-content-img">
+                    <p>123</p>
+                    <img id="Img" src="@ViewBag.StoryCard.IMG" />
+                </div>
+                <div class="col-md-8 main-content-text">
+                    <p id="Text">@ViewBag.StoryCard.Text</p>
+                    <div class="row" id="Option">
+                        @foreach (var option in ViewBag.StoryOptions)
+                        {
+                            <div class="row">
+                                <p>@option.Text</p>
+                                <button class="btn-default" onclick="NextCard('@option.ID')">继续</button>
+                            </div>
+                        }
                     </div>
                 </div>
-                
-            }
-            else if (!ViewBag.InLocation && ViewBag.ReadList != null)
-            {
-                <div class="container-fluid">
-                    <div class="col-md-4  main-content-img">
-                        <p>123</p>
-                        <img id="Img" src="@(ViewBag.ReadList.IMG)" />
-                    </div>
-                    <div class="col-md-8  main-content-text">
-                        <p id="Text">@ViewBag.ReadList.Text</p>
-                        <div id="Option">
-                            @foreach (var option in ViewBag.ReadList.StoryOptions)
-                            {
-                                <div class="col-md-12 option-content"  onclick="NextCard('@option.ID')">
-                                    @option.Text
-                                </div>
-                            }
-                        </div>
-                    </div>
-                    
-                </div>
-                
-            }
+            </div>
         </div>
     </div>
     <div id="right" class="col-md-3" >
@@ -187,12 +161,15 @@
 
 
     function NextCard(optionID) {
-
+     
         $.post(
             '/Main/NextCard',
             { optionID: optionID },
             function (result) {
-                
+                if (result == "GameOver") {
+                    window.location.href = '/Main/StorySelect/'
+                }
+                debugger;
                 CleanContent();
                 AddContent(result.text);
                 AddOption(result.storyOptions)
@@ -257,11 +234,9 @@
     //获取任务列表
     function GetSchedule() {
         $.get('/Main/GetSchedule', function (data) { 
- 
             let jsonObj = JSON.parse(data);
             let html = '';
             for (let i in jsonObj) {
-          
                 html += "<div class='row'>" + jsonObj[i].SeriesName + ":" + jsonObj[i].Text + "</div>"
             }
             let content = "<div class='row'>" + html + "</div>";

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using NewCity.Enum;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -26,14 +27,9 @@ namespace NewCity.Models
         public string flag { get; set; }
 
         /// <summary>
-        /// 是否已经游玩
+        /// 故事状态
         /// </summary>
-        public bool IsPlayed { get; set; }
-
-        /// <summary>
-        /// 是否测试
-        /// </summary>
-        public bool IsTest { get; set; }
+        public enumStoryStatus Status { get; set; }
 
         public ICollection<StoryCard> StoryCards { get; set; }
     }

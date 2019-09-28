@@ -26,12 +26,7 @@ namespace NewCity.Models
         /// 是否启用
         /// </summary>
         public bool IsActivate { get; set; }
-        
-
-        /// <summary>
-        /// 角色故事进度
-        /// </summary>
-        public ICollection<CharacterSchedule> CharacterSchedules { get; set; }
+       
 
         //////////////////////////////////////////基础能力////////////////////////////////////////////////////////
         

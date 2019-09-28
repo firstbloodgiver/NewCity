@@ -1,5 +1,5 @@
 ﻿@model IEnumerable<NewCity.Models.StoryCard>
-@{ 
+@{
     StoryCard LastStoryCard = ViewBag.LastCard as StoryCard;
 }
 <script src="~/js/enum.js"></script>
@@ -18,13 +18,13 @@
                 </div>
             </div>
             <div class="row">
-                <div class="col-md-3" id="Title"></div>
+                <div class="col-md-3" id="TitleContent"></div>
             </div>
             <div class="row">
                 <div class="col-md-4" id="Img">
 
                 </div>
-                
+
                 <div class="col-md-8" id="Content">
 
                 </div>
@@ -51,7 +51,7 @@
         <div class="modal-content">
             <div class="modal-header">
                 <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-                <h4 class="modal-title" id="myModalLabel">模态框（Modal）标题</h4>
+                <h4 class="modal-title" id="myModalLabel">条件</h4>
             </div>
             <div class="modal-body">
                 <div id="Condition"></div>
@@ -61,13 +61,50 @@
     </div>
 </div>
 
+<!--条件状态选择模态框-->
+<div id="StatusModel" class="model fade">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                <h4 class="modal-title" id="myModalLabel">条件选择</h4>
+            </div>
+            <div class="modal-body">
+                <div id="StatusSelectoperation">
+                    <button onclick="addstatus()">+</button>
+                </div>
+                <ul id="StatusSelect"></ul>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!--新增状态选择模态框-->
+<div id="StatusAddModel" class="model fade">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                <h4 class="modal-title" id="myModalLabel">新增状态</h4>
+            </div>
+            <div class="modal-body">
+                <input name="status" id="status" />
+                <button type="submit" onclick="confidstatus()">确定</button>
+                <button onclick="cancelstatus()">取消</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
 <!--效果模态框-->
 <div id="EffectModel" class="modal fade">
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
                 <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-                <h4 class="modal-title" id="myModalLabel">模态框（Modal）标题</h4>
+                <h4 class="modal-title" id="myModalLabel">效果</h4>
             </div>
             <div class="modal-body">
                 <div id="Effect"></div>
@@ -83,7 +120,7 @@
         <div class="modal-content">
             <div class="modal-header">
                 <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-                <h4 class="modal-title" id="myModalLabel">模态框（Modal）标题</h4>
+                <h4 class="modal-title" id="myModalLabel">下一页</h4>
             </div>
             <div class="modal-body">
 
@@ -92,13 +129,13 @@
     </div>
 </div>
 
+
+
 <script>
     //将来自控制器的故事卡转换为js对象,并显示到页面
     var CardObj;
-
     $(function () {
         Serialize()
-
         CreaterView(CardObj)
     });
 
@@ -108,11 +145,11 @@
         EmptyView()
 
         let content = "<textarea id='Text' style=height:250px;width:100%>" + card.text+"</textarea>"
-        let title = "<input value=" + card.title +" />";
+        let title = "<input id='Title' value=" + card.title +" />";
 
         $("#StoryId").append(card.id)
-        $("#StoryName").append(card.storyName)  
-        $("#Title").append(title)
+        $("#StoryName").append(card.storyName)
+        $("#TitleContent").append(title)
         $("#Img").append(card.img)
         $("#Content").append(content)
         $("#BackgroundIMG").append(card.backgroundIMG)
@@ -121,7 +158,7 @@
             for (let i = 0; i < card.storyOptions.length; i++) {
                 CreateOption(i);
             }
-        } 
+        }
     }
     function CreateOption(i) {
         let option = "";
@@ -172,7 +209,6 @@
         for (let i = 0; i < CardObj.storyOptions.length; i++) {
             //保存选项文本
             CardObj.storyOptions[i].text = $("#option" + i).val();
-
             //文本化条件
             CardObj.storyOptions[i].condition = JSON.stringify(CardObj.storyOptions[i].condition);
             //文本化效果
@@ -184,7 +220,7 @@
     }
 
     //返回到树界面
-    function ReturnTree(storySeriesID) { 
+    function ReturnTree(storySeriesID) {
         window.location.href = '/CreateStory/ReturnTree?StorySeriesID=' + storySeriesID
     }
 
@@ -200,6 +236,7 @@
         SerializeOption();
     }
     function Serialize() {
+        debugger;
         CardObj = @Json.Serialize(LastStoryCard);
 
         SerializeOption();
@@ -214,7 +251,7 @@
         else {
             CardObj.storyOptions = new Array();
         }
-        
+
     }
 
 
@@ -274,16 +311,16 @@
         }
         let context =
             "<div id='conditionid" + condition +"'>"+
-            "<input class='conditionname' value='" + name + "'/>" +
+            "<input readonly onclick='selectstatus()'  class='conditionname' value='" + name + "'/>" +
             "<select class='conditionidselect'>"
             + "<option value='1'>></option>"
             + "<option value='2'><</option>"
             + "<option value='3'>=</option>"
             + "<option value='4'>≠</option>"
             + "<select/>" +
-            "<input  class='conditionvalue'  value='" + value + "'/>" + 
+            "<input  class='conditionvalue'  value='" + value + "'/>" +
             "<button onclick='ConditionCancel(" + condition + "," + storyoption + ")'>取消</button>" +
-            "</div>" 
+            "</div>"
             $("#conditionidselect" + condition).val(type)
         $('#Condition').append(context)
 
@@ -299,8 +336,43 @@
     function ConditionCancel(condition, storyoption) {
         $("#conditionid" + condition).remove();
     }
+
+    //选择条件状态
+    function selectstatus() {
+        $('#ConditionModel').modal('hide')
+        $('#StatusSelect').empty();
+        $('#StatusModel').model('show')
+        //获取该故事系列状态
+        //加载到页面
+        $.post("/CreateStory/getStatus", { StorySeriesID: CardObj.storySeriesID }, function (data) {
+            debugger;  
+            let li;
+            for (let i in data) {
+                 li += "<li>" + data + "</li>";
+            }
+            $('#StatusSelect').append(li);
+        })
+    }
+
+    function addstatus() {
+        $('#StatusModel').model('hide')
+        $('#StatusAddModel').model('show')
+    }
+
+    function confidstatus(){
+        $.post('/CreateStory/Addstatus', { storyseries: CardObj.storySeriesID, status: $('#status').value()}, function (data) {
+            $('#StatusModel').model('show')
+            $('#StatusAddModel').model('hide')
+        });
+    }
+
+    function cancelstatus() {
+        $('#StatusModel').model('show')
+        $('#StatusAddModel').model('hide')
+    }
+
     /////////////////////////////////end
-    
+
     /////////////////////////////////效果
     //设置效果
     function CreateEffect(i) {
@@ -338,6 +410,7 @@
             + "<option value='0'>增加</option>"
             + "<option value='1'>减少</option>"
             + "<option value='2'>赋值</option>"
+            + "<option value='4'>结束故事</option>"
             + "<select/>" +
             "<input  class='effectvalue'  value='" + value + "'/>" +
             "<button onclick='ConditionCancel(" + effect + "," + storyoption + ")'>取消</button>" +
@@ -347,6 +420,8 @@
 
         $("#Effect option[value='"+ type +"']").attr("selected", true);
     }
+
+
 
     function EmptyEffect() {
         $('#Effect').empty();
