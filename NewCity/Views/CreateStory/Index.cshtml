@@ -62,12 +62,12 @@
 </div>
 
 <!--条件状态选择模态框-->
-<div id="StatusModel" class="model fade">
+<div id="StatusModel" class="modal fade">
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
                 <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-                <h4 class="modal-title" id="myModalLabel">条件选择</h4>
+                <h4 class="modal-title">条件选择</h4>
             </div>
             <div class="modal-body">
                 <div id="StatusSelectoperation">
@@ -79,13 +79,16 @@
     </div>
 </div>
 
+
+
 <!--新增状态选择模态框-->
-<div id="StatusAddModel" class="model fade">
+
+<div id="StatusAddModel" class="modal fade">
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
                 <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-                <h4 class="modal-title" id="myModalLabel">新增状态</h4>
+                <h4 class="modal-title">新增状态</h4>
             </div>
             <div class="modal-body">
                 <input name="status" id="status" />
@@ -95,6 +98,7 @@
         </div>
     </div>
 </div>
+
 
 
 
@@ -341,7 +345,8 @@
     function selectstatus() {
         $('#ConditionModel').modal('hide')
         $('#StatusSelect').empty();
-        $('#StatusModel').model('show')
+        $('#StatusModel').modal('show')
+        debugger;
         //获取该故事系列状态
         //加载到页面
         $.post("/CreateStory/getStatus", { StorySeriesID: CardObj.storySeriesID }, function (data) {
@@ -355,20 +360,20 @@
     }
 
     function addstatus() {
-        $('#StatusModel').model('hide')
-        $('#StatusAddModel').model('show')
+        $('#StatusModel').modal('hide')
+        $('#StatusAddModel').modal('show')
     }
 
     function confidstatus(){
         $.post('/CreateStory/Addstatus', { storyseries: CardObj.storySeriesID, status: $('#status').value()}, function (data) {
-            $('#StatusModel').model('show')
-            $('#StatusAddModel').model('hide')
+            $('#StatusModel').modal('show')
+            $('#StatusAddModel').modal('hide')
         });
     }
 
     function cancelstatus() {
-        $('#StatusModel').model('show')
-        $('#StatusAddModel').model('hide')
+        $('#StatusModel').modal('show')
+        $('#StatusAddModel').modal('hide')
     }
 
     /////////////////////////////////end
