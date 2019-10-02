@@ -82,7 +82,8 @@ namespace NewCity.Controllers
                 //如果是系列作者才能查看
                 if(_context.StorySeries.AsNoTracking().Where(a => a.ID == StorySeriesID && a.Author == userid).FirstOrDefault() != null)
                 {
-                    var statuslist = _context.StoryStatus.AsNoTracking().Where(a => a.StorySeries == StorySeriesID.ToString()).ToList();
+                    List<StoryStatus> statuslist = _context.StoryStatus.AsNoTracking().Where(a => a.StorySeries == StorySeriesID.ToString()).ToList();
+
                     return Json(statuslist); 
                 }
 

@@ -13,3 +13,5 @@ function guid() {
     return (S4() + S4() + "-" + S4() + "-" + S4() + "-" + S4() + "-" + S4() + S4() + S4());
 }
 
+//角色状态   行动力 幸运 速度 力量 智力 社会经验 社会地位 善恶值
+var characterSyayus = ["ActionPoints", "Lucky", "Speed", "Strength", "Intelligence", "Experience", "Status", "Moral"] 
