@@ -428,6 +428,15 @@ namespace NewCity.Controllers
                 foreach (var status in storyStatuses)
                 {
                     var DBstatus = _context.StoryStatus.AsNoTracking().Where(a => a.StorySeries == StorySeriesID && a.Name == status.Name).FirstOrDefault();
+                    if(DBstatus == null)
+                    {
+                        List<string> characterSyayus = new List<string> { "ActionPoints", "Lucky", "Speed", "Strength", "Intelligence", "Experience", "Status", "Moral" };
+                        int pst = characterSyayus.IndexOf(Condition); //位置
+                        if(pst != -1)
+                        {
+                            DBstatus = 
+                        }
+                    }
                     if (DBstatus != null)
                     {
                         int dbstatus = Convert.ToInt32(DBstatus.Value);

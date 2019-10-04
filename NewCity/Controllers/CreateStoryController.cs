@@ -313,16 +313,29 @@ namespace NewCity.Controllers
         }
 
         [HttpPost]
-        [ValidateAntiForgeryToken]
         public IActionResult Addstatus(string storyseries, string status)
         {
-            StoryStatus storyStatus = new StoryStatus() {
-                ID = Guid.NewGuid(),
-                StorySeries = storyseries,
-                Name = status
+            try
+            {
+                StoryStatus storyStatus = new StoryStatus()
+                {
+                    ID = Guid.NewGuid(),
+                    StorySeries = storyseries,
+                    Name = status
 
-            };
-            return Json(false);
+                };
+                if( _context.StoryStatus.Where(a=>a.StorySeries == storyseries && a.Name.Equals(status)).FirstOrDefault() == null)
+                {
+                    _context.StoryStatus.Add(storyStatus);
+                    _context.SaveChanges();
+                    return Json(true);
+                }
+                return Json("不允许重复状态名！");
+            }
+            catch
+            {
+                return Json("保存时发生错误！");
+            }
         }
     }
 

@@ -207,7 +207,7 @@
         CreateOption(CardObj.storyOptions.length-1)
     }
     function SaveCard() {
-        debugger;
+
         CardObj.title = $('#Title').val();
         CardObj.text = $('#Text').val();
         for (let i = 0; i < CardObj.storyOptions.length; i++) {
@@ -240,7 +240,7 @@
         SerializeOption();
     }
     function Serialize() {
-        debugger;
+
         CardObj = @Json.Serialize(LastStoryCard);
 
         SerializeOption();
@@ -313,13 +313,12 @@
             value = CardObj.storyOptions[storyoption].condition[condition].Value
             type = CardObj.storyOptions[storyoption].condition[condition].Type
         }
-        debugger;
         let context =
             "<div id='conditionid" + condition +"'>"+
-            "<input id='" + condition + '-' + storyoption + "' readonly onclick='selectstatus('" + condition + '-' + storyoption+"')'  class='conditionname' value='" + name + "'/>" +
+            "<input id='" + condition + '-' + storyoption + "' readonly onclick=selectstatus('" + condition + '-' + storyoption+"') class='conditionname' value='" + name + "'/>" +
             "<select class='conditionidselect'>"
             + "<option value='1'>></option>"
-            + "<option value='2'><</option>"
+            + "<option value='2'><</option>" 
             + "<option value='3'>=</option>"
             + "<option value='4'>≠</option>"
             + "<select/>" +
@@ -347,18 +346,20 @@
         $('#ConditionModel').modal('hide')
         $('#StatusSelect').empty();
         $('#StatusModel').modal('show')
-        debugger;
+
         //获取该故事系列状态
         //加载到页面
         $.post("/CreateStory/getStatus", { StorySeriesID: CardObj.storySeriesID }, function (data) {
-            debugger;  
-            let li;
+ debugger;
+            let li = '';
+            li += '<h3>故事状态</h3>'
             for (let i in data) {
-                li += "<li onclick=clickstatus(" + data[i] + "," + option+")>" + data[i] + "</li>";
+                li += "<li onclick=clickstatus('" + data[i].name + "','" + option + "')>" + data[i].name + "</li>";
             }
             li += '<hr/>'
+            li += '<h3>人物状态</h3>'
             for (let i in characterSyayus) {
-                li += "<li onclick=clickstatus(" + characterSyayus[i] + "," + option +")>" + characterSyayus[i] + "</li>";
+                li += "<li onclick=clickstatus('" + characterSyayus[i] + "','" + option +"')>" + characterSyayus[i] + "</li>";
             }
 
             $('#StatusSelect').append(li);
@@ -370,10 +371,16 @@
         $('#StatusAddModel').modal('show')
     }
 
-    function confidstatus(){
-        $.post('/CreateStory/Addstatus', { storyseries: CardObj.storySeriesID, status: $('#status').value()}, function (data) {
-            $('#StatusModel').modal('show')
-            $('#StatusAddModel').modal('hide')
+    function confidstatus() {
+        
+        $.post('/CreateStory/Addstatus', { storyseries: CardObj.storySeriesID, status: $('#status').val() }, function (data) {
+            if (data == 'true') {
+                //$('#StatusModel').modal('show')
+                $('#StatusAddModel').modal('hide')
+            }
+            else {
+                alert(data)
+            }
         });
     }
 
