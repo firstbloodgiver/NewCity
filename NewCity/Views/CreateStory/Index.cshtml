@@ -6,7 +6,7 @@
 <script src="~/lib/jquery/dist/jquery.min.js"></script>
 <!--故事卡包装为树。新建下一故事卡要在故事卡里面建-->
 <div class="container-fluid">
-    <div class="btn" onclick="ReturnTree('@LastStoryCard.StorySeriesID')">返回到树</div>
+    <button type="button" class="btn btn-primary" onclick="ReturnTree('@LastStoryCard.StorySeriesID')">返回到树</button>
     <div class="row">
         <div class="col-md-12">
             <div class="row">
@@ -317,10 +317,10 @@
             "<div id='conditionid" + condition +"'>"+
             "<input id='" + condition + '-' + storyoption + "' readonly onclick=selectstatus('" + condition + '-' + storyoption+"') class='conditionname' value='" + name + "'/>" +
             "<select class='conditionidselect'>"
-            + "<option value='1'>></option>"
-            + "<option value='2'><</option>" 
-            + "<option value='3'>=</option>"
-            + "<option value='4'>≠</option>"
+            + "<option value='0'>></option>"
+            + "<option value='1'><</option>" 
+            + "<option value='2'>=</option>"
+            + "<option value='3'>≠</option>"
             + "<select/>" +
             "<input  class='conditionvalue'  value='" + value + "'/>" +
             "<button onclick='ConditionCancel(" + condition + "," + storyoption + ")'>取消</button>" +

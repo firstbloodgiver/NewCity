@@ -11,7 +11,9 @@
         width: 160px;
         border: 1px solid blue;
     }
-
+    .on{
+        border-color:brown
+    }
    
 </style>
 <script src="~/js/jsplumb.js"></script>
@@ -54,10 +56,13 @@
             let div = '';
             for (var j in StoryCards[i].storyCard) {
                 let context = StoryCards[i].storyCard[j].storyCard.id + StoryCards[i].storyCard[j].storyCard.title;
-                div += "<div id='" + StoryCards[i].storyCard[j].storyCard.id + "' class='StoryCard' style='left:"+180*j+"px' ondblclick  =ToCard('" + StoryCards[i].storyCard[j].storyCard.id + "','" + StoryCards[i].storyCard[j].storyCard.storySeriesID + "') style='float:left;margin-left:5px;margin-top:5px'>" + context+"</div>";
+                div += "<div id='" + StoryCards[i].storyCard[j].storyCard.id + "' class='StoryCard' style='left:" + 180 * j + "px' onclick=select('" +
+                    StoryCards[i].storyCard[j].storyCard.id + "') ondblclick  =ToCard('" +
+                    StoryCards[i].storyCard[j].storyCard.id + "','" + StoryCards[i].storyCard[j].storyCard.storySeriesID + "') style='float:left;margin-left:5px;margin-top:5px'>" +
+                    context + "</div>";
             }
             let h = i == 0 ? 0 : 1;
-            let content = "<div class='row' style='margin-top:"+80*h+"px'>" + div + "</div>";
+            let content = "<div class='row' style='margin-top:"+90*h+"px'>" + div + "</div>";
             $("#contener").append(content);
         }
     }
@@ -73,10 +78,21 @@
 
 </script>
 <script>
+    var selectcard;
     function ReturnList() {
         window.location.href ='/Creator/Index/'
     }
+    function DelectCard() {
+
+    }
+    function select(cardid) {
+        $('.StoryCard').removeClass("on");
+        $('#'+cardid).addClass("on");
+        selectcard = cardid;
+    }
 </script>
 <button onclick="ReturnList()">返回</button>
+<button onclick="DelectCard()">删除</button>
+
 <hr />
 <div id="contener"></div>
