@@ -25,7 +25,7 @@ namespace NewCity.Controllers
         /// </summary>
         /// <param name="id">故事卡片</param>
         /// <returns></returns>
-        public IActionResult Index(string id)             
+        public IActionResult Index(string id)
         {
             try
             {
@@ -69,44 +69,13 @@ namespace NewCity.Controllers
         }
 
         /// <summary>
-        /// 获取故事系列的状态
-        /// </summary>
-        /// <param name="StorySeriesID"></param>
-        /// <returns></returns>
-        [HttpPost]
-        public JsonResult getStatus(Guid StorySeriesID)
-        {
-            Guid userid = GetUserId();
-            try
-            {
-                //如果是系列作者才能查看
-                if(_context.StorySeries.AsNoTracking().Where(a => a.ID == StorySeriesID && a.Author == userid).FirstOrDefault() != null)
-                {
-                    List<StoryStatus> statuslist = _context.StoryStatus.AsNoTracking().Where(a => a.StorySeries == StorySeriesID.ToString()).ToList();
-
-                    return Json(statuslist); 
-                }
-
-            }
-            catch
-            {
-                return Json(false);
-            }
-            return Json(false);
-        }
-
-        /// <summary>
-        /// 故事卡树
+        /// 故事卡树界面
         /// </summary>
         List<StoryCardTree> storyCardTrees = new List<StoryCardTree>();
         List<StoryCard> storyCards = new List<StoryCard>();
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="id">StorySeriesID</param>
-        /// <returns></returns>
         public IActionResult FlowChart(string id)
         {
+            #region 故事卡树
             List<StoryCardTree> StoryCardTrees = new List<StoryCardTree>();
             var obj = _context.StoryCard.AsNoTracking().Where(a => a.StorySeriesID == Guid.Parse(id)).Include(a => a.StoryOptions).ToList().OrderBy(a => a.IsHead);
             if(obj.Count() == 0)
@@ -147,6 +116,10 @@ namespace NewCity.Controllers
             }
 
             ViewBag.StoryCardTree = Trees;
+            #endregion
+            #region 故事状态
+            ViewBag.StoryStatus = _context.StoryStatus.AsNoTracking().Where(a => a.StorySeries == id).ToList();
+            #endregion
             return View();
         }
 
@@ -312,8 +285,41 @@ namespace NewCity.Controllers
             }
         }
 
+        /// <summary>
+        /// 删除卡片
+        /// </summary>
+        /// <param name="cardid"></param>
+        /// <returns></returns>
         [HttpPost]
-        public IActionResult Addstatus(string storyseries, string status)
+        public JsonResult DeleteCard(Guid cardid)
+        {
+            try
+            {
+                var card = _context.StoryCard.Where(a => a.ID == cardid).First();
+                var series = _context.StorySeries.AsNoTracking().Where(a => a.ID == card.StorySeriesID).FirstOrDefault();
+                if (series != null && series.Author == GetUserId())
+                {
+                    //删除选项
+                    _context.RemoveRange(_context.StoryOption.Where(a => a.StoryCardID == cardid));
+                    _context.Remove(card);
+                    _context.SaveChanges();
+                }
+                return Json("true");
+            }
+            catch
+            {
+                return Json("false");
+            }
+        }
+
+        /// <summary>
+        /// 增加状态
+        /// </summary>
+        /// <param name="storyseries"></param>
+        /// <param name="status"></param>
+        /// <returns></returns>
+        [HttpPost]
+        public JsonResult Addstatus(string storyseries, string status)
         {
             try
             {
@@ -336,6 +342,59 @@ namespace NewCity.Controllers
             {
                 return Json("保存时发生错误！");
             }
+        }
+
+        /// <summary>
+        /// 删除状态
+        /// </summary>
+        /// <param name="statusID"></param>
+        /// <returns></returns>
+        [HttpPost]
+        public JsonResult removestatus(Guid statusID)
+        {
+            try
+            {
+                var status = _context.StoryStatus.Where(a => a.ID == statusID).First();
+                var series = _context.StorySeries.AsNoTracking().Where(a => a.ID == Guid.Parse(status.StorySeries)).FirstOrDefault();
+                if(series != null)
+                {
+                    _context.Remove(status);
+                    _context.SaveChanges();
+                    return Json("true");
+                }
+                return Json("未找到该状态！");
+            }
+            catch
+            {
+                return Json("未找到该状态！");
+            }
+        }
+
+        /// <summary>
+        /// 编辑状态
+        /// </summary>
+        /// <param name="statusID"></param>
+        /// <returns></returns>
+        [HttpPost]
+        public JsonResult editstatus(Guid statusID,string status)
+        {
+            try
+            {
+                var DBstatus = _context.StoryStatus.Where(a => a.ID == statusID).First();
+                var series = _context.StorySeries.AsNoTracking().Where(a => a.ID == Guid.Parse(DBstatus.StorySeries)).FirstOrDefault();
+                if (series != null)
+                {
+                    DBstatus.Name = status;
+                    _context.SaveChanges();
+                    return Json("true");
+                }
+                return Json("未找到该状态！");
+            }
+            catch
+            {
+                return Json("未找到该状态！");
+            }
+            
         }
     }
 

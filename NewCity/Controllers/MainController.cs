@@ -219,21 +219,49 @@ namespace NewCity.Controllers
                         List<Istatus> storyStatuses = JsonConvert.DeserializeObject<List<Istatus>>(opti.Effect);
                         foreach (var obj in storyStatuses)
                         {
-                            switch (Convert.ToInt32(obj.Type))
+                            StoryStatus status = _context.StoryStatus.Where(a => a.StorySeries == obj.StorySeries && a.Name == obj.Name).FirstOrDefault();
+                            if(Convert.ToInt32(obj.Type) == (int)enumEffectType.结束处理)
                             {
-                                case (int)enumEffectType.增加:
-                                    Increase(obj);
-                                    break;
-                                case (int)enumEffectType.减少:
-                                    Reduce(obj);
-                                    break;
-                                case (int)enumEffectType.赋值:
-                                    Assign(obj);
-                                    break;
-                                case (int)enumEffectType.结束处理:
-                                    GameOver(Schedule.StorySeriesID);
-                                    return result = Json("GameOver");
-                                    
+                                GameOver(Schedule.StorySeriesID);
+                                return result = Json("GameOver");
+                            }
+                            if (status != null)
+                            {
+                                status.Value = ExeCharacterEffect(float.Parse(status.Value), float.Parse(obj.Value), obj.Type).ToString();
+                                _context.StoryStatus.Update(status);
+                            }
+                            else
+                            {
+                                UserSchedule schedule = _context.UserSchedule.AsNoTracking().Where(a => a.UserID == GetUserId() && a.StorySeriesID == Schedule.StorySeriesID).First();
+                                UserCharacter character = _context.UserCharacter.Where(a => a.ID == schedule.CharacterID).First();
+                                switch (obj.Name)
+                                {
+                                    case ("ActionPoints"):
+                                        character.ActionPoints = ExeCharacterEffect(character.ActionPoints, float.Parse(obj.Value),obj.Type);
+                                        break;
+                                    case ("Lucky"):
+                                        character.Lucky = ExeCharacterEffect(character.Lucky, float.Parse(obj.Value), obj.Type);
+                                        break;
+                                    case ("Speed"):
+                                        character.Speed = ExeCharacterEffect(character.Speed, float.Parse(obj.Value), obj.Type);
+                                        break;
+                                    case ("Strength"):
+                                        character.Strength = ExeCharacterEffect(character.Strength, float.Parse(obj.Value), obj.Type);
+                                        break;
+                                    case ("Intelligence"):
+                                        character.Intelligence = ExeCharacterEffect(character.Intelligence, float.Parse(obj.Value), obj.Type);
+                                        break;
+                                    case ("Experience"):
+                                        character.Experience = ExeCharacterEffect(character.Experience, float.Parse(obj.Value), obj.Type);
+                                        break;
+                                    case ("Status"):
+                                        character.Status = ExeCharacterEffect(character.Status, float.Parse(obj.Value), obj.Type);
+                                        break;
+                                    case ("Moral"):
+                                        character.Moral = ExeCharacterEffect(character.Moral, float.Parse(obj.Value), obj.Type);
+                                        break;
+                                }
+                                _context.SaveChanges();
                             }
                         }
                     }
@@ -250,6 +278,31 @@ namespace NewCity.Controllers
                 return Json(false);
             }
         }
+
+        /// <summary>
+        /// 效果执行
+        /// </summary>
+        /// <param name="status"></param>
+        /// <param name="num"></param>
+        /// <param name="type"></param>
+        /// <returns></returns>
+        private float ExeCharacterEffect(float status,float num, string type)
+        {
+            switch (Convert.ToInt32(type))
+            {
+                case (int)enumEffectType.增加:
+                    status += num;
+                    break;
+                case (int)enumEffectType.减少:
+                    status -= num;
+                    break;
+                case (int)enumEffectType.赋值:
+                    status = num;
+                    break;
+            }
+            return status;
+        }
+
 
         /// <summary>
         /// 获取人物属性
@@ -488,39 +541,12 @@ namespace NewCity.Controllers
             return View();
         }
 
-        
 
-        #region 卡片执行操作
-        private void Increase(Istatus storyStatus)
-        {
-            StoryStatus status = _context.StoryStatus.Where(a => a.StorySeries == storyStatus.StorySeries && a.Name == storyStatus.Name).FirstOrDefault();
-            if (status != null)
-            {
-                status.Value = (Convert.ToInt32(status.Value) + Convert.ToInt32(storyStatus.Value)).ToString();
-                _context.StoryStatus.Update(status);
-
-            }
-        }
-        private void Reduce(Istatus storyStatus)
-        {
-            StoryStatus status = _context.StoryStatus.Where(a => a.StorySeries == storyStatus.StorySeries && a.Name == storyStatus.Name).FirstOrDefault();
-            if (status != null)
-            {
-                status.Value = (Convert.ToInt32(status.Value) - Convert.ToInt32(storyStatus.Value)).ToString();
-                _context.StoryStatus.Update(status);
-
-            }
-        }
-        private void Assign(Istatus storyStatus)
-        {
-            StoryStatus status = _context.StoryStatus.Where(a => a.StorySeries == storyStatus.StorySeries && a.Name == storyStatus.Name).FirstOrDefault();
-            if (status != null)
-            {
-                status.Value = storyStatus.Value;
-                _context.StoryStatus.Update(status);
-
-            }
-        } 
+      
+        /// <summary>
+        /// 结束操作
+        /// </summary>
+        /// <param name="StorySeriesID"></param>
         private void GameOver(Guid StorySeriesID)
         {
             var Schedule = _context.UserSchedule.Where(a => a.StorySeriesID == StorySeriesID && a.UserID == GetUserId()).FirstOrDefault();
@@ -531,7 +557,7 @@ namespace NewCity.Controllers
             }
         }
 
-        #endregion
+
     }
 
 

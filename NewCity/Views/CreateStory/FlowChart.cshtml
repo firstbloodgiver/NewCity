@@ -1,6 +1,7 @@
 ﻿
 @{
     List<StoryCardTrees> ListStoryCard = ViewBag.StoryCardTree as List<StoryCardTrees>;
+    List<StoryStatus> ListStatus = ViewBag.StoryStatus as List<StoryStatus>;
     ViewData["Title"] = "FlowChart";
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
@@ -11,10 +12,10 @@
         width: 160px;
         border: 1px solid blue;
     }
-    .on{
-        border-color:brown
+
+    .on {
+        border-color: brown
     }
-   
 </style>
 <script src="~/js/jsplumb.js"></script>
 <script src="~/lib/jquery/dist/jquery.min.js"></script>
@@ -28,7 +29,7 @@
     }
 
     jsPlumb.ready(function () {
-       
+
         debugger;
         for (let i in StoryCards) {
             for (let j in StoryCards[i].storyCard) {
@@ -80,19 +81,117 @@
 <script>
     var selectcard = null;
     function ReturnList() {
-        window.location.href ='/Creator/Index/'
+        window.location.href = '/Creator/Index/'
     }
     function DelectCard() {
-        
+        if (selectcard == null) {
+            alert("无卡片选择！")
+        }
+        else {
+            var msg = "您真的确定要删除吗？\n\n请确认！";
+            if (confirm(msg) == true) {
+                $.post('"/CreateStory/DeleteCard"', { cardid: selectcard }, function (data) {
+                    if (data != 'false') location.reload()
+                })
+            }
+        }
+
     }
     function select(cardid) {
         $('.StoryCard').removeClass("on");
-        $('#'+cardid).addClass("on");
+        $('#' + cardid).addClass("on");
         selectcard = cardid;
+    }
+    //点击添加
+    function addstatus() {
+        let guid = guid();
+        let content = "<li id='" + guid + "'><input /><button onclick=addstatusconfirm(" + guid + ")>确定</button><button onclick=addstatuscancel(" + guid +")>取消</button></li>";
+        $('#statuslist').prepend(content);
+    }
+    //确认添加
+    function addstatusconfirm(statusID) {
+        let status = $("input#" + statusID).val();
+        $.post('/CreataStory/Addstatus', { storyseries:@ListStoryCard.First().StoryCard.First().StoryCard.StorySeriesID, status: status}, function (data) {
+            if (data != 'true') {
+                alert(data);
+            } 
+        })
+    }
+    //取消添加
+    function addstatuscancel(statusID) {
+        $('#' + statusID).remove();
+    }
+
+    //点击修改
+    function edit(statusid) {
+        let status = $('p#' + statusid).val();
+        $('p#' + statusid).remove();
+        $('button#' + statusid).remove();
+        let content = "<input value=" + status + "/><button onclick='editconfirm(" + statusid + ")'>确定</button><button onclick='editcancel(" + statusid + "," + status+")'>取消</button>" 
+        $('#' + statusid).prepend(content);
+    }
+    //确认修改
+    function editconfirm(statusid) {
+        let status = $('input#' + statusid).val();
+        $.post('/CreataStory/editstatus', { statusID: statusid, status: status}, function (data) {
+            if (data == 'true') {
+                $('#' + statusid).empty();
+                let content = "<p>" + status + "</p><button onclick='edit(" + statusid + ")'>编辑</button><button onclick='remove(" + statusid + ")'>删除</button>";
+                $('#' + statusid).append(content);
+            } else {
+                location.reload();
+            }
+        });
+    }
+    //取消修改
+    function editcancel(statusid, status) {
+        $('#' + statusid).empty();
+        let content = "<p>" + status+"</p><button onclick='edit(" + statusid + ")'>编辑</button><button onclick='remove(" + statusid+")'>删除</button>";
+            $('#' + statusid).append(content);
+    }
+    //点击删除
+    function remove(statusid) {
+        let r = confirm("确认删除？");
+        if (r == true) {
+            $post("/CreataStory/removestatus", { statusID:statusid}, function (data) {
+                if (data == 'true') {
+                    $('#'+statusid).remove();
+                } else {
+                    alert(data);
+                }
+            });
+        } 
     }
 </script>
 <button onclick="ReturnList()">返回</button>
 <button onclick="DelectCard()">删除</button>
-
+<button data-toggle="modal" data-target="#StatusModel">状态量</button>
 <hr />
+
 <div id="contener"></div>
+
+<div id="StatusModel" class="modal fade">
+    <div class="modal-dialog"> 
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                <h4 class="modal-title">条件选择</h4>
+            </div>
+            <div class="modal-body">
+                <div id="StatusSelectoperation">
+                    <button onclick="addstatus()">+</button>
+                </div>
+                <ul id="StatusSelect">
+                    @foreach (StoryStatus s in ListStatus)
+                    {
+                        <li id="@s.ID">
+                            <p>@s.Name</p>
+                            <button onclick="edit(@s.ID)">编辑</button>
+                            <button onclick="remove(@s.ID)">删除</button>
+                        </li>
+                    }
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
