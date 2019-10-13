@@ -350,7 +350,7 @@
         //获取该故事系列状态
         //加载到页面
         $.post("/CreateStory/getStatus", { StorySeriesID: CardObj.storySeriesID }, function (data) {
- debugger;
+            debugger;
             let li = '';
             li += '<h3>故事状态</h3>'
             for (let i in data) {

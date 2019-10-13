@@ -396,6 +396,29 @@ namespace NewCity.Controllers
             }
             
         }
+
+        /// <summary>
+        /// 获取状态
+        /// </summary>
+        /// <param name="StorySeriesID"></param>
+        /// <returns></returns>
+        [HttpPost]
+        public JsonResult getStatus(string StorySeriesID)
+        {
+            var result = new List<StoryStatus>();
+            try
+            {
+                if (_context.StorySeries.AsNoTracking().Where(a => a.ID == Guid.Parse(StorySeriesID)).First().Author == GetUserId())
+                {
+                    result = _context.StoryStatus.AsNoTracking().Where(a => a.StorySeries == StorySeriesID).ToList();
+                }
+                return Json(result);
+            }
+            catch
+            {
+                return Json(result);
+            }
+        }
     }
 
 }
