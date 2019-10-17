@@ -120,6 +120,9 @@ namespace NewCity.Controllers
             #region 故事状态
             ViewBag.StoryStatus = _context.StoryStatus.AsNoTracking().Where(a => a.StorySeries == id).ToList();
             #endregion
+            #region 故事道具
+            ViewBag.StoryItems = _context.Item.AsNoTracking().Where(a => a.StorySeriesID == Guid.Parse(id)).ToList();
+            #endregion
             return View();
         }
 
@@ -417,6 +420,129 @@ namespace NewCity.Controllers
             catch
             {
                 return Json(result);
+            }
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> AddItem(string itemID,Guid StorySeriesID, [Bind("Name,Introduction" +
+            ",EffectType1,EffectType1,EffectValue1" +
+            ",EffectType2,EffectType2,EffectValue2" +
+            ",EffectType3,EffectType3,EffectValue3" +
+            ",EffectType4,EffectType4,EffectValue4" +
+            ",EffectType5,EffectType5,EffectValue5")] Item item)
+        {
+            try
+            {
+                var story = _context.StorySeries.Where(a => a.ID == StorySeriesID).First();
+                if(story.Author == GetUserId())
+                {
+                    if (itemID != string.Empty)
+                    {
+                        var olditem = _context.Item.Where(a => a.ID == Guid.Parse(itemID)).First();
+                        olditem.Name = item.Name;
+                        olditem.Introduction = item.Introduction;
+                        olditem.EffectName1 = item.EffectName1;
+                        olditem.EffectType1 = item.EffectType1;
+                        olditem.EffectValue1 = item.EffectValue1;
+                        olditem.EffectName2 = item.EffectName2;
+                        olditem.EffectType2 = item.EffectType2;
+                        olditem.EffectValue2 = item.EffectValue2;
+                        olditem.EffectName3 = item.EffectName3;
+                        olditem.EffectType3 = item.EffectType3;
+                        olditem.EffectValue3 = item.EffectValue3;
+                        olditem.EffectName4 = item.EffectName4;
+                        olditem.EffectType4 = item.EffectType4;
+                        olditem.EffectValue4 = item.EffectValue4;
+                        olditem.EffectName5 = item.EffectName5;
+                        olditem.EffectType5 = item.EffectType5;
+                        olditem.EffectValue5 = item.EffectValue5;
+
+                        await _context.SaveChangesAsync();
+                        return Json("true");
+                    }
+                    else
+                    {
+                        Item newitem = new Item()
+                        {
+                            ID = Guid.NewGuid(),
+                            StorySeriesID = StorySeriesID,
+                            Name = item.Name,
+                            Introduction = item.Introduction,
+                            EffectName1 = item.EffectName1,
+                            EffectType1 = item.EffectType1,
+                            EffectValue1 = item.EffectValue1,
+                            EffectName2 = item.EffectName2,
+                            EffectType2 = item.EffectType2,
+                            EffectValue2 = item.EffectValue2,
+                            EffectName3 = item.EffectName3,
+                            EffectType3 = item.EffectType3,
+                            EffectValue3 = item.EffectValue3,
+                            EffectName4 = item.EffectName4,
+                            EffectType4 = item.EffectType4,
+                            EffectValue4 = item.EffectValue4,
+                            EffectName5 = item.EffectName5,
+                            EffectType5 = item.EffectType5,
+                            EffectValue5 = item.EffectValue5,
+                        };
+                        await _context.Item.AddAsync(newitem);
+                        return Json("true");
+                    }
+                }
+                else
+                {
+                    return NotFound();
+                }
+
+            }
+            catch
+            {
+                return NotFound();
+            }
+            
+        }
+
+        [HttpPost]
+        public JsonResult getitem(Guid itemID)
+        {
+            try
+            {
+                var item = _context.Item.AsNoTracking().Where(a => a.ID == itemID).First();
+                _context.StorySeries.AsNoTracking().Where(a => a.ID == item.ID && a.Author == GetUserId()).First();
+                return Json(item);
+            }
+            catch
+            {
+                return Json(new Item());
+            }
+            
+        }
+
+        /// <summary>
+        /// 删除道具
+        /// </summary>
+        /// <param name="itemID"></param>
+        /// <returns></returns>
+        [HttpPost]
+        public JsonResult removeitem(Guid itemID)
+        {
+            try
+            {
+                var item =_context.Item.Where(a => a.ID == itemID).First();
+                if (_context.StorySeries.AsNoTracking().Where(a => a.ID == item.StorySeriesID).First().Author == GetUserId())
+                {
+                    _context.Remove(item);
+                    _context.SaveChanges();
+                    return Json(true);
+                }
+                else
+                {
+                    return Json(false);
+                }
+            }
+            catch
+            {
+                return Json(false);
             }
         }
     }

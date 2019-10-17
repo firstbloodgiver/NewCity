@@ -2,9 +2,12 @@
 @{
     List<StoryCardTrees> ListStoryCard = ViewBag.StoryCardTree as List<StoryCardTrees>;
     List<StoryStatus> ListStatus = ViewBag.StoryStatus as List<StoryStatus>;
+    List<Item> ListItem = ViewBag.StoryItems as List<Item>;
     ViewData["Title"] = "FlowChart";
     Layout = "~/Views/Shared/_Layout.cshtml";
+    
 }
+@model NewCity.Models.Item
 <style>
     .StoryCard {
         position: absolute;
@@ -102,6 +105,8 @@
         $('#' + cardid).addClass("on");
         selectcard = cardid;
     }
+
+
     //点击添加
     function addstatus() {
         let guid = guid();
@@ -114,43 +119,42 @@
         $.post('/CreataStory/Addstatus', { storyseries:@ListStoryCard.First().StoryCard.First().StoryCard.StorySeriesID, status: status}, function (data) {
             if (data != 'true') {
                 alert(data);
-            } 
+            }
         })
     }
     //取消添加
     function addstatuscancel(statusID) {
         $('#' + statusID).remove();
     }
-
-    //点击修改
-    function edit(statusid) {
+    //状态点击修改
+    function statusedit(statusid) {
         let status = $('p#' + statusid).val();
         $('p#' + statusid).remove();
         $('button#' + statusid).remove();
-        let content = "<input value=" + status + "/><button onclick='editconfirm(" + statusid + ")'>确定</button><button onclick='editcancel(" + statusid + "," + status+")'>取消</button>" 
+        let content = "<input value=" + status + "/><button onclick='statuseditconfirm(" + statusid + ")'>确定</button><button onclick='statuseditcancel(" + statusid + "," + status+")'>取消</button>"
         $('#' + statusid).prepend(content);
     }
-    //确认修改
-    function editconfirm(statusid) {
+    //状态确认修改
+    function statuseditconfirm(statusid) {
         let status = $('input#' + statusid).val();
         $.post('/CreataStory/editstatus', { statusID: statusid, status: status}, function (data) {
             if (data == 'true') {
                 $('#' + statusid).empty();
-                let content = "<p>" + status + "</p><button onclick='edit(" + statusid + ")'>编辑</button><button onclick='remove(" + statusid + ")'>删除</button>";
+                let content = "<p>" + status + "</p><button onclick='edit(" + statusid + ")'>编辑</button><button onclick='statusremove(" + statusid + ")'>删除</button>";
                 $('#' + statusid).append(content);
             } else {
                 location.reload();
             }
         });
     }
-    //取消修改
-    function editcancel(statusid, status) {
+    //状态取消修改
+    function statuseditcancel(statusid, status) {
         $('#' + statusid).empty();
         let content = "<p>" + status+"</p><button onclick='edit(" + statusid + ")'>编辑</button><button onclick='remove(" + statusid+")'>删除</button>";
             $('#' + statusid).append(content);
     }
-    //点击删除
-    function remove(statusid) {
+    //状态点击删除
+    function statusremove(statusid) {
         let r = confirm("确认删除？");
         if (r == true) {
             $post("/CreataStory/removestatus", { statusID:statusid}, function (data) {
@@ -160,18 +164,68 @@
                     alert(data);
                 }
             });
-        } 
+        }
     }
+
+    //道具编辑界面
+    function itemedit(itemID) {
+        $('#isAdd').val() = itemID
+        $('#ItemModel').modal('hide');
+        $('#ItemDetailModel').modal('show')
+        $.post('/CreataStory/getitem', { itemID: itemid }, function (data) {
+            $('#itemname').val() = data.name;
+            $('#Introduction').val() = data.Introduction
+            $('#itemname')
+            $('#itemname')
+            $('#itemname')
+            $('#itemname')
+            $('#itemname')
+            $('#itemname')
+            $('#itemname')
+            $('#itemname')
+            $('#itemname')
+            $('#itemname')
+            $('#itemname')
+            $('#itemname')
+            $('#itemname')
+            $('#itemname')
+            $('#itemname')
+        })
+    }
+    //道具新增界面
+    function itemadd() {
+        $('#isAdd').val() = ''
+        $('#ItemModel').modal('hide');
+        $('#ItemDetailModel').modal('show')
+    }
+    
+    //道具保存
+    function itemsave() { }
+    //道具删除
+    function itemremove(itemid) {
+        let r = confirm("确认删除？");
+        if (r == true) {
+            $post("/CreataStory/removeitem", { itemID: itemid }, function (data) {
+                if (data == 'true') {
+                    $('#' + statusid).remove();
+                } else {
+                    alert(data);
+                }
+            });
+        }
+    }
+    
 </script>
 <button onclick="ReturnList()">返回</button>
 <button onclick="DelectCard()">删除</button>
 <button data-toggle="modal" data-target="#StatusModel">状态量</button>
+<button data-toggle="modal" data-target="#ItemModel">道具</button>
 <hr />
 
 <div id="contener"></div>
 
 <div id="StatusModel" class="modal fade">
-    <div class="modal-dialog"> 
+    <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
                 <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
@@ -186,11 +240,64 @@
                     {
                         <li id="@s.ID">
                             <p>@s.Name</p>
-                            <button onclick="edit(@s.ID)">编辑</button>
-                            <button onclick="remove(@s.ID)">删除</button>
+                            <button onclick="statusedit(@s.ID)">编辑</button>
+                            <button onclick="statusremove(@s.ID)">删除</button>
                         </li>
                     }
                 </ul>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="ItemModel" class="modal fade">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                <h4 class="modal-title">道具选择</h4>
+            </div>
+            <div class="modal-body">
+                <div id="ItemSelectoperation">
+                    <button onclick="itemadd()">+</button>
+                </div>
+                <ul id="ItemSelect">
+                    @foreach (Item s in ListItem)
+                    {
+                        <li id="@s.ID">
+                            <p>@s.Name</p>
+                            <button onclick="itemedit(@s.ID)">编辑</button>
+                            <button onclick="itemremove(@s.ID)">删除</button>
+                        </li>
+                    } 
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="ItemDetailModel" class="modal fade">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                <h4 class="modal-title">道具</h4>
+            </div>
+            <div class="modal-body">
+                <form asp-action="">
+                    <input type="hidden" id="itemID" name="itemID"/>
+                    图标：
+                    名称：<input asp-for="Name" id="itemname" />
+                    说明：<textarea asp-for="Introduction" id="itemdetail"></textarea>
+                    效果：
+                    <input id="EffectType1" asp-for="EffectType1" /><select id="EffectType1" asp-for="EffectType1"><option value='0'>增加</option><option value='1'>减少</option><option value='2'>赋值</option></select><input id="EffectValue1" asp-for="EffectValue1" />
+                    <input asp-for="EffectType2" /><select asp-for="EffectType2"><option value='0'>增加</option><option value='1'>减少</option><option value='2'>赋值</option></select><input asp-for="EffectValue2" />
+                    <input asp-for="EffectType3" /><select asp-for="EffectType3"><option value='0'>增加</option><option value='1'>减少</option><option value='2'>赋值</option></select><input asp-for="EffectValue3" />
+                    <input asp-for="EffectType4" /><select asp-for="EffectType4"><option value='0'>增加</option><option value='1'>减少</option><option value='2'>赋值</option></select><input asp-for="EffectValue4" />
+                    <input asp-for="EffectType5" /><select asp-for="EffectType5"><option value='0'>增加</option><option value='1'>减少</option><option value='2'>赋值</option></select><input asp-for="EffectValue5" />
+                    <button type="submit">保存</button>
+                    <button type="button"  data-dismiss="modal">取消</button>
+                </form>
             </div>
         </div>
     </div>

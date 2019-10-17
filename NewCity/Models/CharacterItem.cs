@@ -9,7 +9,8 @@ namespace NewCity.Models
     {
         public Guid ID { get; set; }
 
-        
+        public bool Special { get; set; }
+
         public Guid ItemID { get; set; }
 
         public Guid CharacterID { get; set; }
@@ -18,9 +19,6 @@ namespace NewCity.Models
         /// 个数
         /// </summary>
         public int Amount { get; set; }
-
-
-
 
     }
 }

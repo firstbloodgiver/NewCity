@@ -26,6 +26,7 @@ namespace NewCity.Data
         public DbSet<NewCity.Models.CharacterLog> CharacterLog { get; set; }
         public DbSet<NewCity.Models.Item> Item { get; set; }
         public DbSet<NewCity.Models.ItemLog> ItemLog { get; set; }
+        public DbSet<NewCity.Models.ItemEffect> ItemEffect { get; set; }
         public DbSet<NewCity.Models.Location> Location { get; set; }
     }
 }
