@@ -423,6 +423,30 @@ namespace NewCity.Controllers
             }
         }
 
+        /// <summary>
+        /// 获取物品
+        /// </summary>
+        /// <param name="StorySeriesID"></param>
+        /// <returns></returns>
+        [HttpPost]
+        public JsonResult getItem(Guid StorySeriesID)
+        {
+            var result = new List<Item>();
+            try
+            {
+                if (_context.StorySeries.AsNoTracking().Where(a => a.ID == StorySeriesID).First().Author == GetUserId())
+                {
+                    result = _context.Item.AsNoTracking().Where(a => a.StorySeriesID == StorySeriesID).ToList();
+                }
+                return Json(result);
+            }
+            catch
+            {
+                return Json(result);
+            }
+        }
+
+
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> AddItem(string itemID,Guid StorySeriesID, [Bind("Name,Introduction" +

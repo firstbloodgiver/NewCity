@@ -118,6 +118,37 @@
     </div>
 </div>
 
+<!--效果状态选择模态框-->
+<div id="EffectSelectModel" class="modal fade">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                <h4 class="modal-title">状态选择</h4>
+            </div>
+            <div class="modal-body">
+                <ul id="EffectTab" class="nav nav-tabs">
+                    <li class="active"><a href="#status" data-toggle="tab">故事状态</a></li>
+                    <li><a href="#character" data-toggle="tab">人物属性</a></li>
+                    <li><a href="#item" data-toggle="tab">物品</a></li>
+                </ul>
+
+                <div id="EffectTabContent" class="tab-content">
+                    <div class="tab-pane fade in active" id="status">
+                        <ul id="statusSelect"></ul>
+                    </div>
+                    <div class="tab-pane fade" id="character">
+                        <ul id="characterSelect"></ul>
+                    </div>
+                    <div class="tab-pane fade" id="item">
+                        <ul id="itemSelect"></ul>
+                    </div>
+                </div>                
+            </div>
+        </div>
+    </div>
+</div>
+
 <!--下一张卡片模态框-->
 <div id="NextCardModel" class="modal fade">
     <div class="modal-dialog">
@@ -315,10 +346,10 @@
         }
         let context =
             "<div id='conditionid" + condition +"'>"+
-            "<input id='" + condition + '-' + storyoption + "' readonly onclick=selectstatus('" + condition + '-' + storyoption+"') class='conditionname' value='" + name + "'/>" +
+            "<input id='condition" + condition + '-' + storyoption + "' readonly onclick=selectstatus('condition" + condition + '-' + storyoption+"') class='conditionname' value='" + name + "'/>" +
             "<select class='conditionidselect'>"
             + "<option value='0'>></option>"
-            + "<option value='1'><</option>" 
+            + "<option value='1'><</option>"
             + "<option value='2'>=</option>"
             + "<option value='3'>≠</option>"
             + "<select/>" +
@@ -358,8 +389,8 @@
             }
             li += '<hr/>'
             li += '<h3>人物状态</h3>'
-            for (let i in characterSyayus) {
-                li += "<li onclick=clickstatus('" + characterSyayus[i] + "','" + option +"')>" + characterSyayus[i] + "</li>";
+            for (let i in characterStatus) {
+                li += "<li onclick=clickstatus('" + characterStatus[i] + "','" + option +"')>" + characterStatus[i] + "</li>";
             }
 
             $('#StatusSelect').append(li);
@@ -372,7 +403,7 @@
     }
 
     function confidstatus() {
-        
+
         $.post('/CreateStory/Addstatus', { storyseries: CardObj.storySeriesID, status: $('#status').val() }, function (data) {
             if (data == 'true') {
                 //$('#StatusModel').modal('show')
@@ -390,7 +421,7 @@
     }
 
     function clickstatus(name, option) {
-        $("#" + option).val(name)
+        $("#condition" + option).val(name)
         $('#ConditionModel').modal('show')
         $('#StatusSelect').empty();
         $('#StatusModel').modal('hide')
@@ -430,7 +461,7 @@
 
         let context =
             "<div id='effectid" + effect + "'>" +
-            "<input class='effectname' value='" + name + "'/>" +
+            "<input class='effectname' readonly onclick='selecteffect(effect"+ effect +'-'+ storyoption+") id='effect"+ effect +'-'+ storyoption +"' value='" + name + "'/>" +
             "<select class='effectidselect'>"
             + "<option value='0'>增加</option>"
             + "<option value='1'>减少</option>"
@@ -438,7 +469,7 @@
             + "<option value='4'>结束故事</option>"
             + "<select/>" +
             "<input  class='effectvalue'  value='" + value + "'/>" +
-            "<button onclick='ConditionCancel(" + effect + "," + storyoption + ")'>取消</button>" +
+            "<button onclick='ConditionCancel(" + effect + "," + storyoption +")'>取消</button>" +
             "</div>"
             $("#effectidselect" + effect).val(type)
         $('#Effect').append(context)
@@ -446,7 +477,48 @@
         $("#Effect option[value='"+ type +"']").attr("selected", true);
     }
 
+    //选择效果状态
+    function selecteffect(option) {
+        $('#EffectModel').modal('hide')
+        $('#statusSelect').empty();
+        $('#characterSelect').empty();
+        $('#itemSelect').empty();
+        $('#EffectSelectModel').modal('show')
+        
+        //获取该故事系列状态
+        //加载到页面
+        $.post("/CreateStory/getStatus", { StorySeriesID: CardObj.storySeriesID }, function (data) {
+            debugger;
+            let li = '';
+            li += '<h3>故事状态</h3>'
+            for (let i in data) {
+                li += "<li onclick=clickEffect('" + data[i].name + "','" + option + "')>" + data[i].name + "</li>";
+            }
+            $('#statusSelect').append(li);
+        })
 
+        $.post("/CreateStory/getItem", { StorySeriesID: CardObj.storySeriesID }, function (data) {
+            let li = '';
+            for (let i in data) {
+                li += "<li onclick=clickEffect('" + characterStatus[i] + "','" + option + "')>" + characterStatus[i] + "</li>";
+            }
+            $('#itemSelect').append(li);
+        });
+        let li = '';
+        for (let i in characterStatus) {
+            li += "<li onclick=clickEffect('" + characterStatus[i] + "','" + option + "')>" + characterStatus[i] + "</li>";
+        }
+        $('#characterSelect').append(li);
+    }
+
+    function clickEffect(name, option) {
+        $("#effect" + option).val(name)
+        $('#EffectModel').modal('show')
+        $('#statusSelect').empty();
+        $('#characterSelect').empty();
+        $('#itemSelect').empty();
+        $('#EffectSelectModel').modal('hide')
+    }
 
     function EmptyEffect() {
         $('#Effect').empty();

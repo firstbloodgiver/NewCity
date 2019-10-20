@@ -338,19 +338,29 @@ namespace NewCity.Controllers
         /// </summary>
         /// <returns></returns>
         [HttpGet]
-        public string GetItem()
+        public string GetItem(Guid StorySeriesID)
         {
-            var items = _context.CharacterItem.AsNoTracking()
-                .Where(a => a.CharacterID ==
-                _context.UserCharacter.AsNoTracking().Where(u => u.UserId == GetUserId() && u.IsActivate == true).FirstOrDefault().ID)
-                .Join(_context.Item, a => a.ItemID, i => i.ID, (a, i) => new { Amount = a.Amount, Introduction = i.Introduction, Name = i.Name })
-                .ToList();
+            //var items = _context.CharacterItem.AsNoTracking()
+            //    .Where(a => a.CharacterID ==
+            //    _context.UserCharacter.AsNoTracking().Where(u => u.UserId == GetUserId() && u.IsActivate == true).FirstOrDefault().ID)
+            //    .Join(_context.Item, a => a.ItemID, i => i.ID, (a, i) => new { Amount = a.Amount, Introduction = i.Introduction, Name = i.Name })
+            //    .ToList();
 
-            if (items != null)
+            //if (items != null)
+            //{
+            //    return JsonConvert.SerializeObject(items);
+            //}
+            //return "[]";
+            try
             {
-                return JsonConvert.SerializeObject(items);
+                var story = _context.StorySeries.AsNoTracking().Where(a => a.IsActivate == true).First();
+                var itesm = _context.Item.AsNoTracking().Where(a => a.StorySeriesID == StorySeriesID).First();
+                return JsonConvert.SerializeObject(itesm);
             }
-            return "[]";
+            catch
+            {
+                return "[]";
+            }
         }
 
         /// <summary>

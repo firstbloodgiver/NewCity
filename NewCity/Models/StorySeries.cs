@@ -25,6 +25,10 @@ namespace NewCity.Models
         /// 出现条件
         /// </summary>
         public string flag { get; set; }
+        /// <summary>
+        /// 是否启用
+        /// </summary>
+        public bool IsActivate { get; set; }
 
         /// <summary>
         /// 故事状态

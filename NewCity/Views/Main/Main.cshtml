@@ -152,7 +152,7 @@
 
     //初始读取
     window.onload = function () {
-        GetItem();
+        GetItem(@ViewBag.StoryCard.StorySeriesID);
         GetState();
         GetSchedule();
 
@@ -217,17 +217,30 @@
     }
 
     //获取人物背包
-    function GetItem() {
-        $.get('/Main/GetItem', function (data) {
+    function GetItem(StorySeriesID) {
+        $.get('/Main/GetItem', {StorySeriesID:StorySeriesID}, function (data) {
             debugger;
             let jsonObj = JSON.parse(data);
             let html = '';
             for (let i in jsonObj) {
-  
-                html += "<div class='row'>" + jsonObj[i].Name + ":" + jsonObj[i].Amount + "</div>"
+
+                html += "<div class='row'>" + jsonObj[i].Name + ":<div id=item" + jsonObj[i].ID + ">" + jsonObj[i].Amount + "</div><button onclick='useItem(" + jsonObj[i].ID + ")'>使用</button></div>"
             }
             let content = "<div class='row'>" + html + "</div>";
             $("#Item").append(content);
+        });
+    }
+
+    function useItem(itemID) {
+        $.post('/Main/useItem', { itemID: itemID }, function (data) {
+            if (data == 'true') {
+                let num = $("#item" + itemID).val();
+                $("#item" + itemID).val() = num--;
+
+            }
+            else {
+                alert('发生错误！')
+            }
         });
     }
 
