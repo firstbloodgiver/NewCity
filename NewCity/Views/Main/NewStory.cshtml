@@ -2,47 +2,61 @@
 @{
     ViewData["Title"] = "NewStory";
     Layout = "~/Views/Shared/_Layout.cshtml";
-
-}
-@model PaginatedList<StorySeries>
-<h2>New</h2>
-<!--选择新的故事 故事简介-》StoryDetail-->
-<form asp-action="NewStory" method="get">
-    <div class="form-actions no-color">
-        <p>
-            Find by name: <input type="text" name="SearchString" value="@ViewData["currentFilter"]" />
-            <input type="submit" value="Search" class="btn btn-default" />
-        </p>
-    </div>
-</form>
-@foreach (var i in Model)
-{
-    <div class="col-md-4">
-        <h1>@i.SeriesName</h1>
-        <p>@i.Text</p>
-        <button onclick="seriesdetail('@i.ID')">详情</button>
-    </div>
-}
-
-@{
     var prevDisabled = !Model.HasPreviousPage ? "disabled" : "";
     var nextDisabled = !Model.HasNextPage ? "disabled" : "";
 }
 
-<a asp-action="Index"
-   asp-route-sortOrder="@ViewData["CurrentSort"]"
-   asp-route-pageNumber="@(Model.PageIndex - 1)"
-   asp-route-currentFilter="@ViewData["CurrentFilter"]"
-   class="btn btn-default @prevDisabled">
-    Previous
-</a>
-<a asp-action="Index"
-   asp-route-sortOrder="@ViewData["CurrentSort"]"
-   asp-route-pageNumber="@(Model.PageIndex + 1)"
-   asp-route-currentFilter="@ViewData["CurrentFilter"]"
-   class="btn btn-default @nextDisabled">
-    Next
-</a>
+@model PaginatedList<StorySeries>
+<link rel="stylesheet" href="~/css/defaultStyle.css" type="text/css" />
+<h2>浏览新故事</h2>
+<hr />
+<!--选择新的故事 故事简介-》StoryDetail-->
+<div class="container">
+    <form asp-action="NewStory" method="get">
+        <div class="form-actions no-color">
+            <div class="row">
+                <div class="col-md-4">
+                    <div class="input-group">
+                        <span class="input-group-btn">
+                            <button class="btn btn-default" type="submit">搜索</button>
+                        </span>
+                        <input class="form-control" type="text" name="SearchString" value="@ViewData["currentFilter"]" />
+                    </div>
+                </div>
+                <div class="col-md-8">
+                    <a asp-action="Index"
+                       asp-route-sortOrder="@ViewData["CurrentSort"]"
+                       asp-route-pageNumber="@(Model.PageIndex - 1)"
+                       asp-route-currentFilter="@ViewData["CurrentFilter"]"
+                       class="btn btn-default @prevDisabled">
+                        上一页
+                    </a>
+                    <a asp-action="Index"
+                       asp-route-sortOrder="@ViewData["CurrentSort"]"
+                       asp-route-pageNumber="@(Model.PageIndex + 1)"
+                       asp-route-currentFilter="@ViewData["CurrentFilter"]"
+                       class="btn btn-default @nextDisabled">
+                       下一页
+                    </a>
+                </div>
+            </div>
+        </div>
+    </form>
+    @foreach (var i in Model)
+    {
+        <div class="col-md-4 unitcell">
+            <h1>@i.SeriesName</h1>
+            <p>@i.Text</p>
+            <button class="btn btn-primary" onclick="seriesdetail('@i.ID')">详情</button>
+        </div>
+    }
+
+</div>
+
+
+
+
+
 
 
 <script>

@@ -3,46 +3,45 @@
     ViewData["Title"] = "Creator";
     List<StorySeries> storySeries = ViewBag.storySeries as List<StorySeries>;
 }
-
-<div class="container-fluid">
+<h2>详情</h2>
+<hr />
+<div class="container">
     <div class="row">
-        <button class="btn-default">返回</button>
-        <button class="btn-default" data-toggle="modal" data-target="#Addseries">新增</button>
+        <button class="btn btn-primary" data-toggle="modal" data-target="#Addseries">新增</button>
     </div>
-    <hr />
     <div class="row">
         @if (storySeries.Count != 0)
         {
             @foreach (var item in storySeries)
             {
 
-        <div>
-            <div>
-                @item.SeriesName
-            </div>
-            <div>
-                @item.Text
-            </div>
-            <a asp-controller="CreateStory" asp-action="FlowChart" asp-route-id="@item.ID">编辑</a>
-            @if (item.Status == NewCity.Enum.enumStoryStatus.测试)
-            {
-                <a onclick="Active('@item.ID')">启用</a>
-            }
-            else
-            {
-                <a onclick="AntiActive('@item.ID')">禁用</a>
-            }
+                <div  class="unitcell col-md-4">
+                    <div>
+                        <h1>@item.SeriesName</h1>
+                    </div>
+                    <div>
+                        @item.Text
+                    </div>
+                    <a class="btn btn-primary" asp-controller="CreateStory" asp-action="FlowChart" asp-route-id="@item.ID">编辑</a>
+                    @if (item.Status == NewCity.Enum.enumStoryStatus.测试)
+                    {
+                        <a class="btn btn-primary" onclick="Active('@item.ID')">启用</a>
+                    }
+                    else
+                    {
+                        <a class="btn btn-primary" onclick="AntiActive('@item.ID')">禁用</a>
+                    }
 
-            <a>测试</a>
-            <a onclick="DeleteConfirm('@item.ID')">删除</a>
-        </div>
+                    <a class="btn btn-primary" href="/Main/Main?SeriesID=@item.ID">测试</a>
+                    <a class="btn btn-primary" onclick="DeleteConfirm('@item.ID')">删除</a>
+                </div>
             }
         }
     </div>
 </div>
 
 <div class="modal fade" id="Addseries" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
-    <div class="modal-dialog">   
+    <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
                 <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
@@ -51,12 +50,12 @@
             <div class="modal-body">
                 <form asp-action="Index">
                     <div class="form-group">
-                        <label asp-for="SeriesName" class="control-label"></label>
+                        <label asp-for="SeriesName" class="control-label">故事名称</label>
                         <input asp-for="SeriesName" class="form-control" />
                         <span asp-validation-for="SeriesName" class="text-danger"></span>
                     </div>
                     <div class="form-group">
-                        <label asp-for="Text" class="control-label"></label>
+                        <label asp-for="Text" class="control-label">简介</label>
                         <input asp-for="Text" class="form-control" />
                         <span asp-validation-for="SeriesName" class="text-danger"></span>
                     </div>
@@ -74,7 +73,7 @@
     }
 
     function DeleteConfirm(id) {
-        let msg = "您真的确定要删除吗？\n\n请确认！"; 
+        let msg = "您真的确定要删除吗？\n\n请确认！";
         if (confirm(msg)) {
             $.post("/Creator/Delete", { id: id }, function (data) {
                 window.location.reload();

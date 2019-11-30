@@ -11,15 +11,21 @@
 <style>
     .StoryCard {
         position: absolute;
-        height: 60px;
+        height: 80px;
         width: 160px;
         border: 1px solid blue;
+        border-radius:10px;
+        
     }
 
     .on {
         border-color: brown
     }
+    .cardID{
+        font-size:5px;
+    }
 </style>
+<script src="~/js/enum.js"></script>
 <script src="~/js/jsplumb.js"></script>
 <script src="~/lib/jquery/dist/jquery.min.js"></script>
 
@@ -32,8 +38,6 @@
     }
 
     jsPlumb.ready(function () {
-
-        debugger;
         for (let i in StoryCards) {
             for (let j in StoryCards[i].storyCard) {
                 for (let t in StoryCards[i].storyCard[j].fatherStoryCardId) {
@@ -55,18 +59,18 @@
     })
 
     function createProcess() {
-        debugger;
+
         for (let i in StoryCards) {
             let div = '';
             for (var j in StoryCards[i].storyCard) {
-                let context = StoryCards[i].storyCard[j].storyCard.id + StoryCards[i].storyCard[j].storyCard.title;
+                let context = '<h4>'+StoryCards[i].storyCard[j].storyCard.title + '</h4><p class=cardID> ' + StoryCards[i].storyCard[j].storyCard.id+'</p>';
                 div += "<div id='" + StoryCards[i].storyCard[j].storyCard.id + "' class='StoryCard' style='left:" + 180 * j + "px' onclick=select('" +
                     StoryCards[i].storyCard[j].storyCard.id + "') ondblclick  =ToCard('" +
                     StoryCards[i].storyCard[j].storyCard.id + "','" + StoryCards[i].storyCard[j].storyCard.storySeriesID + "') style='float:left;margin-left:5px;margin-top:5px'>" +
                     context + "</div>";
             }
             let h = i == 0 ? 0 : 1;
-            let content = "<div class='row' style='margin-top:"+90*h+"px'>" + div + "</div>";
+            let content = "<div class='row' style='margin-top:" + 120 * h +"px'>" + div + "</div>";
             $("#contener").append(content);
         }
     }
@@ -75,7 +79,7 @@
 
     //跳转到特定页面
     function ToCard(CardId, SeriesId) {
-        debugger;
+
         window.location.href = '/CreateStory/GetCard?StoryCardID=' + CardId + "&StorySeriesID=" + SeriesId
     }
 
@@ -93,7 +97,8 @@
         else {
             var msg = "您真的确定要删除吗？\n\n请确认！";
             if (confirm(msg) == true) {
-                $.post('"/CreateStory/DeleteCard"', { cardid: selectcard }, function (data) {
+                debugger
+                $.post('/CreateStory/DeleteCard', { cardid: selectcard }, function (data) {
                     if (data != 'false') location.reload()
                 })
             }
@@ -107,40 +112,43 @@
     }
 
 
-    //点击添加
+    //点击添加状态
     function addstatus() {
-        let guid = guid();
-        let content = "<li id='" + guid + "'><input /><button onclick=addstatusconfirm(" + guid + ")>确定</button><button onclick=addstatuscancel(" + guid +")>取消</button></li>";
-        $('#statuslist').prepend(content);
+        let uid = guid();
+        let content = "<li id='" + uid + "'><input /><button onclick=addstatusconfirm('" + uid + "')>确定</button><button onclick=addstatuscancel('" + uid +"')>取消</button></li>";
+        $('#StatusSelect').prepend(content);
     }
-    //确认添加
+    //确认添加状态
     function addstatusconfirm(statusID) {
-        let status = $("input#" + statusID).val();
-        $.post('/CreataStory/Addstatus', { storyseries:@ListStoryCard.First().StoryCard.First().StoryCard.StorySeriesID, status: status}, function (data) {
-            if (data != 'true') {
+        let status = $("#" + statusID +'>input').val();
+        $.post('/CreateStory/Addstatus', { storyseries:'@ListStoryCard.First().StoryCard.First().StoryCard.StorySeriesID', status: status}, function (data) {
+            if (data != true) {
                 alert(data);
+            }
+            else {
+                location.reload();
             }
         })
     }
-    //取消添加
+    //取消添加状态
     function addstatuscancel(statusID) {
         $('#' + statusID).remove();
     }
     //状态点击修改
     function statusedit(statusid) {
-        let status = $('p#' + statusid).val();
-        $('p#' + statusid).remove();
-        $('button#' + statusid).remove();
-        let content = "<input value=" + status + "/><button onclick='statuseditconfirm(" + statusid + ")'>确定</button><button onclick='statuseditcancel(" + statusid + "," + status+")'>取消</button>"
+        let status = $('#' + statusid+'>p').text();
+        $('#' + statusid + '>p').remove();
+        $('#' + statusid + '>button').remove();
+        let content = "<input value='" + status + "'/><button onclick=statuseditconfirm('" + statusid + "')>确定</button><button onclick=statuseditcancel('" + statusid + "','" + status+"')>取消</button>"
         $('#' + statusid).prepend(content);
     }
     //状态确认修改
     function statuseditconfirm(statusid) {
-        let status = $('input#' + statusid).val();
-        $.post('/CreataStory/editstatus', { statusID: statusid, status: status}, function (data) {
+        let status = $('#' + statusid +'>input').val();
+        $.post('/CreateStory/editstatus/', { statusID: statusid, status: status}, function (data) {
             if (data == 'true') {
                 $('#' + statusid).empty();
-                let content = "<p>" + status + "</p><button onclick='edit(" + statusid + ")'>编辑</button><button onclick='statusremove(" + statusid + ")'>删除</button>";
+                let content = "<p>" + status + "</p><button onclick=statusedit('" + statusid + "')>编辑</button><button onclick=statusremove('" + statusid + "')>删除</button>";
                 $('#' + statusid).append(content);
             } else {
                 location.reload();
@@ -150,14 +158,14 @@
     //状态取消修改
     function statuseditcancel(statusid, status) {
         $('#' + statusid).empty();
-        let content = "<p>" + status+"</p><button onclick='edit(" + statusid + ")'>编辑</button><button onclick='remove(" + statusid+")'>删除</button>";
-            $('#' + statusid).append(content);
+        let content = "<p>" + status +"</p><button onclick=statusedit('" + statusid + "')>编辑</button><button onclick=statusremove('" + statusid+"')>删除</button>";
+        $('#' + statusid).append(content);
     }
     //状态点击删除
     function statusremove(statusid) {
         let r = confirm("确认删除？");
         if (r == true) {
-            $post("/CreataStory/removestatus", { statusID:statusid}, function (data) {
+            $.post("/CreateStory/removestatus", { statusID:statusid}, function (data) {
                 if (data == 'true') {
                     $('#'+statusid).remove();
                 } else {
@@ -169,45 +177,74 @@
 
     //道具编辑界面
     function itemedit(itemID) {
-        $('#isAdd').val() = itemID
         $('#ItemModel').modal('hide');
         $('#ItemDetailModel').modal('show')
-        $.post('/CreataStory/getitem', { itemID: itemid }, function (data) {
-            $('#itemname').val() = data.name;
-            $('#Introduction').val() = data.Introduction
-            $('#itemname')
-            $('#itemname')
-            $('#itemname')
-            $('#itemname')
-            $('#itemname')
-            $('#itemname')
-            $('#itemname')
-            $('#itemname')
-            $('#itemname')
-            $('#itemname')
-            $('#itemname')
-            $('#itemname')
-            $('#itemname')
-            $('#itemname')
-            $('#itemname')
+        $.post('/CreateStory/getitemstatus', { itemID: itemID }, function (data) {
+            debugger;
+            $('#itemID').val(data.id)
+            $('#itemname').val(data.name)
+            $('#itemdetail').val(data.introduction)
+            $('#EffectClass1').val(data.effectClass1) 
+            $('#EffectClass2').val(data.effectClass2) 
+            $('#EffectClass3').val(data.effectClass3) 
+            $('#EffectClass4').val(data.effectClass4) 
+            $('#EffectClass5').val(data.effectClass5) 
+            $('#EffectName1').val(data.effectName1) 
+            $('#EffectType1').val(data.effectType1) 
+            $('#EffectValue1').val(data.effectValue1) 
+            $('#EffectName2').val(data.effectName2)
+            $('#EffectType2').val(data.effectType2) 
+            $('#EffectValue2').val(data.effectValue2) 
+            $('#EffectName3').val(data.effectName3) 
+            $('#EffectType3').val(data.effectType3) 
+            $('#EffectValue3').val(data.effectValue3) 
+            $('#EffectName4').val(data.effectName4) 
+            $('#EffectType4').val(data.effectType4) 
+            $('#EffectValue4').val(data.effectValue4) 
+            $('#EffectName5').val(data.effectName5) 
+            $('#EffectType5').val(data.effectType5) 
+            $('#EffectValue5').val(data.effectValue5) 
         })
     }
     //道具新增界面
     function itemadd() {
-        $('#isAdd').val() = ''
+        $('#isAdd').val(" ") 
         $('#ItemModel').modal('hide');
         $('#ItemDetailModel').modal('show')
+
+        $('#itemID').val('')
+        $('#itemname').val('')
+        $('#itemdetail').val('')
+        $('#EffectClass1').val('')
+        $('#EffectClass2').val('')
+        $('#EffectClass3').val('')
+        $('#EffectClass4').val('')
+        $('#EffectClass5').val('')
+        $('#EffectName1').val('')
+        $('#EffectType1').val('')
+        $('#EffectValue1').val('')
+        $('#EffectName2').val('')
+        $('#EffectType2').val('')
+        $('#EffectValue2').val('')
+        $('#EffectName3').val('')
+        $('#EffectType3').val('')
+        $('#EffectValue3').val('')
+        $('#EffectName4').val('')
+        $('#EffectType4').val('')
+        $('#EffectValue4').val('')
+        $('#EffectName5').val('')
+        $('#EffectType5').val('')
+        $('#EffectValue5').val('') 
     }
     
-    //道具保存
-    function itemsave() { }
+
     //道具删除
     function itemremove(itemid) {
         let r = confirm("确认删除？");
         if (r == true) {
-            $post("/CreataStory/removeitem", { itemID: itemid }, function (data) {
-                if (data == 'true') {
-                    $('#' + statusid).remove();
+            $.post("/CreateStory/removeitem", { itemID: itemid }, function (data) {
+                if (data == true) {
+                    $('#' + itemid).remove();
                 } else {
                     alert(data);
                 }
@@ -215,14 +252,45 @@
         }
     }
     
-</script>
-<button onclick="ReturnList()">返回</button>
-<button onclick="DelectCard()">删除</button>
-<button data-toggle="modal" data-target="#StatusModel">状态量</button>
-<button data-toggle="modal" data-target="#ItemModel">道具</button>
-<hr />
+    //道具效果选择界面打开
+    function itemeffect(itemeffect)
+    {
 
-<div id="contener"></div>
+        $('#selectitem').val(itemeffect);
+        $('#ItemDetailModel').modal('hide');
+        $('#ItemEffectModel').modal('show');
+        $.post('/CreateStory/getitemeffect', { StorySeriesID:'@ListStoryCard.First().StoryCard.First().StoryCard.StorySeriesID'}, function (data) {
+            let content = '';
+            for (i in data) {
+                content += "<li onclick=selectstatus('" + data[i].name +"',1)>"+ data[i].name +"</li>"
+            }
+            $('#ItemEffectStatus-ul').empty();
+            $('#ItemEffectStatus-ul').append(content);
+        });
+    }
+     
+    //道具选择
+    function selectstatus(status,type) {
+        let item = $('#selectitem').val();
+        $('#EffectName' + item).val(status);
+        $('#EffectClass' + item).val(type);
+        $('#ItemDetailModel').modal('show');
+        $('#ItemEffectModel').modal('hide');
+    }
+
+</script>
+
+<h2>树<button class="btn btn-primary" style="float:right" onclick="ReturnList()">返回</button></h2>
+<hr />
+<div class="container">
+    <button class="btn btn-primary" onclick="DelectCard()">删除</button>
+    <button class="btn btn-primary" data-toggle="modal" data-target="#StatusModel">状态量</button>
+    <button class="btn btn-primary" data-toggle="modal" data-target="#ItemModel">道具</button>
+    <div style="margin:10px 10px 10px 10px" id="contener"></div>
+</div>
+
+
+
 
 <div id="StatusModel" class="modal fade">
     <div class="modal-dialog">
@@ -240,8 +308,8 @@
                     {
                         <li id="@s.ID">
                             <p>@s.Name</p>
-                            <button onclick="statusedit(@s.ID)">编辑</button>
-                            <button onclick="statusremove(@s.ID)">删除</button>
+                            <button onclick="statusedit('@s.ID')">编辑</button>
+                            <button onclick="statusremove('@s.ID')">删除</button>
                         </li>
                     }
                 </ul>
@@ -266,8 +334,8 @@
                     {
                         <li id="@s.ID">
                             <p>@s.Name</p>
-                            <button onclick="itemedit(@s.ID)">编辑</button>
-                            <button onclick="itemremove(@s.ID)">删除</button>
+                            <button onclick="itemedit('@s.ID')">编辑</button>
+                            <button onclick="itemremove('@s.ID')">删除</button>
                         </li>
                     } 
                 </ul>
@@ -284,20 +352,52 @@
                 <h4 class="modal-title">道具</h4>
             </div>
             <div class="modal-body">
-                <form asp-action="">
-                    <input type="hidden" id="itemID" name="itemID"/>
-                    图标：
-                    名称：<input asp-for="Name" id="itemname" />
-                    说明：<textarea asp-for="Introduction" id="itemdetail"></textarea>
-                    效果：
-                    <input id="EffectType1" asp-for="EffectType1" /><select id="EffectType1" asp-for="EffectType1"><option value='0'>增加</option><option value='1'>减少</option><option value='2'>赋值</option></select><input id="EffectValue1" asp-for="EffectValue1" />
-                    <input asp-for="EffectType2" /><select asp-for="EffectType2"><option value='0'>增加</option><option value='1'>减少</option><option value='2'>赋值</option></select><input asp-for="EffectValue2" />
-                    <input asp-for="EffectType3" /><select asp-for="EffectType3"><option value='0'>增加</option><option value='1'>减少</option><option value='2'>赋值</option></select><input asp-for="EffectValue3" />
-                    <input asp-for="EffectType4" /><select asp-for="EffectType4"><option value='0'>增加</option><option value='1'>减少</option><option value='2'>赋值</option></select><input asp-for="EffectValue4" />
-                    <input asp-for="EffectType5" /><select asp-for="EffectType5"><option value='0'>增加</option><option value='1'>减少</option><option value='2'>赋值</option></select><input asp-for="EffectValue5" />
-                    <button type="submit">保存</button>
-                    <button type="button"  data-dismiss="modal">取消</button>
+                <form asp-action="AddItem">
+                    <input type="hidden" id="StorySeriesID" name="StorySeriesID" value="@ListStoryCard.First().StoryCard.First().StoryCard.StorySeriesID"/>
+                    <input type="hidden" id="itemID" name="itemID" />
+                    <span>名称：<input asp-for="Name" id="itemname" /></span>
+                    <p>说明：</p><textarea asp-for="Introduction" id="itemdetail"></textarea>
+                    <p>效果：</p>
+                    <input hidden id="EffectClass1" asp-for="EffectClass1" /><input readonly id="EffectName1" asp-for="EffectName1" onclick="itemeffect(1)" /><select id="EffectType1" asp-for="EffectType1"><option value='0'>增加</option><option value='1'>减少</option><option value='2'>赋值</option></select><input id="EffectValue1" asp-for="EffectValue1" />
+                    <input hidden id="EffectClass2" asp-for="EffectClass2" /><input readonly id="EffectName2" asp-for="EffectName2" onclick="itemeffect(2)" /><select id="EffectType2" asp-for="EffectType2"><option value='0'>增加</option><option value='1'>减少</option><option value='2'>赋值</option></select><input id="EffectValue2" asp-for="EffectValue2" />
+                    <input hidden id="EffectClass3" asp-for="EffectClass3" /><input readonly id="EffectName3" asp-for="EffectName3" onclick="itemeffect(3)" /><select id="EffectType3" asp-for="EffectType3"><option value='0'>增加</option><option value='1'>减少</option><option value='2'>赋值</option></select><input id="EffectValue3" asp-for="EffectValue3" />
+                    <input hidden id="EffectClass4" asp-for="EffectClass4" /><input readonly id="EffectName4" asp-for="EffectName4" onclick="itemeffect(4)" /><select id="EffectType4" asp-for="EffectType4"><option value='0'>增加</option><option value='1'>减少</option><option value='2'>赋值</option></select><input id="EffectValue4" asp-for="EffectValue4" />
+                    <input hidden id="EffectClass5" asp-for="EffectClass5" /><input readonly id="EffectName5" asp-for="EffectName5" onclick="itemeffect(5)" /><select id="EffectType5" asp-for="EffectType5"><option value='0'>增加</option><option value='1'>减少</option><option value='2'>赋值</option></select><input id="EffectValue5" asp-for="EffectValue5" />
+                    <button type="submit" >保存</button>
+                    <button type="button" data-dismiss="modal">取消</button>
                 </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<div id="ItemEffectModel" class="modal fade">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-body">
+                <ul id="myTab" class="nav nav-tabs">
+                    <li class="active"><a href="#ItemEffectStatus" data-toggle="tab">状态</a></li>
+                    <li><a href="#ItemEffectCharacter" data-toggle="tab">人物属性</a></li>
+                </ul>
+                <div id="myTabContent" class="tab-content">
+                    <input hidden id="selectitem" />
+                    <div class="tab-pane fade in active" id="ItemEffectStatus">
+                        <ul id="ItemEffectStatus-ul"></ul>
+                    </div>
+                    <div class="tab-pane fade" id="ItemEffectCharacter">
+                        <ul>
+                            <li onclick="selectstatus('ActionPoints',2)">行动力</li>
+                            <li onclick="selectstatus('Lucky',2)">幸运</li>
+                            <li onclick="selectstatus('Speed',2)">速度</li>
+                            <li onclick="selectstatus('Strength',2)">力量</li>
+                            <li onclick="selectstatus('Intelligence',2)">智力</li>
+                            <li onclick="selectstatus('Experience',2)">社会经验</li>
+                            <li onclick="selectstatus('Status',2)">社会地位</li>
+                            <li onclick="selectstatus('Moral',2)">善恶值</li>
+                        </ul>
+                    </div>
+                </div>
             </div>
         </div>
     </div>

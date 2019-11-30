@@ -25,20 +25,22 @@ namespace NewCity.Controllers
             _SignInManager = SignInManager;
             _userManager = UserManager;
             _context = context;
+            
         }
 
 
         public bool isCreator() {
-            return _context.Creator.Where(a => a.UserID == GetUserId()).FirstOrDefault() != null ? true : false;
+            return _context.Creator.Where(a => a.UserID == Guid.Parse(GetUserId().ToString())).FirstOrDefault() != null ? true : false;
         }
         /// <summary>
         /// 获取当前用户Guid
         /// </summary>
         /// <returns></returns>
-        public Guid GetUserId() {
+        public Guid GetUserId()
+        {
             try
             {
-                return User != null ? Guid.Parse(_userManager.GetUserId(User)) : Guid.Empty;
+                return Guid.Parse(_userManager.GetUserId(User));
             }
             catch
             {
@@ -46,8 +48,6 @@ namespace NewCity.Controllers
             }
                 
         }
-
-        
 
     }
 }

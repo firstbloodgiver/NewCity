@@ -1,46 +1,50 @@
 ﻿
 @{
     ViewData["Title"] = "Main";
-
 }
 <style>
     #content {
-        background-color:black;
-        padding-top:20px;
+        background-color: black;
+        padding-top: 20px;
     }
-    #right{
-        background-color:black;
-        padding:1px 1px 1px 1px;
+
+    #right {
+        background-color: black;
+        padding: 1px 1px 1px 1px;
     }
+
     #main {
         background-color: black;
-        border:5px solid rgb(135,125,112);
+        border: 5px solid rgb(135,125,112);
     }
+
     #left {
         background-color: black;
         padding: 1px 1px 1px 1px;
     }
+
     #right-content {
         margin: 5px 5px 5px 5px;
         background-color: rgb(174,165,132);
-
     }
+
     #left-content {
         margin: 5px 5px 5px 5px;
         background-color: rgb(174,165,132);
-
     }
-    #main-content {
 
+    #main-content {
         background-color: rgb(174,165,132);
     }
-    #Option{
-        margin-top:50px
+
+    #Option {
+        margin-top: 50px
     }
 
-    #Option > div{
-        margin-top:50px;
-    }
+        #Option > div {
+            margin-top: 50px;
+        }
+
     .option-content :hover {
         background-color: aqua;
         color: aquamarine;
@@ -49,29 +53,37 @@
     .main-content-img {
         margin-top: 20px;
     }
+
     .main-content-text {
         margin-top: 20px;
     }
+
     .option-content {
         background-color: rgb(187,165,125);
         border: 3px solid rgb(135,125,112);
     }
-    .option-content:hover {
-        background-color:rgb(200,195,165);
-    }
+
+        .option-content:hover {
+            background-color: rgb(200,195,165);
+        }
+
     .status-row {
         padding: 10px 10px 10px 10px;
     }
+
     .nav-tabs {
         border-bottom: 1px hidden #ddd;
     }
-        .nav-tabs > li.active > a, .nav-tabs > li.active > a:hover, .nav-tabs > li.active > a:focus {
+
+    .nav-tabs > li.active > a, .nav-tabs > li.active > a:hover, .nav-tabs > li.active > a:focus {
             border-color: rgb(174,165,132);
             background-color: rgb(174,165,132);
-        }
-        .nav-tabs > li > a {
-            color: white
-        }
+    }
+
+    .nav-tabs > li > a {
+            color: white;
+            border-radius: 0px 0px 0px 0px;
+    }
 </style>
 
 
@@ -91,10 +103,10 @@
             </ul>
             <div class="tab-content">
                 <div class="tab-pane fade in active row" id="Status">
-                    
+
                 </div>
                 <div class="tab-pane fade row" id="Item">
-                     
+
                 </div>
             </div>
         </div>
@@ -112,8 +124,7 @@
                         @foreach (var option in ViewBag.StoryOptions)
                         {
                             <div class="row">
-                                <p>@option.Text</p>
-                                <button class="btn-default" onclick="NextCard('@option.ID')">继续</button>
+                                <button class="btn-default" onclick="NextCard('@option.ID')">@option.Text</button>
                             </div>
                         }
                     </div>
@@ -121,24 +132,24 @@
             </div>
         </div>
     </div>
-    <div id="right" class="col-md-3" >
+    <div id="right" class="col-md-3">
         <div id="right-content">
             <ul class="nav nav-tabs" style="background-color:black">
                 <li class="active">
                     <a href="#Task" data-toggle="tab">事件</a>
 
                 </li>
-                <li> 
+                <li>
                     <a href="#History" data-toggle="tab">历史</a>
 
                 </li>
             </ul>
             <div class="tab-content">
                 <div class="tab-pane fade in active row" id="Task">
-                    
+
                 </div>
                 <div class="tab-pane fade row" id="History">
-                    
+
                 </div>
             </div>
         </div>
@@ -152,22 +163,23 @@
 
     //初始读取
     window.onload = function () {
-        GetItem(@ViewBag.StoryCard.StorySeriesID);
+        GetItem('@ViewBag.StoryCard.StorySeriesID');
         GetState();
         GetSchedule();
-
         SetHeight();
     }
 
-
     function NextCard(optionID) {
-     
+
         $.post(
             '/Main/NextCard',
             { optionID: optionID },
             function (result) {
                 if (result == "GameOver") {
                     window.location.href = '/Main/StorySelect/'
+                }
+                else if (result == "TestOver") {
+                    window.location.href = '/Creator/'
                 }
                 debugger;
                 CleanContent();
@@ -177,12 +189,10 @@
         )
     }
 
-
-
     //添加选项
     function AddOption(option) {
         for (var i in option) {
-            $('#Option').append("<button onclick = NextCard('" + option[i].id + "')>" + option[i].text + "</button>")
+            $('#Option').append("<div class='row'><button class='btn-default' onclick = NextCard('" + option[i].id + "')>" + option[i].text + "</button></div>")
         }
     }
     //添加内容框内容
@@ -224,7 +234,8 @@
             let html = '';
             for (let i in jsonObj) {
 
-                html += "<div class='row'>" + jsonObj[i].Name + ":<div id=item" + jsonObj[i].ID + ">" + jsonObj[i].Amount + "</div><button onclick='useItem(" + jsonObj[i].ID + ")'>使用</button></div>"
+                html += "<div class='row'>" + jsonObj[i].Name + ":<div id=item" + jsonObj[i].ID + ">" +
+                    jsonObj[i].Amount + "</div><button onclick='useItem(" + jsonObj[i].ID + ")'>使用</button></div>"
             }
             let content = "<div class='row'>" + html + "</div>";
             $("#Item").append(content);
@@ -246,7 +257,7 @@
 
     //获取任务列表
     function GetSchedule() {
-        $.get('/Main/GetSchedule', function (data) { 
+        $.get('/Main/GetSchedule', function (data) {
             let jsonObj = JSON.parse(data);
             let html = '';
             for (let i in jsonObj) {
@@ -275,8 +286,4 @@
         let content = "<div class='row'>" + html + "</div>";
         $("#" + traget).append(content);
     }
-
-
-
-
 </script>

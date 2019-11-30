@@ -1,7 +1,7 @@
 ﻿
 var enumConditionType = [">", "<", "=", "≠"];
 
-var enumEffectType = ["增加", "减少", "赋值"];
+var enumEffectType = ["增加", "减少", "赋值","场景转移","结束"];
 
 const emptyguid = "00000000-0000-0000-0000-000000000000";
 

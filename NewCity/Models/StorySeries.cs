@@ -31,6 +31,11 @@ namespace NewCity.Models
         public bool IsActivate { get; set; }
 
         /// <summary>
+        /// 是否删除
+        /// </summary>
+        public bool IsCancel { get; set; } = false;
+
+        /// <summary>
         /// 故事状态
         /// </summary>
         public enumStoryStatus Status { get; set; }

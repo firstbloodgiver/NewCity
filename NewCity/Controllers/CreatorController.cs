@@ -19,11 +19,14 @@ namespace NewCity.Controllers
         public IActionResult Index()
         {
             string AccoundID = _userManager.GetUserId(User);
+            if (AccoundID == Guid.Empty.ToString())
+            {
+                return RedirectToAction("PleaseLogin", "Home");
+            }
             if (_SignInManager.IsSignedIn(User)|| AccoundID != null)
             {
                 List<StorySeries> storySeries = new List<StorySeries>();
-                storySeries = _context.StorySeries.Where(a => a.Author == Guid.Parse( AccoundID)).ToList();
-
+                storySeries = _context.StorySeries.Where(a => a.Author == Guid.Parse( AccoundID) && a.IsCancel != true).ToList();
                 ViewBag.storySeries = storySeries;
                 return View();
             }
@@ -50,7 +53,7 @@ namespace NewCity.Controllers
         public async Task<IActionResult> Delete(string id) {
             var storySeries = await _context.StorySeries.FirstOrDefaultAsync(m => m.ID == Guid.Parse(id));
             if (storySeries.Author == GetUserId()) {
-                _context.StorySeries.Remove(storySeries);
+                storySeries.IsCancel = true;
                 await _context.SaveChangesAsync();
                 return Json(true);
             }

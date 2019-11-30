@@ -33,6 +33,10 @@ namespace NewCity.Models
         /// <summary>
         /// 效果1
         /// </summary>
+        public string EffectClass1 { get; set; }
+        /// <summary>
+        /// 效果1
+        /// </summary>
         public string EffectName1 { get; set; }
         /// <summary>
         /// 效果1
@@ -42,6 +46,10 @@ namespace NewCity.Models
         /// 效果1
         /// </summary>
         public string EffectValue1 { get; set; }
+        /// <summary>
+        /// 效果2
+        /// </summary>
+        public string EffectClass2 { get; set; }
         /// <summary>
         /// 效果2
         /// </summary>
@@ -57,6 +65,10 @@ namespace NewCity.Models
         /// <summary>
         /// 效果3
         /// </summary>
+        public string EffectClass3 { get; set; }
+        /// <summary>
+        /// 效果3
+        /// </summary>
         public string EffectName3 { get; set; }
         /// <summary>
         /// 效果3
@@ -69,6 +81,10 @@ namespace NewCity.Models
         /// <summary>
         /// 效果4
         /// </summary>
+        public string EffectClass4 { get; set; }
+        /// <summary>
+        /// 效果4
+        /// </summary>
         public string EffectName4 { get; set; }
         /// <summary>
         /// 效果4
@@ -78,6 +94,10 @@ namespace NewCity.Models
         /// 效果4
         /// </summary>
         public string EffectValue4 { get; set; }
+        /// <summary>
+        /// 效果5
+        /// </summary>
+        public string EffectClass5 { get; set; }
         /// <summary>
         /// 效果5
         /// </summary>

@@ -22,22 +22,17 @@ namespace NewCity.Controllers
 
         public IActionResult Index()
         {
+            ViewBag.Silde = _context.HomeNews.Where(a => a.Type == (int)HomeType.轮播).OrderBy(a => a.CreateTime).Take(3).ToList();
+            ViewBag.Content = _context.HomeNews.Where(a => a.Type == (int)HomeType.内容).OrderBy(a => a.CreateTime).Take(4).ToList();
+            ViewBag.Publicity = _context.HomeNews.Where(a => a.Type == (int)HomeType.主体语).OrderBy(a => a.CreateTime).FirstOrDefault();
 
-            if (_SignInManager.IsSignedIn(User))
-            {
-                return RedirectToAction("Index", "Main");
-            }
-            else
-            {
-                ViewBag.Silde = _context.HomeNews.Where(a => a.Type == (int)HomeType.轮播).OrderBy(a => a.CreateTime).Take(3).ToList();
-                ViewBag.Content = _context.HomeNews.Where(a => a.Type == (int)HomeType.内容).OrderBy(a => a.CreateTime).Take(4).ToList();
-                ViewBag.Publicity = _context.HomeNews.Where(a => a.Type == (int)HomeType.主体语).OrderBy(a => a.CreateTime).FirstOrDefault();
-            }
             return View();
         }
 
 
-
+        public IActionResult PleaseLogin() {
+            return View();
+        }
 
         public IActionResult About()
         {
@@ -59,6 +54,24 @@ namespace NewCity.Controllers
         }
 
 
+        public IActionResult List()
+        {
+            Guid userid = GetUserId();
+            if (userid != Guid.Empty)
+            {
+                var creator = _context.Creator.AsNoTracking().Where(a => a.UserID == userid).FirstOrDefault();
+                if (creator != null)
+                {
+                    return RedirectToAction("Index", "Creator");
+                }
+                else
+                {
+                    return RedirectToAction("StorySelect", "Main");
+                }
+            }
+            return RedirectToAction("Index");
+        }
+
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
         public IActionResult Error()
         {
@@ -66,5 +79,5 @@ namespace NewCity.Controllers
         }
     }
 
-    
+
 }

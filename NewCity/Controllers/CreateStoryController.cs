@@ -37,11 +37,14 @@ namespace NewCity.Controllers
                 }
                 else
                 {
+                    
                     StoryCard card = new StoryCard()
                     {
                         ID = Guid.NewGuid(),
                         StorySeriesID = Guid.Parse(id),
-                        StoryName = string.Empty,
+                        StoryName = _context.StorySeries.AsNoTracking().Where(a=>a.ID == Guid.Parse(id)).First().SeriesName,
+                        Title = string.Empty,
+                        Text = string.Empty,
                         IsHead = true
                     };
 
@@ -87,6 +90,7 @@ namespace NewCity.Controllers
                 StoryCard storyCard = new StoryCard()
                 {
                     ID = temp.ID,
+                    Title = temp.Title,
                     StorySeriesID = temp.StorySeriesID,
                     StoryName = temp.StoryName,
                     Text = temp.Text,
@@ -205,7 +209,6 @@ namespace NewCity.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Save(string json)
         {
-            
             if (!string.IsNullOrEmpty(json))
             {
                 StoryCard card = JsonConvert.DeserializeObject<StoryCard>(json);
@@ -216,36 +219,27 @@ namespace NewCity.Controllers
                 storyCard.BackgroundIMG = card.BackgroundIMG;
                 //storyCard.StoryOptions = card.StoryOptions;
 
-                foreach (var obj in card.StoryOptions)
+                _context.StoryOption.RemoveRange(storyCard.StoryOptions); 
+
+                foreach(var obj in card.StoryOptions)
                 {
-                    var temp = storyCard.StoryOptions.FirstOrDefault(a => a.ID == obj.ID);
-                    if(temp == null)
+                    StoryOption option = new StoryOption()
                     {
-                        StoryOption option = new StoryOption()
-                        {
-                            ID = obj.ID,
-                            StoryCardID = obj.StoryCardID,
-                            Text = obj.Text,
-                            NextStoryCardID = obj.NextStoryCardID,
-                            Condition = obj.Condition,
-                            Effect = obj.Effect
-                        };
-                        storyCard.StoryOptions.Add(option);
-                    }
-                    else
-                    {
-                        temp.Condition = obj.Condition;
-                        temp.Effect = obj.Effect;
-                        temp.Text = obj.Text;
-                    }       
-                    
+                        ID = obj.ID,
+                        StoryCardID = obj.StoryCardID,
+                        Text = obj.Text,
+                        NextStoryCardID = obj.NextStoryCardID,
+                        Condition = obj.Condition,
+                        Effect = obj.Effect
+                    };
+                    storyCard.StoryOptions.Add(option);
                 }
+
                 await _context.SaveChangesAsync();
                 //return Index(card.StorySeriesID.ToString());
                 return RedirectToAction(nameof(Index),new { id = card.StorySeriesID.ToString() });
             }
             return NotFound();
-
         }
 
         /// <summary>
@@ -265,7 +259,9 @@ namespace NewCity.Controllers
                     {
                         ID = Guid.NewGuid(),
                         StorySeriesID = storyCard.StorySeriesID,
-                        StoryName = string.Empty,
+                        StoryName = _context.StorySeries.AsNoTracking().Where(a=>a.ID == storyCard.StorySeriesID).First().SeriesName,
+                        Title = string.Empty,
+                        Text = string.Empty
                     };
                     _context.StoryCard.Add(NewStoryCard);
                     nextCardId = NewStoryCard.ID;
@@ -282,7 +278,7 @@ namespace NewCity.Controllers
 
                 return RedirectToAction(nameof(Index), new { id = schedule.StorySeriesID });
             }
-            catch
+            catch(Exception ex)
             {
                 return NotFound();
             }
@@ -302,6 +298,12 @@ namespace NewCity.Controllers
                 var series = _context.StorySeries.AsNoTracking().Where(a => a.ID == card.StorySeriesID).FirstOrDefault();
                 if (series != null && series.Author == GetUserId())
                 {
+                    //重置父卡片记录
+                    var fcard = _context.StoryOption.Where(a => a.NextStoryCardID == cardid).FirstOrDefault();
+                    if(fcard != null)
+                    {
+                        fcard.NextStoryCardID = Guid.Empty;
+                    }
                     //删除选项
                     _context.RemoveRange(_context.StoryOption.Where(a => a.StoryCardID == cardid));
                     _context.Remove(card);
@@ -379,7 +381,7 @@ namespace NewCity.Controllers
         /// <param name="statusID"></param>
         /// <returns></returns>
         [HttpPost]
-        public JsonResult editstatus(Guid statusID,string status)
+        public JsonResult editstatus(Guid statusID, string status)
         {
             try
             {
@@ -397,7 +399,6 @@ namespace NewCity.Controllers
             {
                 return Json("未找到该状态！");
             }
-            
         }
 
         /// <summary>
@@ -450,40 +451,45 @@ namespace NewCity.Controllers
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> AddItem(string itemID,Guid StorySeriesID, [Bind("Name,Introduction" +
-            ",EffectType1,EffectType1,EffectValue1" +
-            ",EffectType2,EffectType2,EffectValue2" +
-            ",EffectType3,EffectType3,EffectValue3" +
-            ",EffectType4,EffectType4,EffectValue4" +
-            ",EffectType5,EffectType5,EffectValue5")] Item item)
+            ",EffectType1,EffectName1,EffectValue1,EffectClass1" +
+            ",EffectType2,EffectName2,EffectValue2,EffectClass2" +
+            ",EffectType3,EffectName3,EffectValue3,EffectClass3" +
+            ",EffectType4,EffectName4,EffectValue4,EffectClass4" +
+            ",EffectType5,EffectName5,EffectValue5,EffectClass5")] Item item)
         {
             try
             {
-                var story = _context.StorySeries.Where(a => a.ID == StorySeriesID).First();
+                var story = _context.StorySeries.Where(a => a.ID == StorySeriesID && a.Author == GetUserId()).First();
                 if(story.Author == GetUserId())
                 {
-                    if (itemID != string.Empty)
+                    if (itemID != null)
                     {
                         var olditem = _context.Item.Where(a => a.ID == Guid.Parse(itemID)).First();
                         olditem.Name = item.Name;
                         olditem.Introduction = item.Introduction;
+                        olditem.EffectClass1 = item.EffectClass1;
                         olditem.EffectName1 = item.EffectName1;
                         olditem.EffectType1 = item.EffectType1;
                         olditem.EffectValue1 = item.EffectValue1;
+                        olditem.EffectClass2 = item.EffectClass2;
                         olditem.EffectName2 = item.EffectName2;
                         olditem.EffectType2 = item.EffectType2;
                         olditem.EffectValue2 = item.EffectValue2;
+                        olditem.EffectClass3 = item.EffectClass3;
                         olditem.EffectName3 = item.EffectName3;
                         olditem.EffectType3 = item.EffectType3;
                         olditem.EffectValue3 = item.EffectValue3;
+                        olditem.EffectClass4 = item.EffectClass4;
                         olditem.EffectName4 = item.EffectName4;
                         olditem.EffectType4 = item.EffectType4;
                         olditem.EffectValue4 = item.EffectValue4;
+                        olditem.EffectClass5 = item.EffectClass5;
                         olditem.EffectName5 = item.EffectName5;
                         olditem.EffectType5 = item.EffectType5;
                         olditem.EffectValue5 = item.EffectValue5;
 
                         await _context.SaveChangesAsync();
-                        return Json("true");
+                        return RedirectToAction(nameof(FlowChart), new { id = StorySeriesID });
                     }
                     else
                     {
@@ -493,6 +499,11 @@ namespace NewCity.Controllers
                             StorySeriesID = StorySeriesID,
                             Name = item.Name,
                             Introduction = item.Introduction,
+                            EffectClass1 = item.EffectClass1,
+                            EffectClass2 = item.EffectClass2,
+                            EffectClass3 = item.EffectClass3,
+                            EffectClass4 = item.EffectClass4,
+                            EffectClass5 = item.EffectClass5,
                             EffectName1 = item.EffectName1,
                             EffectType1 = item.EffectType1,
                             EffectValue1 = item.EffectValue1,
@@ -510,7 +521,8 @@ namespace NewCity.Controllers
                             EffectValue5 = item.EffectValue5,
                         };
                         await _context.Item.AddAsync(newitem);
-                        return Json("true");
+                        await _context.SaveChangesAsync();
+                        return RedirectToAction(nameof(FlowChart), new { id = StorySeriesID });
                     }
                 }
                 else
@@ -526,13 +538,36 @@ namespace NewCity.Controllers
             
         }
 
+        /// <summary>
+        /// 获取物品可选的故事状态，人物状态
+        /// </summary>
+        /// <returns></returns>
         [HttpPost]
-        public JsonResult getitem(Guid itemID)
+        public JsonResult getitemeffect(Guid StorySeriesID)
+        {
+            try
+            {
+                _context.StorySeries.AsNoTracking().Where(a => a.ID == StorySeriesID && a.Author == GetUserId()).First();
+                List<StoryStatus> storystatus = _context.StoryStatus.AsNoTracking().Where(a => a.StorySeries == StorySeriesID.ToString()).ToList();
+                return Json(storystatus);
+            }
+            catch{
+                return Json("[]");
+            }
+        }
+
+        /// <summary>
+        /// 获取物品列表
+        /// </summary>
+        /// <param name="itemID"></param>
+        /// <returns></returns>
+        [HttpPost]
+        public JsonResult getitemstatus(Guid itemID)
         {
             try
             {
                 var item = _context.Item.AsNoTracking().Where(a => a.ID == itemID).First();
-                _context.StorySeries.AsNoTracking().Where(a => a.ID == item.ID && a.Author == GetUserId()).First();
+                _context.StorySeries.AsNoTracking().Where(a => a.ID == item.StorySeriesID && a.Author == GetUserId()).First();
                 return Json(item);
             }
             catch
