@@ -255,36 +255,7 @@ namespace NewCity.Controllers
                 var Schedule = _context.UserSchedule.Where(a => a.UserID == GetUserId() && a.StoryCardID == storycard.ID).First();
                 if (Check(opti.Condition, storycard.StorySeriesID.ToString()))
                 {
-                    var Nextstorycard = _context.StoryCard.Include(a => a.StoryOptions).AsNoTracking().Where(a => a.ID == opti.NextStoryCardID).FirstOrDefault();
                     JsonResult result = Json(string.Empty);
-                    if (Nextstorycard != null)
-                    {
-                        StoryCard resultCard = new StoryCard() {
-                            ID = Nextstorycard.ID,
-                            StorySeriesID = Nextstorycard.StorySeriesID,
-                            StoryName = Nextstorycard.StoryName,
-                            Title = Nextstorycard.Title,
-                            Text = Nextstorycard.Text,
-                            IMG = Nextstorycard.IMG,
-                            BackgroundIMG = Nextstorycard.BackgroundIMG,
-                            IsHead = Nextstorycard.IsHead,
-                            StoryOptions = new List<StoryOption>()
-                        };
-                        //去除不显示的选项
-                        foreach (var option in Nextstorycard.StoryOptions)
-                        {
-                            if (Check(option.Condition, storycard.StorySeriesID.ToString()))
-                            {
-                                resultCard.StoryOptions.Add(option);
-                            }
-                        }
-                        result = Json(resultCard);
-                        //保存进度
-                        #region  
-                        Schedule.StoryCardID = Nextstorycard.ID;
-                        await _context.SaveChangesAsync();
-                        #endregion
-                    }
                     //执行操作效果
                     #region
                     if (!string.IsNullOrWhiteSpace(opti.Effect))
@@ -336,9 +307,43 @@ namespace NewCity.Controllers
                             }
                             _context.SaveChanges();
                         }
-                       
+
                     }
                     #endregion
+
+                    //下一页构建
+                    #region  
+                    var Nextstorycard = _context.StoryCard.Include(a => a.StoryOptions).AsNoTracking().Where(a => a.ID == opti.NextStoryCardID).FirstOrDefault();
+                    
+                    if (Nextstorycard != null)
+                    {
+                        StoryCard resultCard = new StoryCard() {
+                            ID = Nextstorycard.ID,
+                            StorySeriesID = Nextstorycard.StorySeriesID,
+                            StoryName = Nextstorycard.StoryName,
+                            Title = Nextstorycard.Title,
+                            Text = Nextstorycard.Text,
+                            IMG = Nextstorycard.IMG,
+                            BackgroundIMG = Nextstorycard.BackgroundIMG,
+                            IsHead = Nextstorycard.IsHead,
+                            StoryOptions = new List<StoryOption>()
+                        };
+                        //去除不显示的选项
+                        foreach (var option in Nextstorycard.StoryOptions)
+                        {
+                            if (Check(option.Condition, storycard.StorySeriesID.ToString()))
+                            {
+                                resultCard.StoryOptions.Add(option);
+                            }
+                        }
+                        result = Json(resultCard);
+                        //保存进度
+    
+                        Schedule.StoryCardID = Nextstorycard.ID;
+                        await _context.SaveChangesAsync();
+                        #endregion
+                    }
+                    
                     return result;
                 }
                 else
