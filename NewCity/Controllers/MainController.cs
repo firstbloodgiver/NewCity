@@ -317,7 +317,7 @@ namespace NewCity.Controllers
                     
                     if (Nextstorycard != null)
                     {
-                        StoryCard resultCard = new StoryCard() {
+                        StoryCard resultCard = new StoryCard() {    
                             ID = Nextstorycard.ID,
                             StorySeriesID = Nextstorycard.StorySeriesID,
                             StoryName = Nextstorycard.StoryName,
@@ -660,6 +660,7 @@ namespace NewCity.Controllers
                         }
                         if (DBstatus != null)
                         {
+                            getRandom(StorySeriesID);
                             int dbstatus = Convert.ToInt32(DBstatus.Value);
                             int statues = Convert.ToInt32(status.Value);
                             bool result = false;
@@ -688,11 +689,19 @@ namespace NewCity.Controllers
                     return true;
                 }
             }
-            catch
+            catch(Exception ex)
             {
                 return true;
             }
         }
+
+        private int getRandom(Guid StorySeriesID) {
+            int result = 0;
+            Guid storycardID = _context.UserSchedule.AsNoTracking().Where(a => a.UserID == GetUserId() && a.StorySeriesID == StorySeriesID).First().StoryCardID;
+            
+            return = result;
+        }
+
 
         /// <summary>
         /// 检测在故事卡中还是在场景中

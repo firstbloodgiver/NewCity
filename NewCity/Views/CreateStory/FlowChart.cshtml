@@ -26,7 +26,7 @@
     }
 </style>
 <script src="~/js/enum.js"></script>
-<script src="~/js/jsplumb.js"></script>
+<script src="~/js/jsplumb.min.js"></script>
 <script src="~/lib/jquery/dist/jquery.min.js"></script>
 
 
@@ -41,6 +41,8 @@
         for (let i in StoryCards) {
             for (let j in StoryCards[i].storyCard) {
                 for (let t in StoryCards[i].storyCard[j].fatherStoryCardId) {
+                    debugger
+                    
                     jsPlumb.connect({
                         source: StoryCards[i].storyCard[j].fatherStoryCardId[t],
                         target: StoryCards[i].storyCard[j].storyCard.id,
@@ -50,7 +52,7 @@
                         anchor: ['Top', 'Bottom'],
                         overlays: [['Arrow', { width: 12, length: 12, location: 0.5 }]]
                     })
-
+                    //jsPlumb.draggable('cf7fa91c-95c7-422b-b8d7-3bd0c4b71617')
                     jsPlumb.draggable(StoryCards[i].storyCard[j].storyCard.id)
                 }
             }
@@ -289,9 +291,6 @@
     <div style="margin:10px 10px 10px 10px" id="contener"></div>
 </div>
 
-
-
-
 <div id="StatusModel" class="modal fade">
     <div class="modal-dialog">
         <div class="modal-content">
@@ -342,7 +341,7 @@
             </div>
         </div>
     </div>
-</div>
+</div> 
 
 <div id="ItemDetailModel" class="modal fade">
     <div class="modal-dialog">
@@ -370,7 +369,6 @@
         </div>
     </div>
 </div>
-
 
 <div id="ItemEffectModel" class="modal fade">
     <div class="modal-dialog">
