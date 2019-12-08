@@ -101,6 +101,13 @@ namespace NewCity.Controllers
             {
                 _context.CharacterStatus.RemoveRange(statuslist);
             }
+
+            //清楚随机数记录
+            var random = _context.StoryCardRandom.Where(a => a.UserID == GetUserId() && a.StorySeriesID == Guid.Parse(SeriesID)).ToList();
+            if (random.Count > 0)
+            {
+                _context.StoryCardRandom.RemoveRange(random);
+            }
             _context.SaveChanges();
         }
 
@@ -660,7 +667,7 @@ namespace NewCity.Controllers
                         }
                         if (DBstatus != null)
                         {
-                            getRandom(StorySeriesID);
+                            getRandom(Guid.Parse(StorySeriesID));
                             int dbstatus = Convert.ToInt32(DBstatus.Value);
                             int statues = Convert.ToInt32(status.Value);
                             bool result = false;
@@ -696,10 +703,26 @@ namespace NewCity.Controllers
         }
 
         private int getRandom(Guid StorySeriesID) {
-            int result = 0;
-            Guid storycardID = _context.UserSchedule.AsNoTracking().Where(a => a.UserID == GetUserId() && a.StorySeriesID == StorySeriesID).First().StoryCardID;
-            
-            return = result;
+            Guid storycard = _context.UserSchedule.AsNoTracking().Where(a => a.UserID == GetUserId() && a.StorySeriesID == StorySeriesID).First().StoryCardID;
+            var random = _context.StoryCardRandom.AsNoTracking().Where(a => a.StoryCardID == storycard && a.StorySeriesID == StorySeriesID).FirstOrDefault();
+            if(random!= null)
+            {
+                 return random.Value;
+            }
+            else
+            {
+                Random rd = new Random();
+                StoryCardRandom storyCardRandom = new StoryCardRandom() {
+                    ID = Guid.NewGuid(),
+                    StorySeriesID = StorySeriesID,
+                    StoryCardID = storycard,
+                    Value = rd.Next(1,100),
+                    UserID = GetUserId()
+                };
+                _context.StoryCardRandom.Add(storyCardRandom);
+                _context.SaveChanges();
+                return storyCardRandom.Value;
+            }
         }
 
 
