@@ -64,14 +64,35 @@ namespace NewCity.Controllers
         public async Task<IActionResult> Active(string id)
         {
             var storySeries = await _context.StorySeries.FirstOrDefaultAsync(m => m.ID == Guid.Parse(id));
-            if (storySeries.Author == GetUserId())
+            if (storySeries.Author == GetUserId() && Integrity(storySeries.ID).Count() == 0)
             {
                 storySeries.Status = Enum.enumStoryStatus.进行中;
                 await _context.SaveChangesAsync();
                 return Json(true);
             }
+            else if(Integrity(storySeries.ID).Count() > 0)
+            {
+                return Json(Integrity(storySeries.ID));
+            }
             return Json(false);
         }
+
+        /// <summary>
+        /// 完整性检测
+        /// </summary>
+        private IEnumerable<Guid> Integrity(Guid storySeriesID)
+        {
+            List<Guid> cardIDs = new List<Guid>();
+
+            var temp = _context.StoryOption.AsNoTracking().Where(a => a.NextStoryCardID == Guid.Empty && a.Effect.Contains("结束故事") != true).ToList();
+            foreach(var option in temp)
+            {
+                cardIDs.Add(option.StoryCardID);
+            }
+            var result = cardIDs.Distinct();
+            return result;
+        }
+
         [HttpPost]
         public async Task<IActionResult> AntiActive(string id)
         {

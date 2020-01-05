@@ -41,9 +41,9 @@
         margin-top: 50px
     }
 
-    #Option > div {
-        margin-top: 50px;
-    }
+        #Option > div {
+            margin-top: 50px;
+        }
 
     .option-content :hover {
         background-color: aqua;
@@ -75,15 +75,15 @@
         border-bottom: 1px hidden #ddd;
     }
 
-    .nav-tabs > li.active > a, .nav-tabs > li.active > a:hover, .nav-tabs > li.active > a:focus {
+        .nav-tabs > li.active > a, .nav-tabs > li.active > a:hover, .nav-tabs > li.active > a:focus {
             border-color: rgb(174,165,132);
             background-color: rgb(174,165,132);
-    }
+        }
 
-    .nav-tabs > li > a {
+        .nav-tabs > li > a {
             color: white;
             border-radius: 0px 0px 0px 0px;
-    }
+        }
 </style>
 
 
@@ -94,7 +94,6 @@
             <ul class="nav nav-tabs" style="background-color:black">
                 <li class="active">
                     <a href="#Status" data-toggle="tab">属性</a>
-
                 </li>
                 <li>
                     <a href="#Item" data-toggle="tab">物品</a>
@@ -114,19 +113,31 @@
     <div id="main" class="col-md-6 container-fluid">
         <div id="main-content">
             <div class="container-fluid">
-                <div class="col-md-4 main-content-img">
-                    <p>123</p>
-                    <img id="Img" src="@ViewBag.StoryCard.IMG" />
-                </div>
                 <div class="col-md-8 main-content-text">
-                    <p id="Text">@ViewBag.StoryCard.Text</p>
+                    <div id="Text">
+                        @Html.Raw(ViewBag.StoryCard.Text)
+                    </div>
                     <div class="row" id="Option">
                         @foreach (var option in ViewBag.StoryOptions)
                         {
-                            <div class="row">
-                                <button class="btn-default" onclick="NextCard('@option.ID')">@option.Text</button>
-                            </div>
+                            if (option.hidden)
+                            {
+
+                                <button hidden type="button" class="btn-default" onclick="NextCard('@option.ID')">@option.Text</button>
+
+                            }
+                            else
+                            {
+
+                                <button type="button" class="btn-default" onclick="NextCard('@option.ID')">@option.Text</button><p></p>
+                            }
+
                         }
+                    </div>
+                </div>
+                <div class="col-md-4 main-content-img">
+                    <div id="Img">
+                        <img src="@ViewBag.StoryCard.IMG" class="img-responsive" />
                     </div>
                 </div>
             </div>
@@ -181,9 +192,8 @@
                 else if (result == "TestOver") {
                     window.location.href = '/Creator/'
                 }
-                debugger;
                 CleanContent();
-                AddContent(result.text);
+                AddContent(result.text, result.img);
                 AddOption(result.storyOptions)
             }
         )
@@ -192,18 +202,18 @@
     //添加选项
     function AddOption(option) {
         for (var i in option) {
-            $('#Option').append("<div class='row'><button class='btn-default' onclick = NextCard('" + option[i].id + "')>" + option[i].text + "</button></div>")
+            $('#Option').append("<button  type='button' class='btn-default' onclick = NextCard('" + option[i].id + "')>" + option[i].text + "</button><p></p>")
         }
     }
     //添加内容框内容
-    function AddContent(text) {
-        //$('#Img')
+    function AddContent(text, img) {
+        $("#Img img").attr("src",img);
         $('#Text').append(text);
     }
     //清除内容框
     function CleanContent() {
         $('#Text').empty();
-        $('#Img').empty();
+        $("#Img img").attr("src", "");
         $('#Option').empty();
     }
 

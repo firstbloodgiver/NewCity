@@ -1,5 +1,6 @@
-﻿@model IEnumerable<NewCity.Models.StoryCard>
+﻿@model NewCity.Controllers.CreateStoryController
 @{
+    ViewData["Title"] = "Card";
     StoryCard LastStoryCard = ViewBag.LastCard as StoryCard;
 }
 <script src="~/js/enum.js"></script>
@@ -30,22 +31,29 @@
             <div class="row">
                 <div class="col-md-3" id="TitleContent"></div>
             </div>
-            <div class="row">
-                <div class="col-md-8" id="Content"></div>
-                <div class="col-md-4" id="Img"></div>
-            </div>
-            <div class="row" id="Option">
 
+            <div class="row">
+                <div class="col-md-8" id="Content">
+
+                </div>
+                <div class="col-md-4" id="IMG">
+                    <img src="@LastStoryCard.IMG" class="img-responsive" />
+                </div>
             </div>
+
+            <div class="row" id="Option"></div>
             <div class="form-group">
                 <button type="button" onclick="AddOption()">增加选项</button>
             </div>
             <div class="form-group">
-                <form asp-action="Save">
+                <form id="saveform" asp-action="Save" enctype="multipart/form-data">
+                    <label>插图</label><input type="file" name="file" accept="image.jpg,image.png" />
                     <input name="json" id="json" Hidden />
                     <button type="submit" onclick="SaveCard()">保存</button>
                 </form>
             </div>
+
+
         </div>
     </div>
 </div>
@@ -139,6 +147,21 @@
     </div>
 </div>
 
+<!--效果数值选择模态框-->
+<div id="effectValueModel" class="modal fade">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                <h4 class="modal-title">效果值</h4>
+            </div>
+            <div class="modal-body">
+                <ul id="effectSelectValue"></ul>
+            </div>
+        </div>
+    </div>
+</div>
+
 <!--效果状态选择模态框-->
 <div id="EffectSelectModel" class="modal fade">
     <div class="modal-dialog">
@@ -196,20 +219,26 @@
 </div>
 
 
-
+<script type="text/javascript" src="~/js/wangEditor.min.js"></script>
 <script>
     //将来自控制器的故事卡转换为js对象,并显示到页面
     var CardObj;
     $(function () {
         Serialize()
         CreaterView(CardObj)
-    });
+        CreaterEditor()
+        BindButton()
 
+    });
+</script>
+<script>
     /////////////////////////主界面
     //根据输入的卡片构建主界面
+
     function CreaterView(card) {
         EmptyView()
-        let content = "<textarea id='Text' style=height:250px;width:100%>" + card.text+"</textarea>"
+        let content = "<textarea hidden id='Text' style=height:250px;width:100%></textarea>"
+        content += "<div id='TextEditor'>" + card.text + "</div>"
         let title = "<input id='Title' value=" + card.title +">";
 
         $("#StoryId").append(card.id)
@@ -225,6 +254,44 @@
             }
         }
     }
+    function CreaterEditor() {
+        //因为会挡住，打开model移动editor到最底层
+        $('#Content').css('z-index', 1)
+        var E = window.wangEditor
+        var editor = new E('#TextEditor')
+        editor.customConfig.menus = [
+            'bold',  // 粗体
+            'fontSize',  // 字号
+            'fontName',  // 字体
+            'italic',  // 斜体
+            'underline',  // 下划线
+            'strikeThrough',  // 删除线
+            'foreColor',  // 文字颜色
+            'backColor',  // 背景颜色
+            'link',  // 插入链接
+            'undo',  // 撤销
+            'redo'  // 重做
+        ]
+        var $text1 = $('#Text')
+        editor.customConfig.onchange = function (html) {
+            // 监控变化，同步更新到 textarea
+            $text1.val(html)
+        }
+        editor.create()
+        // 初始化 textarea 的值
+        $text1.val(editor.txt.html())
+    }
+
+    function BindButton() {
+        $(window).keydown(function (event) {
+            if (!(event.which == 83 && event.ctrlKey)) return true;
+            SaveCard()
+            $("#saveform").submit();
+            event.preventDefault();
+            return false
+        })
+    }
+
     function CreateOption(i) {
         let option = "";
         option += "<div class='OptionGroup' id='"+ i +"'>"
@@ -249,14 +316,17 @@
         $("#BackgroundIMG").empty()
 
     }
-    //取消选项
+    //取消并保存选项
     function Cancel(optionid) {
         $("#" + optionid).remove();
-        CardObj.storyOptions.splice(optionid,1)
+        CardObj.storyOptions.splice(optionid, 1)
+        SaveCard()
+        $("#saveform").submit();
     }
     //增加选项
     function AddOption() {
         let option = {
+            condition: [],
             condition: [],
             effect: [],
             id: guid(),
@@ -302,7 +372,6 @@
 
     //下一页详情确定
     function ConfirmNextCard() {
-        debugger
         let optionid = $("#nooptionnextcard").val();
         CardObj.storyOptions[optionid].nextStoryCardID = $("#optionnextcard").val();
     }
@@ -330,8 +399,11 @@
             CardObj.storyOptions = new Array();
         }
     }
-    ///////////////////////////////end
 
+
+    ///////////////////////////////end
+</script>
+<script>
     ///////////////////////////////条件
     let ConditionCount = 0;
     //设置条件
@@ -342,7 +414,7 @@
             Condition(j, i);
             ConditionCount++;
         }
-        let string = "<button onclick='AddCondition(" + i + ")'>+</button><button onclick = 'SaveCondition(" + i + ")' > 确定</button>";
+        let string = "<button onclick='AddCondition(" + i + ")'>+</button><button onclick = 'SaveCondition(" + i + ")'> 确定</button> ";
         $('#Conditionoperation').append(string);
 
         $('#ConditionModel').modal('show');
@@ -360,8 +432,8 @@
         $(".conditionname").each(function () {
             let c = {
                 Name: $(this).val(),
-                Type : "",
-                Value : ""
+                Type: "",
+                Value: ""
             }
             condition.push(c);
 
@@ -378,8 +450,8 @@
     }
 
     function Condition(condition, storyoption) {
-        let name =  "";
-        let value =  "";
+        let name = "";
+        let value = "";
         let type = "";
 
         if (CardObj.storyOptions[storyoption].condition.length >= condition + 1) {
@@ -391,7 +463,7 @@
         if (type == "4") {
             context = "";
         }
-        else{
+        else {
             context =
                 "<div id='conditionid" + condition + "'>" +
                 "<input id='condition" + condition + '-' + storyoption + "' readonly onclick=selectstatus('condition" + condition + '-' + storyoption + "') class='conditionname' value='" + name + "'/>" +
@@ -401,17 +473,14 @@
                 + "<option value='2'>=</option>"
                 + "<option value='3'>≠</option>"
                 + "<select/>" +
-            "<input id='conditionvalue" + condition + '-' + storyoption + "' readonly onclick=selectstatusvalue('conditionvalue" + condition + '-' + storyoption + "') class='conditionvalue' value='" + value + "'/>" +
+                "<input id='conditionvalue" + condition + '-' + storyoption + "' readonly onclick=selectstatusvalue('conditionvalue" + condition + '-' + storyoption + "') class='conditionvalue' value='" + value + "'/>" +
                 "<button onclick='ConditionCancel(" + condition + "," + storyoption + ")'>取消</button>" +
                 "</div>"
             $("#conditionidselect" + condition).val(type)
         }
-
         $('#Condition').append(context)
-
-        $("#Condition option[value='"+ type +"']").attr("selected", true);
+        $("#conditionid" + condition + "  option[value='" + type + "' ]").attr("selected", true);
     }
-
     function EmptyCondition() {
         $('#Condition').empty();
         $('#Conditionoperation').empty();
@@ -424,7 +493,7 @@
 
     //选择条件状态
     function selectstatus(option) {
-        $('#ConditionModel').modal('hide')
+        //$('#ConditionModel').modal('hide')
         $('#StatusSelect').empty();
         $('#StatusModel').modal('show')
 
@@ -439,7 +508,7 @@
             li += '<hr/>'
             li += '<h3>人物状态</h3>'
             for (let i in characterStatus) {
-                li += "<li onclick=clickstatus('" + characterStatus[i] + "','" + option +"')>" + characterStatus[i] + "</li>";
+                li += "<li onclick=clickstatus('" + characterStatus[i] + "','" + option + "')>" + characterStatus[i] + "</li>";
             }
 
             $('#StatusSelect').append(li);
@@ -451,20 +520,21 @@
         $('#ConditionModel').modal('hide')
         $('#StatusValueModel').modal('show')
         let li = '';
-        li += "<li><label> 直接指定</label><input id='select-status-value'/><button onclick=clickstatusvalue('直接指定','" + option + "')>确定</button></li>";
-        li += "<li onclick=clickstatusvalue('随机数','" + option + "')>随机数</li>";
-        li += "<li onclick=clickstatusvalue('困难随机数','" + option + "')>困难随机数</li>";
+        li += "<li><label> 直接指定</label><input id='select-status-value' /><button onclick=clickstatusvalue('直接指定','" + option + "') > 确定</button ></li > ";
+        li += "<li onclick=clickstatusvalue('随机数','" + option + "')>随机数(1D100)</li>";
+        li += "<li onclick=clickstatusvalue('困难随机数','" + option + "')>困难随机数(1D100)</li>";
+        li += "<li onclick=clickstatusvalue('惩罚随机数','" + option + "')>惩罚随机数(1D100)</li>";
+        li += "<li onclick=clickstatusvalue('惩罚困难随机数','" + option + "')>惩罚困难随机数(1D100)</li>";
+        $('#StatusSelectValue').empty();
         $('#StatusSelectValue').append(li);
     }
-
-
     function addstatus(startmodel) {
+        $('#EffectModel').modal('hide')
+        $('#ConditionModel').modal('hide')
         $(startmodel).modal('hide')
         $('#StatusAddModel').modal('show')
     }
-
     function confidstatus() {
-
         $.post('/CreateStory/Addstatus', { storyseries: CardObj.storySeriesID, status: $('#status').val() }, function (data) {
             if (data == true) {
                 //$('#StatusModel').modal('show')
@@ -482,7 +552,7 @@
     }
 
     function clickstatusvalue(value, option) {
-        if (value = '直接指定') {
+        if (value == '直接指定') {
             value = $('#select-status-value').val();
         }
         $("#" + option).val(value)
@@ -493,13 +563,14 @@
 
     function clickstatus(name, option) {
         $("#" + option).val(name)
-        $('#ConditionModel').modal('show')
         $('#StatusSelectValue').empty();
         $('#StatusModel').modal('hide')
+        $('#ConditionModel').modal('show')
     }
 
     /////////////////////////////////end
-
+</script>
+<script>
     /////////////////////////////////效果
     let EffectCount = 0;
     //设置效果
@@ -510,7 +581,7 @@
             Effect(j, i);
             EffectCount++;
         }
-        let string = "<button onclick='AddEffect(" + i + ")'>+</button><button onclick = 'SaveEffect(" + i + ")' > 确定</button>";
+        let string = "<button onclick='AddEffect(" + i + ")'>+</button><button onclick = 'SaveEffect(" + i + ")' > 确定</button> ";
         $('#Effectoperation').append(string);
 
         $('#EffectModel').modal('show');
@@ -543,13 +614,12 @@
                 + "<option value='1'>减少</option>"
                 + "<option value='2'>赋值</option>"
                 + "<option hidden value='4'>结束</option>"
-                + "<select/>" +
-                "<input  class='effectvalue'  value='" + value + "'/>" +
+                + "<select/>"
+                + "<input readonly id='effectvalue-" + effect + '-' + storyoption + "' onclick=selecteffectvalue('effectvalue-" + effect + '-' + storyoption + "')  class='effectvalue'  value='" + value + "'/>" +
                 "<button onclick='EffectCancel(" + effect + "," + storyoption + ")'>取消</button>" +
                 "</div>"
-
         }
-        else if (type == "4") {
+        else if (type == "4") { //结束隐藏
             context =
                 "<div id='effectid" + effect + "'>" +
                 "<input class='effectname' readonly onclick=selecteffect('effect" + effect + '-' + storyoption + "') id='effect" + effect + '-' + storyoption + "' value='" + name + "'/>" +
@@ -565,13 +635,35 @@
         }
         $("#effectidselect" + effect).val(type)
         $('#Effect').append(context)
+        $("#effectid" + effect +" option[value='" + type + "' ]").attr("selected", true);
+    }
 
-        $("#Effect option[value='"+ type +"']").attr("selected", true);
+    //选择效果状态类型
+    function selecteffectvalue(option) {
+        $('#EffectModel').modal('hide')
+        $('#effectValueModel').modal('show')
+        let li = '';
+        li += "<li><label> 直接指定</label > <input id='select-effect-value' /> <button onclick=clickeffectvalue('直接指定','" + option + "') > 确定</button ></li > ";
+        li += "<li onclick=clickeffectvalue('1D3','" + option + "')>随机数(1D3)</li>";
+        li += "<li onclick=clickeffectvalue('1D6','" + option + "')>随机数(1D6)</li>";
+        li += "<li onclick=clickeffectvalue('1D12','" + option + "')>随机数(1D12)</li>";
+        $('#effectSelectValue').empty();
+        $('#effectSelectValue').append(li);
+    }
+
+    function clickeffectvalue(value, option) {
+        if (value == '直接指定') {
+            value = $('#select-effect-value').val();
+        }
+        $("#" + option).val(value)
+        $('#EffectModel').modal('show')
+        $('#effectSelectValue').empty();
+        $('#effectValueModel').modal('hide')
     }
 
     //选择效果状态
     function selecteffect(option) {
-        $('#EffectModel').modal('hide')
+        //$('#EffectModel').modal('hide')
         $('#statusSelect').empty();
         $('#characterSelect').empty();
         $('#itemSelect').empty();
@@ -583,40 +675,34 @@
 
             let li = '';
             for (let i in data) {
-                li += "<li onclick=clickEffect('" + data[i].name + "','" + option + "')>" + data[i].name + "</li>";
-
+                li += "<li onclick = clickEffect('" + data[i].name + "','" + option + "') > " + data[i].name + "</li > ";
             }
             $('#statusSelect').append(li);
         })
-
         $.post("/CreateStory/getItem", { StorySeriesID: CardObj.storySeriesID }, function (data) {
             let li = '';
 
             for (let i in data) {
                 li += "<li onclick=clickEffect('" + data[i].name + "','" + option + "')>" + data[i].name + "</li>";
-
             }
             $('#itemSelect').append(li);
         });
         let li = '';
         for (let i in characterStatus) {
             li += "<li onclick=clickEffect('" + characterStatus[i] + "','" + option + "')>" + characterStatus[i] + "</li>";
-
         }
         $('#characterSelect').append(li);
-
         let operation = "<li onclick=clickOperation('结束故事','" + option + "','4')>结束故事</li>";
         $('#operationSelect').empty()
         $('#operationSelect').append(operation);
     }
-
     function clickEffect(name, option) {
         $("#" + option).val(name)
-        $('#EffectModel').modal('show')
         $('#statusSelect').empty();
         $('#characterSelect').empty();
         $('#itemSelect').empty();
         $('#EffectSelectModel').modal('hide')
+        $('#EffectModel').modal('show')
     }
 
     //点击操作效果后
@@ -660,10 +746,6 @@
 
         $('#EffectModel').modal('hide');
     }
-    //////////////////////////////end
-
-
-
-
+        //////////////////////////////end
 </script>
 

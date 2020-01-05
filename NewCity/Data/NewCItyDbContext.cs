@@ -29,5 +29,5 @@ namespace NewCity.Data
         public DbSet<NewCity.Models.Location> Location { get; set; }
         public DbSet<NewCity.Models.CharacterStatus> CharacterStatus { get; set; }
         public DbSet<StoryCardRandom> StoryCardRandom { get; set; }
-}
+    }
 }

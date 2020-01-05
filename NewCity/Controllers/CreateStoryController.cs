@@ -1,8 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
+using System.IO;
 using System.Linq;
 using System.Runtime.Serialization.Formatters.Binary;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -19,6 +22,9 @@ namespace NewCity.Controllers
             : base(SignInManager, UserManager, context)
         {
         }
+
+        [BindProperty]
+        public FileUploadDb FileUpload { get; set; }
 
         /// <summary>
         /// 根据故事卡片Id返回
@@ -61,8 +67,9 @@ namespace NewCity.Controllers
                     ViewBag.LastCard = card;
                 }
                 _context.SaveChanges();
-                List<StoryCard> storyCards = _context.StoryCard.AsNoTracking().Where(a => a.StorySeriesID == Guid.Parse(id)).Include(a => a.StoryOptions).ToList();
-                return View(storyCards);
+                //List<StoryCard> storyCards = _context.StoryCard.AsNoTracking().Where(a => a.StorySeriesID == Guid.Parse(id)).Include(a => a.StoryOptions).ToList();
+                //return View(storyCards);
+                return View();
             }
             catch
             {
@@ -94,7 +101,6 @@ namespace NewCity.Controllers
                     StorySeriesID = temp.StorySeriesID,
                     StoryName = temp.StoryName,
                     Text = temp.Text,
-                    IMG = temp.IMG,
                     BackgroundIMG = temp.BackgroundIMG,
                     IsHead = temp.IsHead,
                     StoryOptions = temp.StoryOptions,
@@ -201,23 +207,59 @@ namespace NewCity.Controllers
             }
         }
 
+      
         /// <summary>
         /// 保存故事卡
         /// </summary>
         /// <returns></returns>
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Save(string json)
+        public async Task<IActionResult> Save(string json, IFormFile file)
         {
+            
             if (!string.IsNullOrEmpty(json))
             {
+                string IMG = string.Empty;
+                //图片上传
+                if (file != null)
+                {
+                    using (var ms = new MemoryStream())
+                    {
+                        switch (file.ContentType)
+                        {
+                            case "image/png":
+                                IMG = "data:image/png;base64,";
+                                break;
+                            case "image/jpeg":
+                                IMG = "data:image/jpeg;base64,";
+                                break;
+                            default:
+                                ModelState.AddModelError("File", "只支持png、jpeg格式");
+                                break;
+                        }
+
+                        if(IMG != string.Empty)
+                        {
+                            file.CopyTo(ms);
+                            var fileBytes = ms.ToArray();
+                            IMG += Convert.ToBase64String(fileBytes);
+                            if (IMG.Length > 2097152)
+                            {
+                                IMG = string.Empty;
+                                ModelState.AddModelError("File", "图片请保持在2MB以内.");
+                            }
+                        }
+                        
+                    }
+                }
+
+
                 StoryCard card = JsonConvert.DeserializeObject<StoryCard>(json);
                 StoryCard storyCard = _context.StoryCard.Include(a => a.StoryOptions).FirstOrDefault(a=>a.ID == card.ID);
                 storyCard.Title = card.Title;
-                storyCard.Text = card.Text;
-                storyCard.IMG = card.IMG;
+                storyCard.IMG = IMG;
+                storyCard.Text = replaceText(card.Text);
                 storyCard.BackgroundIMG = card.BackgroundIMG;
-                //storyCard.StoryOptions = card.StoryOptions;
 
                 _context.StoryOption.RemoveRange(storyCard.StoryOptions); 
 
@@ -236,10 +278,16 @@ namespace NewCity.Controllers
                 }
 
                 await _context.SaveChangesAsync();
-                //return Index(card.StorySeriesID.ToString());
+
                 return RedirectToAction(nameof(Index),new { id = card.StorySeriesID.ToString() });
             }
             return NotFound();
+        }
+
+        private string replaceText(string text) {
+            text = text.Replace("<scrpit", "<p");
+            text = text.Replace("</scrpit>", "</p>");
+            return text;
         }
 
         /// <summary>
@@ -606,6 +654,11 @@ namespace NewCity.Controllers
         }
     }
 
+    public class FileUploadDb
+    {
+        [Required]
+        public IFormFile FormFile { get; set; }
+    }
 }
 
         

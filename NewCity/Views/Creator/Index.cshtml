@@ -67,6 +67,20 @@
     </div>
 </div>
 
+<div class="modal fade" id="Integrity" >
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+                <h4 class="modal-title" id="myModalLabel">完整性检查</h4>
+            </div>
+            <div class="modal-body" id="IntegrityList">
+                
+            </div>
+        </div>
+    </div>
+</div>
+
 <script>
     function reload() {
         window.location.reload();
@@ -82,7 +96,16 @@
     }
     function Active(id) {
         $.post("/Creator/Active", { id: id }, function (data) {
-            window.location.reload();
+            if (data == true) {
+                window.location.reload();
+            }
+            else if (data == false) {
+                alert("处理中出现问题！")
+            }
+            else {
+                $('#IntegrityList').append("<p><strong>以下故事卡片未通过完整性检验：</strong></p>" + data + "<p><b>请完善该卡片的后续。</b></p>")
+                $('#Integrity').modal('show')
+            }
         })
     }
     function AntiActive(id) {

@@ -24,6 +24,9 @@
     .cardID{
         font-size:5px;
     }
+    footer {
+        display: none;
+    }
 </style>
 <script src="~/js/enum.js"></script>
 <script src="~/js/jsplumb.min.js"></script>
@@ -41,8 +44,7 @@
         for (let i in StoryCards) {
             for (let j in StoryCards[i].storyCard) {
                 for (let t in StoryCards[i].storyCard[j].fatherStoryCardId) {
-                    debugger
-                    
+ 
                     jsPlumb.connect({
                         source: StoryCards[i].storyCard[j].fatherStoryCardId[t],
                         target: StoryCards[i].storyCard[j].storyCard.id,
@@ -99,7 +101,7 @@
         else {
             var msg = "您真的确定要删除吗？\n\n请确认！";
             if (confirm(msg) == true) {
-                debugger
+
                 $.post('/CreateStory/DeleteCard', { cardid: selectcard }, function (data) {
                     if (data != 'false') location.reload()
                 })
@@ -182,7 +184,7 @@
         $('#ItemModel').modal('hide');
         $('#ItemDetailModel').modal('show')
         $.post('/CreateStory/getitemstatus', { itemID: itemID }, function (data) {
-            debugger;
+
             $('#itemID').val(data.id)
             $('#itemname').val(data.name)
             $('#itemdetail').val(data.introduction)
@@ -306,7 +308,7 @@
                     @foreach (StoryStatus s in ListStatus)
                     {
                         <li id="@s.ID">
-                            <p>@s.Name</p>
+                            @s.Name
                             <button onclick="statusedit('@s.ID')">编辑</button>
                             <button onclick="statusremove('@s.ID')">删除</button>
                         </li>

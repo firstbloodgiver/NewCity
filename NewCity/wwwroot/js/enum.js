@@ -14,4 +14,4 @@ function guid() {
 }
 
 //角色状态   行动力 幸运 速度 力量 智力 社会经验 社会地位 善恶值
-var characterStatus = ["ActionPoints", "Lucky", "Speed", "Strength", "Intelligence", "Experience", "Status", "Moral"] 
+var characterStatus = ["Healthy","Sanity","ActionPoints", "Lucky", "Speed", "Strength", "Intelligence", "Experience", "Status", "Moral"] 

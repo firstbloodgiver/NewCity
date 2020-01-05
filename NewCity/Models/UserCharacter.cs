@@ -31,6 +31,26 @@ namespace NewCity.Models
         //////////////////////////////////////////基础能力////////////////////////////////////////////////////////
         
         /// <summary>
+        /// 健康最大值
+        /// </summary>
+        public float MaxHealthy { get; set; }
+
+        /// <summary>
+        /// 健康程度
+        /// </summary>
+        public float Healthy { get; set; }
+
+        /// <summary>
+        /// 神智最大值
+        /// </summary>
+        public float MaxSanity { get; set; }
+
+        /// <summary>
+        /// 神智程度
+        /// </summary>
+        public float Sanity { get; set; }
+
+        /// <summary>
         /// 行动力
         /// 可以进行多少消耗精力的工作
         /// </summary>

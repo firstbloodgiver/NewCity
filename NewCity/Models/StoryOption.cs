@@ -21,5 +21,10 @@ namespace NewCity.Models
         /// 选项点击后效果
         /// </summary>
         public string Effect { get; set; }
+
+        /// <summary>
+        /// 隐藏（不操作，只用作页面逻辑处理）
+        /// </summary>
+        public bool hidden { get; set; } = false;
     }
 }
