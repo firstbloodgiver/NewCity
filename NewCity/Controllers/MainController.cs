@@ -222,6 +222,7 @@ namespace NewCity.Controllers
             {
                 HadAdd = true;
             }
+            ViewBag.Author = _context.Users.AsNoTracking().Where(a => a.Id == storySeries.Author.ToString()).First().UserName;
             ViewBag.HadAdd = HadAdd;
             if (storySeries.Status == enumStoryStatus.测试)
             {
@@ -284,6 +285,11 @@ namespace NewCity.Controllers
                     if (!string.IsNullOrWhiteSpace(opti.Effect))
                     {
                         List<Istatus> storyStatuses = JsonConvert.DeserializeObject<List<Istatus>>(opti.Effect);
+
+                        //人物属性
+                        UserSchedule schedule = _context.UserSchedule.AsNoTracking().Where(a => a.UserID == GetUserId() && a.StorySeriesID == Schedule.StorySeriesID).First();
+                        UserCharacter character = _context.UserCharacter.Where(a => a.ID == schedule.CharacterID).FirstOrDefault();
+
                         foreach (var obj in storyStatuses)
                         {
                             //操作
@@ -291,11 +297,15 @@ namespace NewCity.Controllers
                             {
                                 return result = Json(GameOver(Schedule.StorySeriesID));
                             }
-                            //人物属性
-                            UserSchedule schedule = _context.UserSchedule.AsNoTracking().Where(a => a.UserID == GetUserId() && a.StorySeriesID == Schedule.StorySeriesID).First();
-                            UserCharacter character = _context.UserCharacter.Where(a => a.ID == schedule.CharacterID).FirstOrDefault();
+                            
                             switch (obj.Name)
                             {
+                                case ("MaxHealthy"):
+                                    character.MaxHealthy = ExeCharacterEffect(character.MaxHealthy, obj.Value, obj.Type);
+                                    break;
+                                case ("MaxSanity"):
+                                    character.MaxSanity = ExeCharacterEffect(character.MaxSanity, obj.Value, obj.Type);
+                                    break;
                                 case ("Healthy"):
                                     character.Healthy = ExeCharacterEffect(character.Healthy, obj.Value, obj.Type);
                                     if (character.Healthy > character.MaxHealthy)
@@ -342,9 +352,9 @@ namespace NewCity.Controllers
                                     storystatu(userid, storycard, obj);
                                     break;
                             }
-                            _context.SaveChanges();
+                           
                         }
-
+                        _context.SaveChanges();
                     }
                     #endregion
 
@@ -494,14 +504,16 @@ namespace NewCity.Controllers
             {
                 var status = new
                 {
-                    行动力 = state.ActionPoints,
+                    //行动力 = state.ActionPoints,
+                    健康 = state.Healthy + "/" +state.MaxHealthy,
+                    理智 = state.Sanity + "/" + state.MaxSanity,
                     敏捷 = state.Speed,
                     力量 = state.Strength,
-                    智力 = state.Intelligence,
-                    幸运 = state.Lucky,
-                    社会经验 = state.Experience,
-                    地位 = state.Status,
-                    道德 = state.Moral,
+                    智力 = state.Intelligence
+                    //,幸运 = state.Lucky,
+                    //社会经验 = state.Experience,
+                    //地位 = state.Status,
+                    //道德 = state.Moral,
                 };
                 return JsonConvert.SerializeObject(status);
             }
@@ -691,11 +703,17 @@ namespace NewCity.Controllers
                             string charactervalue = string.Empty;
                             switch (status.Name)
                             {
+                                case ("Healthy"):
+                                    charactervalue = _context.UserCharacter.AsNoTracking().Where(a => a.ID == schedule.CharacterID).First().Healthy.ToString();
+                                    break;
+                                case ("Sanity"):
+                                    charactervalue = _context.UserCharacter.AsNoTracking().Where(a => a.ID == schedule.CharacterID).First().Sanity.ToString();
+                                    break;
                                 case ("ActionPoints"):
                                     charactervalue = _context.UserCharacter.AsNoTracking().Where(a => a.ID == schedule.CharacterID).First().ActionPoints.ToString();
                                     break;
                                 case ("Lucky"):
-                                    if(Convert.ToInt32(status.Value) == 100) //选项需要幸运为100时，为隐藏卡片，默认通过但隐藏
+                                    if(status.Value == "100") //选项需要幸运为100时，为隐藏卡片，默认通过但隐藏
                                     {
                                         option.hidden = true;
                                         return true;
@@ -721,8 +739,17 @@ namespace NewCity.Controllers
                                     charactervalue = _context.UserCharacter.AsNoTracking().Where(a => a.ID == schedule.CharacterID).First().Moral.ToString();
                                     break;
                                 default:
-                                    return false;
-
+                                    CharacterStatus newcharacterStatus = new CharacterStatus() {
+                                        UserID = GetUserId(),
+                                        ID = Guid.NewGuid(),
+                                        StorySeries = StorySeriesID,
+                                        Name = status.Name,
+                                        Value = "-1"
+                                    };
+                                    charactervalue = newcharacterStatus.Value;
+                                    _context.CharacterStatus.Add(newcharacterStatus);
+                                    _context.SaveChanges();
+                                    break;
                             }
                             CharacterStatus characterstatus = new CharacterStatus()
                             {
@@ -775,7 +802,7 @@ namespace NewCity.Controllers
                                     result = dbstatus != statues ? true : false;
                                     break;
                             }
-                            if (result == false) return false;
+                            return result;
                         }
                     }
                     return true;
@@ -787,7 +814,7 @@ namespace NewCity.Controllers
             }
             catch (Exception ex)
             {
-                return true;
+                return false;
             }
         }
 

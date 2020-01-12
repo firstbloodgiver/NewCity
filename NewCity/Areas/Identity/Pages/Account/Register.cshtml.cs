@@ -9,6 +9,8 @@ using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.Extensions.Logging;
+using NewCity.Data;
+using NewCity.Models;
 
 namespace NewCity.Areas.Identity.Pages.Account
 {
@@ -19,17 +21,20 @@ namespace NewCity.Areas.Identity.Pages.Account
         private readonly UserManager<IdentityUser> _userManager;
         private readonly ILogger<RegisterModel> _logger;
         private readonly IEmailSender _emailSender;
+        private readonly NewCityDbContext _context;
 
         public RegisterModel(
             UserManager<IdentityUser> userManager,
             SignInManager<IdentityUser> signInManager,
             ILogger<RegisterModel> logger,
-            IEmailSender emailSender)
+            IEmailSender emailSender,
+            NewCityDbContext context)
         {
             _userManager = userManager;
             _signInManager = signInManager;
             _logger = logger;
             _emailSender = emailSender;
+            _context = context;
         }
 
         [BindProperty]
@@ -54,6 +59,8 @@ namespace NewCity.Areas.Identity.Pages.Account
             [Display(Name = "Confirm password")]
             [Compare("Password", ErrorMessage = "The password and confirmation password do not match.")]
             public string ConfirmPassword { get; set; }
+
+            public string type { get; set; }
         }
 
         public void OnGet(string returnUrl = null)
@@ -83,6 +90,18 @@ namespace NewCity.Areas.Identity.Pages.Account
                         $"Please confirm your account by <a href='{HtmlEncoder.Default.Encode(callbackUrl)}'>clicking here</a>.");
 
                     await _signInManager.SignInAsync(user, isPersistent: false);
+
+                    if(Input.type == "creator")
+                    {
+                        Creator creator = new Creator() {
+                            ID = Guid.NewGuid(),
+                            UserID = Guid.Parse(user.Id),
+                            CreationTime = DateTime.Now
+                        };
+                        _context.Creator.Add(creator);
+                        await _context.SaveChangesAsync();
+                    }
+
                     return LocalRedirect(returnUrl);
                 }
                 foreach (var error in result.Errors)

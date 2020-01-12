@@ -195,6 +195,10 @@
                 CleanContent();
                 AddContent(result.text, result.img);
                 AddOption(result.storyOptions)
+                GetState();
+                GetItem();
+                GetSchedule();
+                GetHistory();
             }
         )
     }
@@ -219,7 +223,6 @@
 
     //设置主界面高度
     function SetHeight() {
-        debugger;
         let contentheight = $("#content").height();
         let windowheight = window.innerHeight * 2 - window.outerHeight;
         let h = contentheight > windowheight ? contentheight : windowheight;
@@ -239,7 +242,6 @@
     //获取人物背包
     function GetItem(StorySeriesID) {
         $.get('/Main/GetItem', {StorySeriesID:StorySeriesID}, function (data) {
-            debugger;
             let jsonObj = JSON.parse(data);
             let html = '';
             for (let i in jsonObj) {
@@ -286,8 +288,10 @@
     }
 
 
-    //创建Json的行
+    //人物创建Json的行
     function LoadRow(json, traget) {
+        debugger
+        $("#" + traget).empty();
         let jsonObj = JSON.parse(json);
         let html = '';
         for (let i in jsonObj) {
