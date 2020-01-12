@@ -21,7 +21,8 @@ namespace NewCity.Enum
         测试 = 0,
         结束 = 1,
         进行中 = 2,
-        隐藏 = 3
+        隐藏 = 3,
+        审批中 = 4,
     }
 
     public enum enumCharacterType { 作家 = 1 };

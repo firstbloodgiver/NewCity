@@ -59,12 +59,17 @@ namespace NewCity.Controllers
             Guid userid = GetUserId();
             if (userid != Guid.Empty)
             {
+                var reviewer = _context.Reviewer.AsNoTracking().Where(a=>a.UserID == userid).FirstOrDefault();
                 var creator = _context.Creator.AsNoTracking().Where(a => a.UserID == userid).FirstOrDefault();
                 if (creator != null)
                 {
                     return RedirectToAction("Index", "Creator");
                 }
-                else
+                else if(reviewer != null)
+                {
+                    return RedirectToAction("Review", "Review");
+                }
+                else 
                 {
                     return RedirectToAction("StorySelect", "Main");
                 }

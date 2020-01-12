@@ -66,7 +66,7 @@ namespace NewCity.Controllers
             var storySeries = await _context.StorySeries.FirstOrDefaultAsync(m => m.ID == Guid.Parse(id));
             if (storySeries.Author == GetUserId() && Integrity(storySeries.ID).Count() == 0)
             {
-                storySeries.Status = Enum.enumStoryStatus.进行中;
+                storySeries.Status = Enum.enumStoryStatus.审批中;
                 await _context.SaveChangesAsync();
                 return Json(true);
             }

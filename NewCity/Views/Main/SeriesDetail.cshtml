@@ -4,12 +4,10 @@
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 @model StorySeries;
-
-
 <h2>详情<button class="btn btn-primary" style="float:right" onclick="ToList()">返回</button></h2>
 <hr />
 
-<div class="container">
+<div id="content" class="container">
     <h1>@Model.SeriesName</h1>
     <p>作者：@ViewBag.Author</p>
     <div class="col-md-8"><p>@Model.Text</p></div>

@@ -1,0 +1,81 @@
+﻿
+@{
+    ViewData["Title"] = "Review";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@model NewCity.Models.StorySeries
+@{
+    List<StorySeries> storySeries = ViewBag.storySeries as List<StorySeries>;
+}
+<h2>详情</h2>
+<hr />
+<div class="container">
+    <div class="row">
+        @if (storySeries.Count != 0)
+        {
+            @foreach (var item in storySeries)
+            {
+
+                <div class="unitcell col-md-4">
+                    <div>
+                        <h1>@item.SeriesName</h1>
+                    </div>
+                    <div>
+                        @item.Text
+                    </div>
+                    <a class="btn btn-primary" asp-controller="CreateStory" asp-action="FlowChart" asp-route-id="@item.ID">流程图</a>
+                    <a class="btn btn-primary" onclick="Active('@item.ID')">通过</a>
+                    <a class="btn btn-primary" onclick="AntiModel('@item.ID')">退回</a>
+                </div>
+            }
+        }
+    </div>
+</div>
+
+<div class="modal fade" id="review">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+                <h4 class="modal-title" id="myModalLabel">原因</h4>
+            </div>
+            <div class="modal-body">
+                <textarea id="reviewContent"></textarea>
+                <p></p>
+                <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+                <button type="button" onclick="AntiActive()" class="btn btn-primary">确定</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    function Active(id) {
+        $.post("/Review/Active", { id: id }, function (data) {
+            if (data == true) {
+                window.location.reload();
+            }
+            else if (data == false) {
+                alert("处理中出现问题！")
+            }
+        })
+    }
+
+    var SeriesID
+    function AntiModel(id) {
+        SeriesID = id;
+        $('#review').modal('show')
+    }
+
+    function AntiActive() {
+        debugger;
+        $.post("/Review/AntiActive", { id: SeriesID,content:$("#reviewContent").val() }, function (data) {
+            window.location.reload();
+        })
+    }
+
+
+</script>
+
+

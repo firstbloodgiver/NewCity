@@ -15,26 +15,37 @@
             @foreach (var item in storySeries)
             {
 
-                <div  class="unitcell col-md-4">
-                    <div>
-                        <h1>@item.SeriesName</h1>
-                    </div>
-                    <div>
-                        @item.Text
-                    </div>
-                    <a class="btn btn-primary" asp-controller="CreateStory" asp-action="FlowChart" asp-route-id="@item.ID">编辑</a>
-                    @if (item.Status == NewCity.Enum.enumStoryStatus.测试)
-                    {
-                        <a class="btn btn-primary" onclick="Active('@item.ID')">启用</a>
-                    }
-                    else
-                    {
-                        <a class="btn btn-primary" onclick="AntiActive('@item.ID')">禁用</a>
-                    }
+        <div class="unitcell col-md-4">
+            <div>
+                <h1>@item.SeriesName</h1>
+            </div>
+            <div>
+                @item.Text
+            </div>
+            @if (item.Status != NewCity.Enum.enumStoryStatus.进行中 && item.Status != NewCity.Enum.enumStoryStatus.审批中)
+            {
+                <a class="btn btn-primary" asp-controller="CreateStory" asp-action="FlowChart" asp-route-id="@item.ID">编辑</a>
 
-                    <a class="btn btn-primary" href="/Main/Main?SeriesID=@item.ID">测试</a>
-                    <a class="btn btn-primary" onclick="DeleteConfirm('@item.ID')">删除</a>
-                </div>
+            }
+            @if (item.Status == NewCity.Enum.enumStoryStatus.测试)
+            {
+                <a class="btn btn-primary" onclick="Active('@item.ID')">启用</a>
+            }
+            else if(item.Status == NewCity.Enum.enumStoryStatus.审批中)
+            {
+                <a class="btn btn-warning">审批中</a>
+            }
+            else
+            {
+            <a class="btn btn-primary" onclick="AntiActive('@item.ID')">停用</a>
+            }
+            <a class="btn btn-primary" href="/Main/Main?SeriesID=@item.ID">测试</a>
+            <a class="btn btn-primary" onclick="DeleteConfirm('@item.ID')">删除</a>
+            <p></p>
+            <div style="background-color:lemonchiffon">
+                @item.ReviewContent
+            </div>
+        </div>
             }
         }
     </div>

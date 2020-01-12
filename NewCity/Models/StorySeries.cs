@@ -40,6 +40,11 @@ namespace NewCity.Models
         /// </summary>
         public enumStoryStatus Status { get; set; }
 
+        /// <summary>
+        /// 审核意见
+        /// </summary>
+        public string ReviewContent { get; set; }
+
         public ICollection<StoryCard> StoryCards { get; set; }
     }
 }

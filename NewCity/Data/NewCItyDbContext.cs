@@ -21,6 +21,7 @@ namespace NewCity.Data
         public DbSet<NewCity.Models.UserSchedule> UserSchedule { get; set; }
         public DbSet<NewCity.Models.CreatorSchedule> CreatorSchedule { get; set; }
         public DbSet<NewCity.Models.Creator> Creator { get; set; }
+        public DbSet<NewCity.Models.Reviewer> Reviewer { get; set; }
         public DbSet<NewCity.Models.HomeNews> HomeNews { get; set; }
         public DbSet<NewCity.Models.CharacterItem> CharacterItem { get; set; }
         public DbSet<NewCity.Models.CharacterLog> CharacterLog { get; set; }
@@ -29,5 +30,7 @@ namespace NewCity.Data
         public DbSet<NewCity.Models.Location> Location { get; set; }
         public DbSet<NewCity.Models.CharacterStatus> CharacterStatus { get; set; }
         public DbSet<StoryCardRandom> StoryCardRandom { get; set; }
+
+        
     }
 }
