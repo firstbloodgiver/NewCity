@@ -32,6 +32,17 @@ namespace NewCity.Controllers
         public bool isCreator() {
             return _context.Creator.Where(a => a.UserID == Guid.Parse(GetUserId().ToString())).FirstOrDefault() != null ? true : false;
         }
+
+        public bool isCreator(Guid StorySeriesID)
+        {
+            var author = _context.StorySeries.Where(a => a.ID == StorySeriesID).First().Author;
+            return _context.Creator.Where(a => a.UserID == Guid.Parse(GetUserId().ToString()) && author == GetUserId()).FirstOrDefault() != null ? true : false;
+        }
+
+        public bool isReviewer()
+        {
+            return _context.Reviewer.Where(a => a.UserID == Guid.Parse(GetUserId().ToString())).FirstOrDefault() != null ? true : false;
+        }
         /// <summary>
         /// 获取当前用户Guid
         /// </summary>
