@@ -166,6 +166,7 @@ namespace NewCity.Controllers
                 Schedule.StoryCardID = _context.StoryCard.AsNoTracking().Where(a => a.StorySeriesID == StorySeriesID && a.IsHead == true).First().ID;
                 Schedule.ScheduleStatus = enumStoryStatus.进行中;
                 CleanStory(StorySeriesID.ToString(), GetUserId());
+                AddList(StorySeriesID.ToString());
                 _context.SaveChanges();
                 return Json(true);
             }

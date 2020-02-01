@@ -1,5 +1,4 @@
-﻿
-@{
+﻿@{
     ViewData["Title"] = "StoryDetail";
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
@@ -26,7 +25,6 @@
     function AddList() {
         let SeriesID = '@Model.ID';
         $.post("/Main/AddList", { SeriesID: SeriesID }, function (data) {
-            debugger;
             if (data == true) {
                 window.location.reload();
             }

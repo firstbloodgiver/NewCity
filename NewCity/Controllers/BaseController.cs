@@ -25,7 +25,6 @@ namespace NewCity.Controllers
             _SignInManager = SignInManager;
             _userManager = UserManager;
             _context = context;
-            
         }
 
 

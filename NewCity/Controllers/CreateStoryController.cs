@@ -78,6 +78,12 @@ namespace NewCity.Controllers
             
         }
 
+        public IActionResult ReviewIndex(string seriesID,string cardID)
+        {
+            ViewBag.LastCard = _context.StoryCard.AsNoTracking().Include(a => a.StoryOptions).FirstOrDefault(a => a.ID == Guid.Parse(cardID));
+            return View("Index");
+        }
+
         /// <summary>
         /// 故事卡树界面
         /// </summary>
@@ -85,55 +91,62 @@ namespace NewCity.Controllers
         List<StoryCard> storyCards = new List<StoryCard>();
         public IActionResult FlowChart(string id)
         {
-            #region 故事卡树
-            List<StoryCardTree> StoryCardTrees = new List<StoryCardTree>();
-            var obj = _context.StoryCard.AsNoTracking().Where(a => a.StorySeriesID == Guid.Parse(id)).Include(a => a.StoryOptions).ToList().OrderBy(a => a.IsHead);
-            if(obj.Count() == 0)
+            if(isCreator(Guid.Parse(id)) || isReviewer())
             {
-                return RedirectToAction(nameof(Index), new { id });
-            }
-            foreach (var temp in obj)
-            {
-                StoryCard storyCard = new StoryCard()
+                #region 故事卡树
+                List<StoryCardTree> StoryCardTrees = new List<StoryCardTree>();
+                var obj = _context.StoryCard.AsNoTracking().Where(a => a.StorySeriesID == Guid.Parse(id)).Include(a => a.StoryOptions).ToList().OrderBy(a => a.IsHead);
+                if (obj.Count() == 0)
                 {
-                    ID = temp.ID,
-                    Title = temp.Title,
-                    StorySeriesID = temp.StorySeriesID,
-                    StoryName = temp.StoryName,
-                    Text = temp.Text,
-                    BackgroundIMG = temp.BackgroundIMG,
-                    IsHead = temp.IsHead,
-                    StoryOptions = temp.StoryOptions,
-                };
-                storyCards.Add(storyCard);
-            }
-            StoryCard FirstStoryCard = storyCards.Where(a => a.IsHead == true).FirstOrDefault();
-            if (FirstStoryCard != null)
-            {
-                CreateTree(FirstStoryCard,Guid.Empty, 0);
-            }
-            var tree = storyCardTrees.OrderBy(a => a.Level).GroupBy(a => a.Level).ToList();
-            List<StoryCardTrees> Trees = new List<StoryCardTrees>();
-            foreach (var i in tree)
-            {
-                StoryCardTrees cardTrees = new StoryCardTrees()
+                    return RedirectToAction(nameof(Index), new { id });
+                }
+                foreach (var temp in obj)
                 {
-                    StoryCard = storyCardTrees.Where(a => a.Level == i.Key).ToList(),
-                    Level = i.Key
-                };
+                    StoryCard storyCard = new StoryCard()
+                    {
+                        ID = temp.ID,
+                        Title = temp.Title,
+                        StorySeriesID = temp.StorySeriesID,
+                        StoryName = temp.StoryName,
+                        Text = temp.Text,
+                        BackgroundIMG = temp.BackgroundIMG,
+                        IsHead = temp.IsHead,
+                        StoryOptions = temp.StoryOptions,
+                    };
+                    storyCards.Add(storyCard);
+                }
+                StoryCard FirstStoryCard = storyCards.Where(a => a.IsHead == true).FirstOrDefault();
+                if (FirstStoryCard != null)
+                {
+                    CreateTree(FirstStoryCard, Guid.Empty, 0);
+                }
+                var tree = storyCardTrees.OrderBy(a => a.Level).GroupBy(a => a.Level).ToList();
+                List<StoryCardTrees> Trees = new List<StoryCardTrees>();
+                foreach (var i in tree)
+                {
+                    StoryCardTrees cardTrees = new StoryCardTrees()
+                    {
+                        StoryCard = storyCardTrees.Where(a => a.Level == i.Key).ToList(),
+                        Level = i.Key
+                    };
 
-                Trees.Add(cardTrees);
+                    Trees.Add(cardTrees);
+                }
+
+                ViewBag.StoryCardTree = Trees;
+                #endregion
+                #region 故事状态
+                ViewBag.StoryStatus = _context.StoryStatus.AsNoTracking().Where(a => a.StorySeries == id).ToList();
+                #endregion
+                #region 故事道具
+                ViewBag.StoryItems = _context.Item.AsNoTracking().Where(a => a.StorySeriesID == Guid.Parse(id)).ToList();
+                #endregion
+                return View();
             }
-
-            ViewBag.StoryCardTree = Trees;
-            #endregion
-            #region 故事状态
-            ViewBag.StoryStatus = _context.StoryStatus.AsNoTracking().Where(a => a.StorySeries == id).ToList();
-            #endregion
-            #region 故事道具
-            ViewBag.StoryItems = _context.Item.AsNoTracking().Where(a => a.StorySeriesID == Guid.Parse(id)).ToList();
-            #endregion
-            return View();
+            else
+            {
+                return NotFound();
+            }
         }
 
         /// <summary>
@@ -194,12 +207,17 @@ namespace NewCity.Controllers
         /// <returns></returns>
         public IActionResult GetCard(string StoryCardID,string StorySeriesID)
         {
+
             CreatorSchedule schedule = _context.CreatorSchedule.FirstOrDefault(a => a.UserID == GetUserId() && a.StorySeriesID == Guid.Parse(StorySeriesID));
             if (schedule != null)
             {
                 schedule.StoryCardID = Guid.Parse(StoryCardID);
                 _context.SaveChanges();
                 return RedirectToAction(nameof(Index), new { id = StorySeriesID });
+            }
+            else if (isReviewer())
+            {
+                return RedirectToAction("ReviewIndex", new { seriesID = StorySeriesID, cardID = StoryCardID });
             }
             else
             {
@@ -299,6 +317,7 @@ namespace NewCity.Controllers
             Guid nextCardId;
             try
             {
+                
                 StoryOption storyOption = _context.StoryOption.FirstOrDefault(a => a.ID == Id);
                 StoryCard storyCard = _context.StoryCard.FirstOrDefault(a => a.ID == storyOption.StoryCardID);
                 if (string.IsNullOrEmpty(storyOption.NextStoryCardID.ToString()) || storyOption.NextStoryCardID == Guid.Empty)
@@ -314,6 +333,10 @@ namespace NewCity.Controllers
                     _context.StoryCard.Add(NewStoryCard);
                     nextCardId = NewStoryCard.ID;
                     storyOption.NextStoryCardID = NewStoryCard.ID;
+                }
+                else if (isReviewer())
+                {
+                    return RedirectToAction(nameof(ReviewIndex), new { seriesID = storyCard.StorySeriesID, cardID = storyOption.NextStoryCardID });
                 }
                 else
                 {

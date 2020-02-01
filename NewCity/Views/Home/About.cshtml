@@ -1,7 +1,48 @@
 ﻿@{
     ViewData["Title"] = "About";
 }
-<h2>@ViewData["Title"]</h2>
-<h3>@ViewData["Message"]</h3>
 
-<p>Use this area to provide additional information.</p>
+
+<ul id="myTab" class="nav nav-tabs">
+    <li class="active">
+        <a href="#home" data-toggle="tab">
+            玩家
+        </a>
+    </li>
+    <li><a href="#ios" data-toggle="tab">创作者</a></li>
+</ul>
+<div id="myTabContent" class="tab-content">
+    <div class="tab-pane fade in active" id="home">
+        <h1>玩家如何开始浏览故事?</h1>
+        <p>1.注册一个类型为玩家的账号</p>
+        <p>2.点击故事列表</p>
+        <p>3.点击浏览新故事</p>
+        <p>4.点击详情后加入故事到列表</p>
+        <p>5.返回故事列表开始故事</p>
+    </div>
+    <div class="tab-pane fade" id="ios">
+        <h1>创作者如何创建故事?</h1>
+        <p>1.注册一个类型为创作者的账号</p>
+        <p>2.点击故事列表</p>
+        <p>3.点击新增增加要创作的故事，并填写故事信息</p>
+        <p>4.点击编辑开始第一张故事卡片的创作</p>
+        <p>5.界面由上到下分为如下几个部分</p>
+        <p>说明部分，包括该故事卡片ID与故事标题</p>
+        <p>内容部分，首先是该故事卡片的标题与故事卡片的内容</p>
+        <p>选项部分，点击增加选项后增加选项,
+        <p>通过设置条件显示选项。</p>
+        <p>通过效果设置点击选项后的结果，</p>
+        <p>如果需要指定下一页，点击下一页详情后指定故事卡片ID，如不需要指定，直接点击‘→’跳转到下一页。</p>
+        <p>完成后点击保存。</p>
+        <p>插图选择部分</p>
+        <h1>什么是树界面?</h1>
+        <p>树界面是显示故事卡片连接的界面，双击后进入该故事卡片。</p>
+        <h1>创作者如何测试故事？</h1>
+        <p>在故事卡片处点击测试，每次测试都是从头开始的</p>
+        <h1>创作者如何发布故事？</h1>
+        <p>1.在故事列表点击启用</p>
+        <p>2.对待审核</p>
+        <p>3.未通过时显示未通过原因，通过时则显示通过时间</p>
+    </div>
+    
+</div>
