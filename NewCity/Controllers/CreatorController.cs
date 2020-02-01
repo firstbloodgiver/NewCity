@@ -83,11 +83,14 @@ namespace NewCity.Controllers
         private IEnumerable<Guid> Integrity(Guid storySeriesID)
         {
             List<Guid> cardIDs = new List<Guid>();
-
+            
             var temp = _context.StoryOption.AsNoTracking().Where(a => a.NextStoryCardID == Guid.Empty && a.Effect.Contains("结束故事") != true).ToList();
             foreach(var option in temp)
             {
-                cardIDs.Add(option.StoryCardID);
+                if(_context.StoryCard.AsNoTracking().Where(a=>a.StorySeriesID == storySeriesID && a.ID == option.StoryCardID).Count() > 0)
+                {
+                    cardIDs.Add(option.StoryCardID);
+                }
             }
             var result = cardIDs.Distinct();
             return result;
